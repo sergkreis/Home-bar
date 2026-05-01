@@ -1,0 +1,59 @@
+name: Deploy Home Bar
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VPS_HOST: 212.227.28.224
+      VPS_USER: root
+      VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Build web export
+        run: npm run build:web
+
+      - name: Configure SSH
+        run: |
+          test -n "$VPS_SSH_KEY" || (echo "Missing GitHub secret VPS_SSH_KEY" && exit 1)
+          mkdir -p ~/.ssh
+          printf "%s\n" "$VPS_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
+
+      - name: Upload static build
+        run: |
+          tar -czf home-bar-dist.tar.gz -C dist .
+          scp home-bar-dist.tar.gz "$VPS_USER@$VPS_HOST:/tmp/home-bar-dist.tar.gz"
+          scp deploy/install-static.sh "$VPS_USER@$VPS_HOST:/tmp/install-static.sh"
+          scp deploy/nginx-home-bar.conf "$VPS_USER@$VPS_HOST:/tmp/nginx-home-bar.conf"
+
+      - name: Install static build
+        run: |
+          ssh "$VPS_USER@$VPS_HOST" '
+            set -euo pipefail
+            rm -rf /tmp/home-bar-dist
+            mkdir -p /tmp/home-bar-dist
+            tar -xzf /tmp/home-bar-dist.tar.gz -C /tmp/home-bar-dist
+            bash /tmp/install-static.sh /tmp/home-bar-dist /tmp/nginx-home-bar.conf
+          '
