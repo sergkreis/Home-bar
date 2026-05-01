@@ -39,6 +39,10 @@ expo-web.log
 # typescript
 *.tsbuildinfo
 
+# Playwright
+test-results/
+playwright-report/
+
 # generated native folders
 /ios
 /android
