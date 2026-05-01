@@ -277,61 +277,65 @@ export default function App() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
-        <ScrollView style={styles.screen} contentContainerStyle={styles.onboardingContent}>
-          <View style={styles.onboardingHero}>
-            <Text style={styles.eyebrow}>Домашний бар</Text>
-            <Text style={styles.onboardingTitle}>Что есть дома?</Text>
-            <Text style={styles.subtitle}>
-              Отметь алкоголь, соки, цитрус и сиропы. Потом сразу покажем, что можно смешать сейчас.
-            </Text>
+        <View style={styles.onboardingShell}>
+          <ScrollView style={styles.screen} contentContainerStyle={styles.onboardingContent}>
+            <View style={styles.onboardingHero}>
+              <Text style={styles.eyebrow}>Домашний бар</Text>
+              <Text style={styles.onboardingTitle}>Что есть дома?</Text>
+              <Text style={styles.subtitle}>
+                Отметь алкоголь, соки, цитрус и сиропы. Потом сразу покажем, что можно смешать сейчас.
+              </Text>
 
-            <View style={styles.onboardingStats}>
-              <View style={styles.onboardingStat}>
-                <Text style={styles.summaryValue}>{selectedIngredients.length}</Text>
-                <Text style={styles.summaryLabel}>выбрано</Text>
-              </View>
-              <View style={styles.onboardingStat}>
-                <Text style={styles.summaryValue}>{allPerfectMatches.length}</Text>
-                <Text style={styles.summaryLabel}>готово</Text>
+              <View style={styles.onboardingStats}>
+                <View style={styles.onboardingStat}>
+                  <Text style={styles.summaryValue}>{selectedIngredients.length}</Text>
+                  <Text style={styles.summaryLabel}>выбрано</Text>
+                </View>
+                <View style={styles.onboardingStat}>
+                  <Text style={styles.summaryValue}>{allPerfectMatches.length}</Text>
+                  <Text style={styles.summaryLabel}>готово</Text>
+                </View>
               </View>
             </View>
-          </View>
 
-          <View style={styles.onboardingActions}>
-            <Pressable
-              accessibilityRole="button"
-              disabled={!canStartMatching}
-              onPress={startMatching}
-              style={[styles.primaryButton, !canStartMatching && styles.primaryButtonDisabled]}
+            <SectionPanel
+              title="Выбери ингредиенты"
+              hint="Начни с реальных бутылок и миксеров. Если хочешь быстро посмотреть демо, нажми «Стартовый»."
             >
-              <Text style={[styles.primaryButtonText, !canStartMatching && styles.primaryButtonTextDisabled]}>
-                Подобрать коктейли
-              </Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              disabled
-              style={[styles.registerButton, styles.registerButtonDisabled]}
-            >
-              <Text style={styles.registerButtonText}>Зарегистрироваться</Text>
-            </Pressable>
-            <Text style={styles.onboardingHint}>Регистрация появится позже: личный бар и синхронизация.</Text>
-          </View>
+              <IngredientPicker
+                ingredients={ingredients}
+                ingredientGroups={ingredientGroups}
+                selectedIngredients={selectedIngredients}
+                onToggleIngredient={toggleIngredient}
+                onClear={clearBar}
+                onReset={resetStarterBar}
+              />
+            </SectionPanel>
+          </ScrollView>
 
-          <SectionPanel
-            title="Выбери ингредиенты"
-            hint="Начни с реальных бутылок и миксеров. Если хочешь быстро посмотреть демо, нажми «Стартовый»."
-          >
-            <IngredientPicker
-              ingredients={ingredients}
-              ingredientGroups={ingredientGroups}
-              selectedIngredients={selectedIngredients}
-              onToggleIngredient={toggleIngredient}
-              onClear={clearBar}
-              onReset={resetStarterBar}
-            />
-          </SectionPanel>
-        </ScrollView>
+          <View style={styles.onboardingDock}>
+            <View style={styles.onboardingActions}>
+              <Pressable
+                accessibilityRole="button"
+                disabled={!canStartMatching}
+                onPress={startMatching}
+                style={[styles.primaryButton, !canStartMatching && styles.primaryButtonDisabled]}
+              >
+                <Text style={[styles.primaryButtonText, !canStartMatching && styles.primaryButtonTextDisabled]}>
+                  Подобрать коктейли
+                </Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                disabled
+                style={[styles.registerButton, styles.registerButtonDisabled]}
+              >
+                <Text style={styles.registerButtonText}>Зарегистрироваться</Text>
+              </Pressable>
+              <Text style={styles.onboardingHint}>Регистрация появится позже: личный бар и синхронизация.</Text>
+            </View>
+          </View>
+        </View>
       </SafeAreaView>
     );
   }
@@ -536,9 +540,12 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     gap: 12,
   },
+  onboardingShell: {
+    flex: 1,
+  },
   onboardingContent: {
     padding: 12,
-    paddingBottom: 40,
+    paddingBottom: 190,
     gap: 12,
   },
   onboardingHero: {
@@ -570,6 +577,18 @@ const styles = StyleSheet.create({
   },
   onboardingActions: {
     gap: 8,
+  },
+  onboardingDock: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#101318",
+    borderTopWidth: 1,
+    borderTopColor: "#303846",
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
   },
   primaryButton: {
     minHeight: 52,
