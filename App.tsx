@@ -156,8 +156,14 @@ export default function App() {
   const almostReady = rankedCocktails.filter(
     (cocktail) => cocktail.missingIngredients.length > 0 && cocktail.missingIngredients.length <= 2,
   );
-  const shoppingSuggestions = buildShoppingSuggestions(allRankedCocktails, ingredients);
-  const tonightHeadline = buildTonightHeadline(allRankedCocktails, selectedIngredients, ingredients);
+  const shoppingSuggestions = useMemo(
+    () => buildShoppingSuggestions(allRankedCocktails, ingredients),
+    [allRankedCocktails],
+  );
+  const tonightHeadline = useMemo(
+    () => buildTonightHeadline(allRankedCocktails, selectedIngredients, ingredients),
+    [allRankedCocktails, selectedIngredients],
+  );
 
   const toggleIngredient = (ingredientId: string) => {
     setSelectedIngredients((current) =>
@@ -194,6 +200,19 @@ export default function App() {
     setSelectedCocktail(null);
     setHasEnteredApp(true);
   };
+
+  if (!hasLoadedSavedBar) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <View style={styles.loadingScreen}>
+          <Text style={styles.eyebrow}>Домашний бар</Text>
+          <Text style={styles.loadingTitle}>Загружаем твой бар</Text>
+          <Text style={styles.loadingText}>Проверяем сохраненные ингредиенты на этом устройстве.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (selectedCocktail) {
     return (
@@ -255,7 +274,9 @@ export default function App() {
           <SectionPanel title="Как приготовить" hint={`Бокал: ${selectedCocktail.glassName}`}>
             {selectedCocktail.steps.map((step, index) => (
               <View key={`${selectedCocktail.id}-${index}`} style={styles.stepRow}>
-                <Text style={styles.stepIndex}>{index + 1}</Text>
+                <View style={styles.stepIndexWrap}>
+                  <Text style={styles.stepIndexText}>{index + 1}</Text>
+                </View>
                 <Text style={styles.stepText}>{step}</Text>
               </View>
             ))}
@@ -317,6 +338,7 @@ export default function App() {
             <View style={styles.onboardingActions}>
               <Pressable
                 accessibilityRole="button"
+                accessibilityState={{ disabled: !canStartMatching }}
                 disabled={!canStartMatching}
                 onPress={startMatching}
                 style={[styles.primaryButton, !canStartMatching && styles.primaryButtonDisabled]}
@@ -327,6 +349,7 @@ export default function App() {
               </Pressable>
               <Pressable
                 accessibilityRole="button"
+                accessibilityState={{ disabled: true }}
                 disabled
                 style={[styles.registerButton, styles.registerButtonDisabled]}
               >
@@ -379,6 +402,7 @@ export default function App() {
                 <View style={styles.primaryActions}>
                   {tonightQuickList.map((mode) => (
                     <Pressable
+                      accessibilityLabel={`${mode.title}: ${mode.matches.length} коктейлей`}
                       accessibilityRole="button"
                       key={mode.id}
                       onPress={() => applyQuickMode(mode.taste)}
@@ -539,6 +563,23 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingBottom: 40,
     gap: 12,
+  },
+  loadingScreen: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+    gap: 8,
+  },
+  loadingTitle: {
+    color: "#f8fafc",
+    fontSize: 26,
+    fontWeight: "900",
+    lineHeight: 31,
+  },
+  loadingText: {
+    color: "#b7c2d3",
+    fontSize: 14,
+    lineHeight: 20,
   },
   onboardingShell: {
     flex: 1,
@@ -961,17 +1002,19 @@ const styles = StyleSheet.create({
     gap: 12,
     alignItems: "flex-start",
   },
-  stepIndex: {
+  stepIndexWrap: {
     width: 28,
     height: 28,
     borderRadius: 8,
-    textAlign: "center",
-    textAlignVertical: "center",
     backgroundColor: "#52c4c8",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  stepIndexText: {
     color: "#102124",
     fontSize: 14,
     fontWeight: "900",
-    overflow: "hidden",
   },
   stepText: {
     flex: 1,
