@@ -73,10 +73,11 @@ function getIngredientName(ingredientId: string) {
 }
 
 export default function App() {
-  const [selectedIngredients, setSelectedIngredients] = useState<string[]>(starterIngredients);
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [activeTaste, setActiveTaste] = useState<TasteTag | null>(null);
   const [activeTab, setActiveTab] = useState<AppTab>("today");
   const [selectedCocktail, setSelectedCocktail] = useState<RankedCocktail | null>(null);
+  const [hasEnteredApp, setHasEnteredApp] = useState(false);
   const [hasLoadedSavedBar, setHasLoadedSavedBar] = useState(false);
 
   useEffect(() => {
@@ -151,6 +152,7 @@ export default function App() {
   );
 
   const perfectMatches = rankedCocktails.filter((cocktail) => cocktail.missingIngredients.length === 0);
+  const allPerfectMatches = allRankedCocktails.filter((cocktail) => cocktail.missingIngredients.length === 0);
   const almostReady = rankedCocktails.filter(
     (cocktail) => cocktail.missingIngredients.length > 0 && cocktail.missingIngredients.length <= 2,
   );
@@ -180,6 +182,17 @@ export default function App() {
 
   const clearBar = () => {
     setSelectedIngredients([]);
+  };
+
+  const startMatching = () => {
+    if (selectedIngredients.length === 0) {
+      return;
+    }
+
+    setActiveTaste(null);
+    setActiveTab("today");
+    setSelectedCocktail(null);
+    setHasEnteredApp(true);
   };
 
   if (selectedCocktail) {
@@ -252,6 +265,71 @@ export default function App() {
                 <Text style={styles.calloutText}>{selectedCocktail.garnish}</Text>
               </View>
             ) : null}
+          </SectionPanel>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  if (!hasEnteredApp) {
+    const canStartMatching = selectedIngredients.length > 0;
+
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <ScrollView style={styles.screen} contentContainerStyle={styles.onboardingContent}>
+          <View style={styles.onboardingHero}>
+            <Text style={styles.eyebrow}>Домашний бар</Text>
+            <Text style={styles.onboardingTitle}>Что есть дома?</Text>
+            <Text style={styles.subtitle}>
+              Отметь алкоголь, соки, цитрус и сиропы. Потом сразу покажем, что можно смешать сейчас.
+            </Text>
+
+            <View style={styles.onboardingStats}>
+              <View style={styles.onboardingStat}>
+                <Text style={styles.summaryValue}>{selectedIngredients.length}</Text>
+                <Text style={styles.summaryLabel}>выбрано</Text>
+              </View>
+              <View style={styles.onboardingStat}>
+                <Text style={styles.summaryValue}>{allPerfectMatches.length}</Text>
+                <Text style={styles.summaryLabel}>готово</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.onboardingActions}>
+            <Pressable
+              accessibilityRole="button"
+              disabled={!canStartMatching}
+              onPress={startMatching}
+              style={[styles.primaryButton, !canStartMatching && styles.primaryButtonDisabled]}
+            >
+              <Text style={[styles.primaryButtonText, !canStartMatching && styles.primaryButtonTextDisabled]}>
+                Подобрать коктейли
+              </Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              disabled
+              style={[styles.registerButton, styles.registerButtonDisabled]}
+            >
+              <Text style={styles.registerButtonText}>Зарегистрироваться</Text>
+            </Pressable>
+            <Text style={styles.onboardingHint}>Регистрация появится позже: личный бар и синхронизация.</Text>
+          </View>
+
+          <SectionPanel
+            title="Выбери ингредиенты"
+            hint="Начни с реальных бутылок и миксеров. Если хочешь быстро посмотреть демо, нажми «Стартовый»."
+          >
+            <IngredientPicker
+              ingredients={ingredients}
+              ingredientGroups={ingredientGroups}
+              selectedIngredients={selectedIngredients}
+              onToggleIngredient={toggleIngredient}
+              onClear={clearBar}
+              onReset={resetStarterBar}
+            />
           </SectionPanel>
         </ScrollView>
       </SafeAreaView>
@@ -457,6 +535,88 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingBottom: 40,
     gap: 12,
+  },
+  onboardingContent: {
+    padding: 12,
+    paddingBottom: 40,
+    gap: 12,
+  },
+  onboardingHero: {
+    backgroundColor: "#1a1f27",
+    borderRadius: 8,
+    padding: 14,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: "#252d38",
+  },
+  onboardingTitle: {
+    color: "#f8fafc",
+    fontSize: 30,
+    fontWeight: "900",
+    lineHeight: 34,
+  },
+  onboardingStats: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  onboardingStat: {
+    flex: 1,
+    backgroundColor: "#121821",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#2b3441",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  onboardingActions: {
+    gap: 8,
+  },
+  primaryButton: {
+    minHeight: 52,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f4b860",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  primaryButtonDisabled: {
+    backgroundColor: "#303846",
+  },
+  primaryButtonText: {
+    color: "#151922",
+    fontSize: 16,
+    fontWeight: "900",
+    textAlign: "center",
+  },
+  primaryButtonTextDisabled: {
+    color: "#8591a3",
+  },
+  registerButton: {
+    minHeight: 48,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#39414f",
+    backgroundColor: "#141a22",
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+  },
+  registerButtonDisabled: {
+    opacity: 0.72,
+  },
+  registerButtonText: {
+    color: "#dce4ef",
+    fontSize: 15,
+    fontWeight: "900",
+    textAlign: "center",
+  },
+  onboardingHint: {
+    color: "#91a0b4",
+    fontSize: 12,
+    lineHeight: 17,
+    textAlign: "center",
   },
   appHeader: {
     backgroundColor: "#1a1f27",
