@@ -25,6 +25,7 @@ C:\Users\Sergej\Documents\Codex\domashniy-bar
 - VPS `212.227.28.224` was cleaned on 2026-05-01 and now serves a temporary Home Bar placeholder from `/var/www/home-bar`.
 - Old KIKU files and services were backed up to `/root/home-bar-cleanup-backups/20260501-131803` before removal.
 - The current Expo Web build was deployed to `https://kreisphoto.de/` on 2026-05-01.
+- A mobile UX pass introduced bottom navigation, compact cocktail cards, a dedicated bar screen, and a dedicated recipe detail screen.
 
 ## Stack
 

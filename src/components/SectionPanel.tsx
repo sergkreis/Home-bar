@@ -22,13 +22,16 @@ const styles = StyleSheet.create({
   panel: {
     backgroundColor: "#1b1f27",
     borderRadius: 8,
-    padding: 16,
+    padding: 14,
     gap: 12,
+    borderWidth: 1,
+    borderColor: "#252d38",
   },
   sectionTitle: {
     color: "#f8fafc",
-    fontSize: 20,
-    fontWeight: "800",
+    fontSize: 21,
+    fontWeight: "900",
+    lineHeight: 26,
   },
   sectionHint: {
     color: "#97a3b6",

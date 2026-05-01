@@ -43,6 +43,7 @@ expo-web.log
 test-results/
 playwright-report/
 tmp-review/
+tmp-review-new/
 
 # generated native folders
 /ios
