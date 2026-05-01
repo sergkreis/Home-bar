@@ -23,9 +23,9 @@ Resources:
 
 ```text
 CPU: 1 vCPU, AMD EPYC-Milan
-RAM: 873 MiB total, about 483 MiB available during audit
+RAM: 873 MiB total, about 591 MiB available after cleanup
 Swap: none
-Disk: 10 GB total, 4.5 GB free on /
+Disk: 10 GB total, 5.8 GB free on / after cleanup
 ```
 
 Current web stack:
@@ -36,7 +36,7 @@ kreisphoto.de and www.kreisphoto.de point to 212.227.28.224
 Let's Encrypt certificate for kreisphoto.de and www.kreisphoto.de is valid until 2026-07-17
 ```
 
-Old KIKU paths found on the server:
+Old KIKU paths removed from the server:
 
 ```text
 /var/www/kiku-site
@@ -50,8 +50,10 @@ Old KIKU paths found on the server:
 Important note:
 
 ```text
-kiku-booking.service is already inactive and disabled.
-The server also has unrelated-looking components such as Docker, warp-svc, /opt/marzban, /opt/tblocker, and a high-CPU v2iplimit process. Do not remove those as part of the KIKU cleanup unless explicitly confirmed.
+Cleanup was completed on 2026-05-01.
+Backups are stored on the server under /root/home-bar-cleanup-backups/20260501-131803.
+Docker, Cloudflare WARP, /opt/marzban, /opt/tblocker, igipu.ru certificate files, and v2iplimit leftovers were removed.
+The server now keeps nginx, certbot, SSH, the kreisphoto.de certificate, /srv/home-bar, and /var/www/home-bar.
 ```
 
 ## Local Build
@@ -79,15 +81,9 @@ dist/
 
 1. Build locally with `npm run build:web`.
 2. Upload `dist/` to a temporary server path.
-3. Back up the current KIKU site and config.
-4. Stop/disable KIKU booking service if still present.
-5. Move old KIKU files to a dated backup directory.
-6. Install `deploy/nginx-home-bar.conf` as `/etc/nginx/conf.d/home-bar.conf`.
-7. Remove or disable `/etc/nginx/conf.d/kiku-site.conf`.
-8. Copy the new static files to `/var/www/home-bar`.
-9. Run `nginx -t`.
-10. Reload nginx.
-11. Check `https://kreisphoto.de/` and `https://www.kreisphoto.de/`.
+3. Copy the new static files to `/var/www/home-bar`.
+4. Run `nginx -t`.
+5. Reload nginx.
+6. Check `https://kreisphoto.de/` and `https://www.kreisphoto.de/`.
 
-Do not perform steps 3-10 until deployment is explicitly approved.
-
+Do not deploy the actual app until deployment is explicitly approved.
