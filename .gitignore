@@ -42,6 +42,7 @@ expo-web.log
 # Playwright
 test-results/
 playwright-report/
+tmp-review/
 
 # generated native folders
 /ios
