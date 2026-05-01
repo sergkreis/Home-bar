@@ -24,6 +24,7 @@ C:\Users\Sergej\Documents\Codex\domashniy-bar
 - VPS deployment preparation lives in `deploy/`.
 - VPS `212.227.28.224` was cleaned on 2026-05-01 and now serves a temporary Home Bar placeholder from `/var/www/home-bar`.
 - Old KIKU files and services were backed up to `/root/home-bar-cleanup-backups/20260501-131803` before removal.
+- The current Expo Web build was deployed to `https://kreisphoto.de/` on 2026-05-01.
 
 ## Stack
 
@@ -131,5 +132,5 @@ npm run import:cocktails
 1. Verify and finish persistent home bar storage.
 2. Finish the phone-oriented web/PWA pass.
 3. Split `App.tsx` into screens/hooks once the MVP behavior is stable.
-4. Deploy static web build to `kreisphoto.de` after explicit approval.
+4. Review the live app on a phone at `https://kreisphoto.de/` and collect UX fixes.
 5. Add a small testable layer around matching/shopping logic before expanding the database further.
