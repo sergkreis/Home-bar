@@ -5,7 +5,7 @@ test("home page supports the core mobile flow", async ({ page }) => {
 
   await expect(page.getByText("Домашний бар")).toBeVisible();
   await expect(page.getByText("Что есть дома?")).toBeVisible();
-  await expect(page.getByText("Зарегистрироваться")).toBeVisible();
+  await expect(page.getByText("Аккаунт позже")).toBeVisible();
 
   await page.getByRole("button", { name: "Стартовый" }).click();
   await page.getByRole("button", { name: "Подобрать коктейли" }).click();
