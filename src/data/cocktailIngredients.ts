@@ -71,7 +71,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "b-52",
-    "ingredientId": "baileys-irish-cream",
+    "ingredientId": "irish-cream",
     "sortOrder": 0,
     "amount": "1/3"
   },
@@ -83,7 +83,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "b-52",
-    "ingredientId": "kahlua",
+    "ingredientId": "coffee-liqueur",
     "sortOrder": 2,
     "amount": "1/4"
   },
@@ -311,7 +311,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "daiquiri",
-    "ingredientId": "powdered-sugar",
+    "ingredientId": "sugar",
     "sortOrder": 2,
     "amount": "1 tsp"
   },
@@ -383,7 +383,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "espresso-martini",
-    "ingredientId": "kahlua",
+    "ingredientId": "coffee-liqueur",
     "sortOrder": 1,
     "amount": "1 cl"
   },
@@ -497,7 +497,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "gin-fizz",
-    "ingredientId": "powdered-sugar",
+    "ingredientId": "sugar",
     "sortOrder": 2,
     "amount": "1 tsp"
   },
@@ -689,7 +689,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "john-collins",
-    "ingredientId": "club-soda",
+    "ingredientId": "soda-water",
     "sortOrder": 3,
     "amount": "3 oz"
   },
@@ -995,7 +995,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "mint-julep",
-    "ingredientId": "powdered-sugar",
+    "ingredientId": "sugar",
     "sortOrder": 2,
     "amount": "1 tsp"
   },
@@ -1535,7 +1535,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "tom-collins",
-    "ingredientId": "club-soda",
+    "ingredientId": "soda-water",
     "sortOrder": 3,
     "amount": "3 oz"
   },
@@ -1583,7 +1583,7 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
   },
   {
     "cocktailId": "whiskey-sour",
-    "ingredientId": "powdered-sugar",
+    "ingredientId": "sugar",
     "sortOrder": 2,
     "amount": "1/2 tsp"
   },

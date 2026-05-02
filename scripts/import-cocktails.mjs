@@ -2,6 +2,8 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { categoryOrder, ingredientIdAliases, ingredientMetadata } from "./ingredient-metadata.mjs";
+
 const API_BASE = "https://www.thecocktaildb.com/api/json/v1/1";
 const LETTERS = "abcdefghijklmnopqrstuvwxyz".split("");
 const REQUEST_DELAY_MS = 220;
@@ -245,7 +247,10 @@ const ingredientIdOverrides = {
 };
 
 const normalizedIngredientIdOverrides = new Map(
-  Object.entries(ingredientIdOverrides).map(([key, value]) => [key.toLowerCase(), value]),
+  Object.entries({ ...ingredientIdOverrides, ...ingredientIdAliases }).map(([key, value]) => [
+    key.toLowerCase(),
+    value,
+  ]),
 );
 
 const ingredientNameOverrides = {
@@ -566,6 +571,10 @@ function translateIngredientName(name) {
   return normalizedIngredientNameTranslations.get(name.toLowerCase()) ?? name;
 }
 
+function getIngredientMetadata(id) {
+  return ingredientMetadata[id] ?? {};
+}
+
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -745,7 +754,9 @@ function extractRecipeIngredients(drink) {
 
     recipeIngredients.push({
       id: getIngredientId(rawIngredient),
-      name: translateIngredientName(getIngredientLabel(rawIngredient)),
+      name:
+        getIngredientMetadata(getIngredientId(rawIngredient)).name ??
+        translateIngredientName(getIngredientLabel(rawIngredient)),
       sourceName: getIngredientLabel(rawIngredient),
       amount: drink[`strMeasure${index}`]?.trim() || "по вкусу",
     });
@@ -841,10 +852,18 @@ async function main() {
 
     recipeIngredients.forEach((ingredient, sortOrder) => {
       if (!ingredientMap.has(ingredient.id)) {
+        const metadata = getIngredientMetadata(ingredient.id);
+
         ingredientMap.set(ingredient.id, {
           id: ingredient.id,
-          name: ingredient.name,
-          category: classifyIngredient(ingredient.sourceName),
+          name: metadata.name ?? ingredient.name,
+          category: metadata.category ?? classifyIngredient(ingredient.sourceName),
+          ...(metadata.aliases ? { aliases: metadata.aliases } : {}),
+          ...(metadata.family ? { family: metadata.family } : {}),
+          ...(metadata.shoppingName ? { shoppingName: metadata.shoppingName } : {}),
+          ...(metadata.isCommon ? { isCommon: true } : {}),
+          ...(metadata.isGarnish ? { isGarnish: true } : {}),
+          ...(metadata.isOptionalDefault ? { isOptionalDefault: true } : {}),
         });
       }
 
@@ -857,9 +876,21 @@ async function main() {
     });
   }
 
-  const ingredients = Array.from(ingredientMap.values()).sort((left, right) =>
-    left.name.localeCompare(right.name),
-  );
+  const ingredients = Array.from(ingredientMap.values()).sort((left, right) => {
+    const leftCategoryOrder = categoryOrder[left.category] ?? categoryOrder.other;
+    const rightCategoryOrder = categoryOrder[right.category] ?? categoryOrder.other;
+    const categoryDelta = leftCategoryOrder - rightCategoryOrder;
+
+    if (categoryDelta !== 0) {
+      return categoryDelta;
+    }
+
+    if (Boolean(right.isCommon) !== Boolean(left.isCommon)) {
+      return Number(Boolean(right.isCommon)) - Number(Boolean(left.isCommon));
+    }
+
+    return left.name.localeCompare(right.name, "ru");
+  });
 
   const starterIngredients = [
     "vodka",

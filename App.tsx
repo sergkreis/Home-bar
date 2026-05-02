@@ -25,10 +25,13 @@ const tasteFilters: { id: TasteTag; label: string }[] = [
 const ingredientGroups = [
   { key: "spirit", label: "Крепкий алкоголь" },
   { key: "liqueur", label: "Ликеры и аперитивы" },
-  { key: "mixer", label: "Миксеры и соки" },
+  { key: "wine", label: "Вино и игристое" },
+  { key: "mixer", label: "Миксеры, соки, кофе" },
   { key: "citrus", label: "Цитрус" },
   { key: "sweetener", label: "Сиропы" },
-  { key: "other", label: "Дополнительно" },
+  { key: "garnish", label: "Гарниры" },
+  { key: "pantry", label: "Кухня" },
+  { key: "other", label: "Редкое" },
 ] as const;
 
 const quickModes = [
@@ -133,12 +136,12 @@ export default function App() {
   }, [hasLoadedSavedBar, selectedIngredients]);
 
   const rankedCocktails = useMemo(
-    () => rankCocktails(cocktails, selectedIngredients, activeTaste),
+    () => rankCocktails(cocktails, selectedIngredients, activeTaste, ingredients),
     [activeTaste, selectedIngredients],
   );
 
   const allRankedCocktails = useMemo(
-    () => rankCocktails(cocktails, selectedIngredients, null),
+    () => rankCocktails(cocktails, selectedIngredients, null, ingredients),
     [selectedIngredients],
   );
 
@@ -146,7 +149,7 @@ export default function App() {
     () =>
       quickModes.map((mode) => ({
         ...mode,
-        matches: rankCocktails(cocktails, selectedIngredients, mode.taste).slice(0, 4),
+        matches: rankCocktails(cocktails, selectedIngredients, mode.taste, ingredients).slice(0, 4),
       })),
     [selectedIngredients],
   );

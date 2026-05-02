@@ -54,7 +54,7 @@ export const cocktailRecords: CocktailRecord[] = [
   {
     "id": "b-52",
     "name": "Б-52",
-    "baseSpirit": "Baileys",
+    "baseSpirit": "Айриш крим",
     "taste": [
       "sweet",
       "strong"
@@ -472,7 +472,7 @@ export const cocktailRecords: CocktailRecord[] = [
   {
     "id": "irish-coffee",
     "name": "Айриш кофе",
-    "baseSpirit": "Irish whiskey",
+    "baseSpirit": "Ирландский виски",
     "taste": [
       "sweet"
     ],

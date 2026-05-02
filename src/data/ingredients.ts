@@ -4,468 +4,920 @@ import { Ingredient } from "./types";
 
 export const ingredients: Ingredient[] = [
   {
-    "id": "absinthe",
-    "name": "Абсент",
-    "category": "spirit"
-  },
-  {
-    "id": "amaretto",
-    "name": "Амаретто",
-    "category": "liqueur"
-  },
-  {
-    "id": "pineapple-juice",
-    "name": "Ананасовый сок",
-    "category": "mixer"
-  },
-  {
-    "id": "angostura",
-    "name": "Ангостура",
-    "category": "liqueur"
-  },
-  {
-    "id": "orange-peel",
-    "name": "Апельсиновая цедра",
-    "category": "other"
-  },
-  {
-    "id": "orange-bitters",
-    "name": "Апельсиновый биттер",
-    "category": "liqueur"
-  },
-  {
-    "id": "orange-juice",
-    "name": "Апельсиновый сок",
-    "category": "citrus"
-  },
-  {
     "id": "white-rum",
     "name": "Белый ром",
-    "category": "spirit"
-  },
-  {
-    "id": "bitters",
-    "name": "Биттер",
-    "category": "liqueur"
+    "category": "spirit",
+    "aliases": [
+      "white rum",
+      "light rum",
+      "белый ром"
+    ],
+    "family": "rum",
+    "isCommon": true
   },
   {
     "id": "bourbon",
     "name": "Бурбон",
-    "category": "spirit"
-  },
-  {
-    "id": "cherry",
-    "name": "Вишня",
-    "category": "other"
+    "category": "spirit",
+    "aliases": [
+      "bourbon",
+      "бурбон"
+    ],
+    "family": "whiskey",
+    "isCommon": true
   },
   {
     "id": "vodka",
     "name": "Водка",
-    "category": "spirit"
-  },
-  {
-    "id": "soda-water",
-    "name": "Газированная вода",
-    "category": "mixer"
-  },
-  {
-    "id": "galliano",
-    "name": "Гальяно",
-    "category": "other"
-  },
-  {
-    "id": "grapefruit-juice",
-    "name": "Грейпфрутовый сок",
-    "category": "citrus"
-  },
-  {
-    "id": "grenadine",
-    "name": "Гренадин",
-    "category": "sweetener"
+    "category": "spirit",
+    "aliases": [
+      "vodka",
+      "водка"
+    ],
+    "family": "vodka",
+    "isCommon": true
   },
   {
     "id": "gin",
     "name": "Джин",
-    "category": "spirit"
-  },
-  {
-    "id": "drambuie",
-    "name": "Драмбуи",
-    "category": "other"
-  },
-  {
-    "id": "ginger-beer",
-    "name": "Имбирное пиво",
-    "category": "mixer"
-  },
-  {
-    "id": "ginger-ale",
-    "name": "Имбирный эль",
-    "category": "mixer"
-  },
-  {
-    "id": "kahlua",
-    "name": "Калуа",
-    "category": "liqueur"
-  },
-  {
-    "id": "campari",
-    "name": "Кампари",
-    "category": "liqueur"
-  },
-  {
-    "id": "cachaca",
-    "name": "Кашаса",
-    "category": "spirit"
-  },
-  {
-    "id": "coconut-milk",
-    "name": "Кокосовое молоко",
-    "category": "mixer"
-  },
-  {
-    "id": "cola",
-    "name": "Кола",
-    "category": "mixer"
-  },
-  {
-    "id": "cognac",
-    "name": "Коньяк",
-    "category": "spirit"
-  },
-  {
-    "id": "coffee",
-    "name": "Кофе",
-    "category": "mixer"
-  },
-  {
-    "id": "coffee-liqueur",
-    "name": "Кофейный ликер",
-    "category": "liqueur"
-  },
-  {
-    "id": "creme-de-cacao",
-    "name": "Крем де какао",
-    "category": "liqueur"
-  },
-  {
-    "id": "creme-de-cassis",
-    "name": "Крем де кассис",
-    "category": "liqueur"
-  },
-  {
-    "id": "creme-de-mure",
-    "name": "Крем де мюр",
-    "category": "liqueur"
-  },
-  {
-    "id": "cointreau",
-    "name": "Куантро",
-    "category": "liqueur"
-  },
-  {
-    "id": "blended-whiskey",
-    "name": "Купажированный виски",
-    "category": "spirit"
-  },
-  {
-    "id": "blended-scotch",
-    "name": "Купажированный скотч",
-    "category": "spirit"
-  },
-  {
-    "id": "lime",
-    "name": "Лайм",
-    "category": "citrus"
-  },
-  {
-    "id": "ice",
-    "name": "Лед",
-    "category": "other"
-  },
-  {
-    "id": "lemon",
-    "name": "Лимон",
-    "category": "citrus"
-  },
-  {
-    "id": "lemon-juice",
-    "name": "Лимонный сок",
-    "category": "citrus"
-  },
-  {
-    "id": "maraschino-liqueur",
-    "name": "Мараскино",
-    "category": "liqueur"
-  },
-  {
-    "id": "honey-syrup",
-    "name": "Медовый сироп",
-    "category": "sweetener"
-  },
-  {
-    "id": "nutmeg",
-    "name": "Мускатный орех",
-    "category": "other"
-  },
-  {
-    "id": "mint",
-    "name": "Мята",
-    "category": "other"
-  },
-  {
-    "id": "olive",
-    "name": "Оливка",
-    "category": "other"
-  },
-  {
-    "id": "olive-brine",
-    "name": "Оливковый рассол",
-    "category": "other"
-  },
-  {
-    "id": "peach-schnapps",
-    "name": "Персиковый шнапс",
-    "category": "liqueur"
-  },
-  {
-    "id": "pisco",
-    "name": "Писко",
-    "category": "spirit"
-  },
-  {
-    "id": "prosecco",
-    "name": "Просекко",
-    "category": "mixer"
-  },
-  {
-    "id": "rye-whiskey",
-    "name": "Ржаной виски",
-    "category": "spirit"
-  },
-  {
-    "id": "rum",
-    "name": "Ром",
-    "category": "spirit"
-  },
-  {
-    "id": "151-proof-rum",
-    "name": "Ром 151",
-    "category": "spirit"
-  },
-  {
-    "id": "sugar",
-    "name": "Сахар",
-    "category": "sweetener"
-  },
-  {
-    "id": "sugar-syrup",
-    "name": "Сахарный сироп",
-    "category": "sweetener"
-  },
-  {
-    "id": "scotch",
-    "name": "Скотч",
-    "category": "spirit"
-  },
-  {
-    "id": "sweet-vermouth",
-    "name": "Сладкий вермут",
-    "category": "liqueur"
-  },
-  {
-    "id": "cream",
-    "name": "Сливки",
-    "category": "mixer"
-  },
-  {
-    "id": "club-soda",
-    "name": "Содовая",
-    "category": "mixer"
-  },
-  {
-    "id": "lime-juice",
-    "name": "Сок лайма",
-    "category": "citrus"
-  },
-  {
-    "id": "dry-vermouth",
-    "name": "Сухой вермут",
-    "category": "liqueur"
+    "category": "spirit",
+    "aliases": [
+      "gin",
+      "джин"
+    ],
+    "family": "gin",
+    "isCommon": true
   },
   {
     "id": "tequila",
     "name": "Текила",
-    "category": "spirit"
+    "category": "spirit",
+    "aliases": [
+      "tequila",
+      "текила"
+    ],
+    "family": "tequila",
+    "isCommon": true
+  },
+  {
+    "id": "absinthe",
+    "name": "Абсент",
+    "category": "spirit",
+    "aliases": [
+      "absinthe"
+    ],
+    "family": "absinthe"
+  },
+  {
+    "id": "islay-single-malt-scotch",
+    "name": "Айла сингл молт",
+    "category": "spirit",
+    "aliases": [
+      "islay scotch",
+      "single malt scotch"
+    ],
+    "family": "whiskey"
+  },
+  {
+    "id": "gold-rum",
+    "name": "Золотой ром",
+    "category": "spirit",
+    "aliases": [
+      "gold rum",
+      "amber rum"
+    ],
+    "family": "rum"
+  },
+  {
+    "id": "irish-whiskey",
+    "name": "Ирландский виски",
+    "category": "spirit",
+    "aliases": [
+      "irish whiskey"
+    ],
+    "family": "whiskey"
+  },
+  {
+    "id": "cachaca",
+    "name": "Кашаса",
+    "category": "spirit",
+    "aliases": [
+      "cachaca",
+      "cachaça",
+      "кашаса"
+    ],
+    "family": "cachaca"
+  },
+  {
+    "id": "cognac",
+    "name": "Коньяк",
+    "category": "spirit",
+    "aliases": [
+      "cognac",
+      "brandy",
+      "коньяк"
+    ],
+    "family": "brandy"
+  },
+  {
+    "id": "151-proof-rum",
+    "name": "Крепкий ром 151",
+    "category": "spirit",
+    "aliases": [
+      "151 rum",
+      "overproof rum"
+    ],
+    "family": "rum"
+  },
+  {
+    "id": "blended-whiskey",
+    "name": "Купажированный виски",
+    "category": "spirit",
+    "aliases": [
+      "blended whiskey",
+      "whiskey"
+    ],
+    "family": "whiskey"
+  },
+  {
+    "id": "blended-scotch",
+    "name": "Купажированный скотч",
+    "category": "spirit",
+    "aliases": [
+      "blended scotch",
+      "scotch"
+    ],
+    "family": "whiskey"
+  },
+  {
+    "id": "pisco",
+    "name": "Писко",
+    "category": "spirit",
+    "aliases": [
+      "pisco"
+    ],
+    "family": "brandy"
+  },
+  {
+    "id": "rye-whiskey",
+    "name": "Ржаной виски",
+    "category": "spirit",
+    "aliases": [
+      "rye whiskey"
+    ],
+    "family": "whiskey"
+  },
+  {
+    "id": "rum",
+    "name": "Ром",
+    "category": "spirit",
+    "aliases": [
+      "rum",
+      "ром"
+    ],
+    "family": "rum"
+  },
+  {
+    "id": "scotch",
+    "name": "Скотч",
+    "category": "spirit",
+    "aliases": [
+      "scotch",
+      "скотч"
+    ],
+    "family": "whiskey"
   },
   {
     "id": "dark-rum",
     "name": "Темный ром",
-    "category": "spirit"
-  },
-  {
-    "id": "tonic",
-    "name": "Тоник",
-    "category": "mixer"
-  },
-  {
-    "id": "triple-sec",
-    "name": "Трипл-сек",
-    "category": "liqueur"
-  },
-  {
-    "id": "champagne",
-    "name": "Шампанское",
-    "category": "mixer"
+    "category": "spirit",
+    "aliases": [
+      "dark rum",
+      "темный ром"
+    ],
+    "family": "rum"
   },
   {
     "id": "apple-brandy",
     "name": "Яблочный бренди",
-    "category": "spirit"
+    "category": "spirit",
+    "aliases": [
+      "apple brandy",
+      "calvados"
+    ],
+    "family": "brandy"
+  },
+  {
+    "id": "campari",
+    "name": "Кампари",
+    "category": "liqueur",
+    "aliases": [
+      "campari",
+      "кампари"
+    ],
+    "family": "bitter-aperitif",
+    "isCommon": true
+  },
+  {
+    "id": "sweet-vermouth",
+    "name": "Сладкий вермут",
+    "category": "liqueur",
+    "aliases": [
+      "sweet vermouth",
+      "rosso"
+    ],
+    "family": "vermouth",
+    "isCommon": true
+  },
+  {
+    "id": "triple-sec",
+    "name": "Трипл-сек",
+    "category": "liqueur",
+    "aliases": [
+      "triple sec",
+      "orange liqueur"
+    ],
+    "family": "orange-liqueur",
+    "isCommon": true
+  },
+  {
+    "id": "irish-cream",
+    "name": "Айриш крим",
+    "category": "liqueur",
+    "aliases": [
+      "baileys",
+      "бейлис",
+      "irish cream"
+    ],
+    "family": "cream-liqueur"
+  },
+  {
+    "id": "amaretto",
+    "name": "Амаретто",
+    "category": "liqueur",
+    "aliases": [
+      "amaretto"
+    ],
+    "family": "almond-liqueur"
+  },
+  {
+    "id": "galliano",
+    "name": "Гальяно",
+    "category": "liqueur",
+    "aliases": [
+      "galliano"
+    ],
+    "family": "herbal-liqueur"
+  },
+  {
+    "id": "grand-marnier",
+    "name": "Гран Марнье",
+    "category": "liqueur",
+    "aliases": [
+      "grand marnier",
+      "orange liqueur"
+    ],
+    "family": "orange-liqueur"
+  },
+  {
+    "id": "drambuie",
+    "name": "Драмбуи",
+    "category": "liqueur",
+    "aliases": [
+      "drambuie"
+    ],
+    "family": "whiskey-liqueur"
+  },
+  {
+    "id": "green-chartreuse",
+    "name": "Зеленый шартрез",
+    "category": "liqueur",
+    "aliases": [
+      "green chartreuse",
+      "chartreuse"
+    ],
+    "family": "herbal-liqueur"
+  },
+  {
+    "id": "coffee-liqueur",
+    "name": "Кофейный ликер",
+    "category": "liqueur",
+    "aliases": [
+      "coffee liqueur",
+      "kahlua",
+      "калуа"
+    ],
+    "family": "coffee-liqueur"
+  },
+  {
+    "id": "creme-de-cacao",
+    "name": "Крем де какао",
+    "category": "liqueur",
+    "aliases": [
+      "creme de cacao",
+      "cacao liqueur"
+    ],
+    "family": "cacao-liqueur"
+  },
+  {
+    "id": "creme-de-cassis",
+    "name": "Крем де кассис",
+    "category": "liqueur",
+    "aliases": [
+      "creme de cassis",
+      "cassis"
+    ],
+    "family": "berry-liqueur"
+  },
+  {
+    "id": "creme-de-mure",
+    "name": "Крем де мюр",
+    "category": "liqueur",
+    "aliases": [
+      "creme de mure",
+      "blackberry liqueur"
+    ],
+    "family": "berry-liqueur"
+  },
+  {
+    "id": "cointreau",
+    "name": "Куантро",
+    "category": "liqueur",
+    "aliases": [
+      "cointreau",
+      "куантро",
+      "triple sec"
+    ],
+    "family": "orange-liqueur"
+  },
+  {
+    "id": "raspberry-liqueur",
+    "name": "Малиновый ликер",
+    "category": "liqueur",
+    "aliases": [
+      "raspberry liqueur",
+      "chambord"
+    ],
+    "family": "berry-liqueur"
+  },
+  {
+    "id": "maraschino-liqueur",
+    "name": "Мараскино",
+    "category": "liqueur",
+    "aliases": [
+      "maraschino liqueur"
+    ],
+    "family": "cherry-liqueur"
+  },
+  {
+    "id": "orange-curacao",
+    "name": "Оранж кюрасао",
+    "category": "liqueur",
+    "aliases": [
+      "orange curacao",
+      "orange curaçao"
+    ],
+    "family": "orange-liqueur"
+  },
+  {
+    "id": "pernod",
+    "name": "Перно",
+    "category": "liqueur",
+    "aliases": [
+      "pernod"
+    ],
+    "family": "anise-liqueur"
+  },
+  {
+    "id": "peach-schnapps",
+    "name": "Персиковый шнапс",
+    "category": "liqueur",
+    "aliases": [
+      "peach schnapps"
+    ],
+    "family": "fruit-liqueur"
+  },
+  {
+    "id": "ricard",
+    "name": "Рикар",
+    "category": "liqueur",
+    "aliases": [
+      "ricard"
+    ],
+    "family": "anise-liqueur"
+  },
+  {
+    "id": "dry-vermouth",
+    "name": "Сухой вермут",
+    "category": "liqueur",
+    "aliases": [
+      "dry vermouth",
+      "martini extra dry"
+    ],
+    "family": "vermouth"
+  },
+  {
+    "id": "red-wine",
+    "name": "Красное вино",
+    "category": "wine",
+    "aliases": [
+      "red wine"
+    ],
+    "family": "wine"
+  },
+  {
+    "id": "lillet-blanc",
+    "name": "Лилле Блан",
+    "category": "wine",
+    "aliases": [
+      "lillet blanc",
+      "lillet"
+    ],
+    "family": "aromatized-wine"
+  },
+  {
+    "id": "prosecco",
+    "name": "Просекко",
+    "category": "wine",
+    "aliases": [
+      "prosecco",
+      "игристое"
+    ],
+    "family": "sparkling-wine"
+  },
+  {
+    "id": "champagne",
+    "name": "Шампанское",
+    "category": "wine",
+    "aliases": [
+      "champagne",
+      "игристое"
+    ],
+    "family": "sparkling-wine"
+  },
+  {
+    "id": "orange-juice",
+    "name": "Апельсиновый сок",
+    "category": "mixer",
+    "aliases": [
+      "orange juice"
+    ],
+    "family": "juice",
+    "isCommon": true
+  },
+  {
+    "id": "ginger-beer",
+    "name": "Имбирное пиво",
+    "category": "mixer",
+    "aliases": [
+      "ginger beer"
+    ],
+    "family": "ginger-soda",
+    "isCommon": true
+  },
+  {
+    "id": "cranberry-juice",
+    "name": "Клюквенный сок",
+    "category": "mixer",
+    "aliases": [
+      "cranberry juice",
+      "клюквенный морс"
+    ],
+    "family": "juice",
+    "isCommon": true
+  },
+  {
+    "id": "cola",
+    "name": "Кола",
+    "category": "mixer",
+    "aliases": [
+      "cola",
+      "coca-cola"
+    ],
+    "family": "cola",
+    "isCommon": true
+  },
+  {
+    "id": "soda-water",
+    "name": "Содовая",
+    "category": "mixer",
+    "aliases": [
+      "soda water",
+      "club soda",
+      "carbonated water",
+      "газированная вода"
+    ],
+    "family": "soda",
+    "isCommon": true
+  },
+  {
+    "id": "tonic",
+    "name": "Тоник",
+    "category": "mixer",
+    "aliases": [
+      "tonic",
+      "tonic water"
+    ],
+    "family": "tonic",
+    "isCommon": true
+  },
+  {
+    "id": "pineapple-juice",
+    "name": "Ананасовый сок",
+    "category": "mixer",
+    "aliases": [
+      "pineapple juice"
+    ],
+    "family": "juice"
+  },
+  {
+    "id": "grape-soda",
+    "name": "Виноградная газировка",
+    "category": "mixer",
+    "aliases": [
+      "grape soda"
+    ],
+    "family": "soda"
+  },
+  {
+    "id": "grapefruit-juice",
+    "name": "Грейпфрутовый сок",
+    "category": "mixer",
+    "aliases": [
+      "grapefruit juice"
+    ],
+    "family": "juice"
+  },
+  {
+    "id": "ginger-ale",
+    "name": "Имбирный эль",
+    "category": "mixer",
+    "aliases": [
+      "ginger ale"
+    ],
+    "family": "ginger-soda"
+  },
+  {
+    "id": "coconut-milk",
+    "name": "Кокосовое молоко",
+    "category": "mixer",
+    "aliases": [
+      "coconut milk"
+    ],
+    "family": "coconut"
+  },
+  {
+    "id": "coffee",
+    "name": "Кофе",
+    "category": "mixer",
+    "aliases": [
+      "coffee",
+      "кофе"
+    ],
+    "family": "coffee"
+  },
+  {
+    "id": "light-cream",
+    "name": "Легкие сливки",
+    "category": "mixer",
+    "aliases": [
+      "light cream"
+    ],
+    "family": "cream"
+  },
+  {
+    "id": "sweet-and-sour",
+    "name": "Сауэр микс",
+    "category": "mixer",
+    "aliases": [
+      "sweet and sour",
+      "sour mix"
+    ],
+    "family": "sour-mix"
+  },
+  {
+    "id": "cream",
+    "name": "Сливки",
+    "category": "mixer",
+    "aliases": [
+      "cream",
+      "сливки"
+    ],
+    "family": "cream"
+  },
+  {
+    "id": "lemon-juice",
+    "name": "Лимонный сок",
+    "category": "citrus",
+    "aliases": [
+      "lemon juice",
+      "лимон"
+    ],
+    "family": "citrus-juice",
+    "isCommon": true
+  },
+  {
+    "id": "lime-juice",
+    "name": "Сок лайма",
+    "category": "citrus",
+    "aliases": [
+      "lime juice",
+      "лайм"
+    ],
+    "family": "citrus-juice",
+    "isCommon": true
+  },
+  {
+    "id": "sugar-syrup",
+    "name": "Сахарный сироп",
+    "category": "sweetener",
+    "aliases": [
+      "sugar syrup",
+      "simple syrup"
+    ],
+    "family": "syrup",
+    "isCommon": true
+  },
+  {
+    "id": "grenadine",
+    "name": "Гренадин",
+    "category": "sweetener",
+    "aliases": [
+      "grenadine",
+      "гренадин"
+    ],
+    "family": "syrup"
+  },
+  {
+    "id": "ginger-syrup",
+    "name": "Имбирный сироп",
+    "category": "sweetener",
+    "aliases": [
+      "ginger syrup"
+    ],
+    "family": "syrup"
+  },
+  {
+    "id": "honey-syrup",
+    "name": "Медовый сироп",
+    "category": "sweetener",
+    "aliases": [
+      "honey syrup"
+    ],
+    "family": "syrup"
+  },
+  {
+    "id": "orgeat-syrup",
+    "name": "Орша",
+    "category": "sweetener",
+    "aliases": [
+      "orgeat",
+      "orgeat syrup",
+      "миндальный сироп"
+    ],
+    "family": "syrup"
+  },
+  {
+    "id": "pineapple",
+    "name": "Ананас",
+    "category": "garnish",
+    "aliases": [
+      "pineapple"
+    ],
+    "family": "pineapple",
+    "isGarnish": true
+  },
+  {
+    "id": "orange",
+    "name": "Апельсин",
+    "category": "garnish",
+    "aliases": [
+      "orange",
+      "апельсин"
+    ],
+    "family": "citrus",
+    "isGarnish": true
+  },
+  {
+    "id": "whipped-cream",
+    "name": "Взбитые сливки",
+    "category": "garnish",
+    "aliases": [
+      "whipped cream"
+    ],
+    "family": "cream",
+    "isGarnish": true
+  },
+  {
+    "id": "cherry",
+    "name": "Вишня",
+    "category": "garnish",
+    "aliases": [
+      "cherry",
+      "вишня"
+    ],
+    "family": "cherry",
+    "isGarnish": true
+  },
+  {
+    "id": "maraschino-cherry",
+    "name": "Коктейльная вишня",
+    "category": "garnish",
+    "aliases": [
+      "maraschino cherry",
+      "cocktail cherry"
+    ],
+    "family": "cherry",
+    "isGarnish": true
+  },
+  {
+    "id": "lime",
+    "name": "Лайм",
+    "category": "garnish",
+    "aliases": [
+      "lime",
+      "лайм"
+    ],
+    "family": "citrus",
+    "isGarnish": true
+  },
+  {
+    "id": "lemon",
+    "name": "Лимон",
+    "category": "garnish",
+    "aliases": [
+      "lemon",
+      "лимон"
+    ],
+    "family": "citrus",
+    "isGarnish": true
+  },
+  {
+    "id": "mint",
+    "name": "Мята",
+    "category": "garnish",
+    "aliases": [
+      "mint",
+      "мята"
+    ],
+    "family": "mint",
+    "isGarnish": true
+  },
+  {
+    "id": "olive",
+    "name": "Оливка",
+    "category": "garnish",
+    "aliases": [
+      "olive"
+    ],
+    "family": "olive",
+    "isGarnish": true
+  },
+  {
+    "id": "orange-peel",
+    "name": "Цедра апельсина",
+    "category": "garnish",
+    "aliases": [
+      "orange peel",
+      "orange twist"
+    ],
+    "family": "citrus-peel",
+    "isGarnish": true
+  },
+  {
+    "id": "lemon-peel",
+    "name": "Цедра лимона",
+    "category": "garnish",
+    "aliases": [
+      "lemon peel",
+      "lemon twist"
+    ],
+    "family": "citrus-peel",
+    "isGarnish": true
+  },
+  {
+    "id": "angostura",
+    "name": "Ангостура",
+    "category": "pantry",
+    "aliases": [
+      "angostura",
+      "angostura bitters",
+      "биттер"
+    ],
+    "family": "bitters",
+    "isCommon": true
+  },
+  {
+    "id": "ice",
+    "name": "Лед",
+    "category": "pantry",
+    "aliases": [
+      "ice",
+      "лед"
+    ],
+    "family": "ice",
+    "isCommon": true,
+    "isOptionalDefault": true
+  },
+  {
+    "id": "sugar",
+    "name": "Сахар",
+    "category": "pantry",
+    "aliases": [
+      "sugar",
+      "powdered sugar",
+      "сахар"
+    ],
+    "family": "sugar",
+    "isCommon": true
+  },
+  {
+    "id": "orange-bitters",
+    "name": "Апельсиновый биттер",
+    "category": "pantry",
+    "aliases": [
+      "orange bitters"
+    ],
+    "family": "bitters"
+  },
+  {
+    "id": "bitters",
+    "name": "Биттер",
+    "category": "pantry",
+    "aliases": [
+      "bitters",
+      "биттер"
+    ],
+    "family": "bitters"
+  },
+  {
+    "id": "peychaud-bitters",
+    "name": "Биттер Пишо",
+    "category": "pantry",
+    "aliases": [
+      "peychaud bitters",
+      "peychaud"
+    ],
+    "family": "bitters"
+  },
+  {
+    "id": "vanilla-extract",
+    "name": "Ванильный экстракт",
+    "category": "pantry",
+    "aliases": [
+      "vanilla extract"
+    ],
+    "family": "vanilla"
+  },
+  {
+    "id": "water",
+    "name": "Вода",
+    "category": "pantry",
+    "aliases": [
+      "water",
+      "вода"
+    ],
+    "family": "water",
+    "isOptionalDefault": true
+  },
+  {
+    "id": "nutmeg",
+    "name": "Мускатный орех",
+    "category": "pantry",
+    "aliases": [
+      "nutmeg"
+    ],
+    "family": "spice",
+    "isGarnish": true
+  },
+  {
+    "id": "olive-brine",
+    "name": "Оливковый рассол",
+    "category": "pantry",
+    "aliases": [
+      "olive brine"
+    ],
+    "family": "olive"
+  },
+  {
+    "id": "salt",
+    "name": "Соль",
+    "category": "pantry",
+    "aliases": [
+      "salt",
+      "соль"
+    ],
+    "family": "salt",
+    "isGarnish": true
   },
   {
     "id": "egg-white",
     "name": "Яичный белок",
-    "category": "other"
-  },
-  {
-    "id": "baileys-irish-cream",
-    "name": "Baileys",
-    "category": "liqueur"
-  },
-  {
-    "id": "cranberry-juice",
-    "name": "Cranberry juice",
-    "category": "mixer"
-  },
-  {
-    "id": "ginger-syrup",
-    "name": "Ginger Syrup",
-    "category": "sweetener"
-  },
-  {
-    "id": "gold-rum",
-    "name": "Gold rum",
-    "category": "spirit"
-  },
-  {
-    "id": "grand-marnier",
-    "name": "Grand Marnier",
-    "category": "other"
-  },
-  {
-    "id": "grape-soda",
-    "name": "Grape Soda",
-    "category": "mixer"
-  },
-  {
-    "id": "green-chartreuse",
-    "name": "Green Chartreuse",
-    "category": "liqueur"
-  },
-  {
-    "id": "irish-whiskey",
-    "name": "Irish whiskey",
-    "category": "spirit"
-  },
-  {
-    "id": "islay-single-malt-scotch",
-    "name": "Islay single malt Scotch",
-    "category": "spirit"
-  },
-  {
-    "id": "lemon-peel",
-    "name": "Lemon peel",
-    "category": "other"
-  },
-  {
-    "id": "light-cream",
-    "name": "Light cream",
-    "category": "mixer"
-  },
-  {
-    "id": "lillet-blanc",
-    "name": "Lillet Blanc",
-    "category": "other"
-  },
-  {
-    "id": "maraschino-cherry",
-    "name": "Maraschino Cherry",
-    "category": "liqueur"
-  },
-  {
-    "id": "orange",
-    "name": "Orange",
-    "category": "citrus"
-  },
-  {
-    "id": "orange-curacao",
-    "name": "Orange Curacao",
-    "category": "liqueur"
-  },
-  {
-    "id": "orgeat-syrup",
-    "name": "Orgeat syrup",
-    "category": "sweetener"
-  },
-  {
-    "id": "pernod",
-    "name": "Pernod",
-    "category": "other"
-  },
-  {
-    "id": "peychaud-bitters",
-    "name": "Peychaud bitters",
-    "category": "liqueur"
-  },
-  {
-    "id": "pineapple",
-    "name": "Pineapple",
-    "category": "other"
-  },
-  {
-    "id": "powdered-sugar",
-    "name": "Powdered sugar",
-    "category": "sweetener"
-  },
-  {
-    "id": "raspberry-liqueur",
-    "name": "Raspberry Liqueur",
-    "category": "liqueur"
-  },
-  {
-    "id": "red-wine",
-    "name": "Red wine",
-    "category": "mixer"
-  },
-  {
-    "id": "ricard",
-    "name": "Ricard",
-    "category": "other"
-  },
-  {
-    "id": "salt",
-    "name": "Salt",
-    "category": "other"
-  },
-  {
-    "id": "sweet-and-sour",
-    "name": "Sweet and sour",
-    "category": "other"
-  },
-  {
-    "id": "vanilla-extract",
-    "name": "Vanilla extract",
-    "category": "other"
-  },
-  {
-    "id": "water",
-    "name": "Water",
-    "category": "mixer"
-  },
-  {
-    "id": "whipped-cream",
-    "name": "Whipped cream",
-    "category": "mixer"
+    "category": "pantry",
+    "aliases": [
+      "egg white",
+      "белок"
+    ],
+    "family": "egg"
   }
 ];

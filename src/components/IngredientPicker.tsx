@@ -46,9 +46,11 @@ export function IngredientPicker({
       return ingredients;
     }
 
-    return ingredients.filter((ingredient) =>
-      normalizeText(ingredient.name).includes(normalizedQuery),
-    );
+    return ingredients.filter((ingredient) => {
+      const searchableText = [ingredient.name, ...(ingredient.aliases ?? [])].join(" ");
+
+      return normalizeText(searchableText).includes(normalizedQuery);
+    });
   }, [ingredients, searchQuery]);
 
   return (

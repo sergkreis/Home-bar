@@ -1,9 +1,12 @@
 export type IngredientCategory =
   | "spirit"
   | "liqueur"
+  | "wine"
   | "mixer"
   | "citrus"
   | "sweetener"
+  | "garnish"
+  | "pantry"
   | "other";
 
 export type TasteTag = "sweet" | "sour" | "refreshing" | "strong" | "bitter";
@@ -14,6 +17,12 @@ export type Ingredient = {
   id: string;
   name: string;
   category: IngredientCategory;
+  aliases?: string[];
+  family?: string;
+  shoppingName?: string;
+  isCommon?: boolean;
+  isGarnish?: boolean;
+  isOptionalDefault?: boolean;
 };
 
 export type CocktailRecord = {
