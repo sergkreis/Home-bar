@@ -21,6 +21,8 @@ function normalizeText(value: string) {
   return value.trim().toLocaleLowerCase("ru-RU");
 }
 
+const defaultExpandedGroups = new Set<IngredientCategory>(["spirit", "mixer", "liqueur"]);
+
 export function IngredientPicker({
   ingredients,
   ingredientGroups,
@@ -30,6 +32,8 @@ export function IngredientPicker({
   onReset,
 }: IngredientPickerProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedGroups, setExpandedGroups] = useState<Set<IngredientCategory>>(defaultExpandedGroups);
+  const isSearching = normalizeText(searchQuery).length > 0;
 
   const selectedIngredientNames = useMemo(
     () =>
@@ -53,12 +57,31 @@ export function IngredientPicker({
     });
   }, [ingredients, searchQuery]);
 
+  const commonIngredients = useMemo(
+    () => ingredients.filter((ingredient) => ingredient.isCommon).slice(0, 18),
+    [ingredients],
+  );
+
+  const toggleGroup = (groupKey: IngredientCategory) => {
+    setExpandedGroups((current) => {
+      const next = new Set(current);
+
+      if (next.has(groupKey)) {
+        next.delete(groupKey);
+        return next;
+      }
+
+      next.add(groupKey);
+      return next;
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.toolbar}>
-        <View>
+        <View style={styles.toolbarCopy}>
           <Text style={styles.toolbarValue}>{selectedIngredients.length}</Text>
-          <Text style={styles.toolbarLabel}>выбрано</Text>
+          <Text style={styles.toolbarLabel}>выбрано из {ingredients.length}</Text>
         </View>
         <View style={styles.toolbarActions}>
           <Pressable accessibilityRole="button" onPress={onReset} style={styles.secondaryButton}>
@@ -99,10 +122,38 @@ export function IngredientPicker({
         <Text style={styles.searchMeta}>Найдено: {filteredIngredients.length}</Text>
       ) : null}
 
+      {!isSearching && commonIngredients.length > 0 ? (
+        <View style={styles.featuredBlock}>
+          <View style={styles.featuredHeader}>
+            <Text style={styles.groupTitle}>Часто бывает дома</Text>
+            <Text style={styles.groupCount}>{commonIngredients.length}</Text>
+          </View>
+          <View style={styles.chipWrap}>
+            {commonIngredients.map((ingredient) => {
+              const isActive = selectedIngredients.includes(ingredient.id);
+
+              return (
+                <Pressable
+                  accessibilityRole="button"
+                  key={ingredient.id}
+                  onPress={() => onToggleIngredient(ingredient.id)}
+                  style={[styles.chip, styles.featuredChip, isActive && styles.chipActive]}
+                >
+                  <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
+                    {ingredient.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+      ) : null}
+
       {ingredientGroups.map((group) => {
         const groupIngredients = filteredIngredients.filter(
           (ingredient) => ingredient.category === group.key,
         );
+        const isExpanded = isSearching || expandedGroups.has(group.key);
 
         if (groupIngredients.length === 0) {
           return null;
@@ -110,25 +161,38 @@ export function IngredientPicker({
 
         return (
           <View key={group.key} style={styles.groupBlock}>
-            <Text style={styles.groupTitle}>{group.label}</Text>
-            <View style={styles.chipWrap}>
-              {groupIngredients.map((ingredient) => {
-                const isActive = selectedIngredients.includes(ingredient.id);
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ expanded: isExpanded }}
+              onPress={() => toggleGroup(group.key)}
+              style={styles.groupHeader}
+            >
+              <Text style={styles.groupTitle}>{group.label}</Text>
+              <View style={styles.groupMeta}>
+                <Text style={styles.groupCount}>{groupIngredients.length}</Text>
+                <Text style={styles.groupChevron}>{isExpanded ? "−" : "+"}</Text>
+              </View>
+            </Pressable>
+            {isExpanded ? (
+              <View style={styles.chipWrap}>
+                {groupIngredients.map((ingredient) => {
+                  const isActive = selectedIngredients.includes(ingredient.id);
 
-                return (
-                  <Pressable
-                    accessibilityRole="button"
-                    key={ingredient.id}
-                    onPress={() => onToggleIngredient(ingredient.id)}
-                    style={[styles.chip, isActive && styles.chipActive]}
-                  >
-                    <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
-                      {ingredient.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+                  return (
+                    <Pressable
+                      accessibilityRole="button"
+                      key={ingredient.id}
+                      onPress={() => onToggleIngredient(ingredient.id)}
+                      style={[styles.chip, isActive && styles.chipActive]}
+                    >
+                      <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
+                        {ingredient.name}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ) : null}
           </View>
         );
       })}
@@ -153,12 +217,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 12,
-    alignItems: "center",
-    backgroundColor: "#121821",
+    alignItems: "flex-start",
+    backgroundColor: "#121923",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#2b3441",
+    borderColor: "#2f3d4a",
     padding: 12,
+  },
+  toolbarCopy: {
+    flex: 1,
   },
   toolbarValue: {
     color: "#f8fafc",
@@ -174,10 +241,12 @@ const styles = StyleSheet.create({
   toolbarActions: {
     flexDirection: "row",
     gap: 8,
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
   },
   secondaryButton: {
-    backgroundColor: "#141a22",
-    borderColor: "#39414f",
+    backgroundColor: "#17212b",
+    borderColor: "#405061",
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
@@ -219,10 +288,10 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   searchWrap: {
-    backgroundColor: "#141a22",
+    backgroundColor: "#101720",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#303846",
+    borderColor: "#405061",
     paddingHorizontal: 12,
   },
   searchInput: {
@@ -238,10 +307,55 @@ const styles = StyleSheet.create({
   groupBlock: {
     gap: 10,
   },
+  featuredBlock: {
+    gap: 10,
+    backgroundColor: "#132221",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#24524a",
+    padding: 12,
+  },
+  featuredHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    alignItems: "center",
+  },
+  groupHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    alignItems: "center",
+    minHeight: 38,
+    backgroundColor: "#151b23",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#2d3948",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
   groupTitle: {
     color: "#cfd7e3",
     fontSize: 14,
     fontWeight: "900",
+  },
+  groupCount: {
+    color: "#7f8fa3",
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  groupMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  groupChevron: {
+    color: "#f4b860",
+    fontSize: 18,
+    fontWeight: "900",
+    lineHeight: 20,
+    minWidth: 14,
+    textAlign: "center",
   },
   chipWrap: {
     flexDirection: "row",
@@ -255,6 +369,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 11,
     paddingVertical: 9,
+  },
+  featuredChip: {
+    backgroundColor: "#182c2b",
+    borderColor: "#32645d",
   },
   chipActive: {
     backgroundColor: "#f4b860",

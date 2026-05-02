@@ -39,29 +39,32 @@ const quickModes = [
     id: "easy",
     title: "Без заморочек",
     subtitle: "Можно смешать сразу",
+    accent: "amber",
     taste: null as TasteTag | null,
   },
   {
     id: "refreshing",
     title: "Что-то свежее",
     subtitle: "Легкие и освежающие",
+    accent: "teal",
     taste: "refreshing" as TasteTag,
   },
   {
     id: "strong",
     title: "Покрепче",
     subtitle: "Короткие и мощные",
+    accent: "berry",
     taste: "strong" as TasteTag,
   },
 ];
 
 type AppTab = "today" | "bar" | "buy" | "recipes";
 
-const tabs: { id: AppTab; label: string }[] = [
-  { id: "today", label: "Сегодня" },
-  { id: "bar", label: "Мой бар" },
-  { id: "buy", label: "Докупить" },
-  { id: "recipes", label: "Рецепты" },
+const tabs: { id: AppTab; label: string; icon: string }[] = [
+  { id: "today", label: "Сегодня", icon: "●" },
+  { id: "bar", label: "Мой бар", icon: "◐" },
+  { id: "buy", label: "Докупить", icon: "+" },
+  { id: "recipes", label: "Рецепты", icon: "≡" },
 ];
 
 const tabSubtitles: Record<AppTab, string> = {
@@ -350,15 +353,10 @@ export default function App() {
                   Подобрать коктейли
                 </Text>
               </Pressable>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityState={{ disabled: true }}
-                disabled
-                style={[styles.registerButton, styles.registerButtonDisabled]}
-              >
-                <Text style={styles.registerButtonText}>Зарегистрироваться</Text>
-              </Pressable>
-              <Text style={styles.onboardingHint}>Регистрация появится позже: личный бар и синхронизация.</Text>
+              <View style={styles.accountLater}>
+                <Text style={styles.accountLaterTitle}>Аккаунт позже</Text>
+                <Text style={styles.onboardingHint}>Сейчас бар сохраняется на этом устройстве.</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -409,8 +407,19 @@ export default function App() {
                       accessibilityRole="button"
                       key={mode.id}
                       onPress={() => applyQuickMode(mode.taste)}
-                      style={styles.actionCard}
+                      style={[
+                        styles.actionCard,
+                        mode.accent === "teal" && styles.actionCardTeal,
+                        mode.accent === "berry" && styles.actionCardBerry,
+                      ]}
                     >
+                      <View
+                        style={[
+                          styles.actionAccent,
+                          mode.accent === "teal" && styles.actionAccentTeal,
+                          mode.accent === "berry" && styles.actionAccentBerry,
+                        ]}
+                      />
                       <View style={styles.actionCardTop}>
                         <Text style={styles.actionTitle}>{mode.title}</Text>
                         <Text style={styles.actionMeta}>{mode.matches.length}</Text>
@@ -535,6 +544,7 @@ export default function App() {
                 onPress={() => setActiveTab(tab.id)}
                 style={[styles.navItem, isActive && styles.navItemActive]}
               >
+                <Text style={[styles.navIcon, isActive && styles.navIconActive]}>{tab.icon}</Text>
                 <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>{tab.label}</Text>
               </Pressable>
             );
@@ -589,16 +599,16 @@ const styles = StyleSheet.create({
   },
   onboardingContent: {
     padding: 12,
-    paddingBottom: 190,
+    paddingBottom: 158,
     gap: 12,
   },
   onboardingHero: {
-    backgroundColor: "#1a1f27",
+    backgroundColor: "#1b2029",
     borderRadius: 8,
     padding: 14,
     gap: 10,
     borderWidth: 1,
-    borderColor: "#252d38",
+    borderColor: "#313b48",
   },
   onboardingTitle: {
     color: "#f8fafc",
@@ -612,10 +622,10 @@ const styles = StyleSheet.create({
   },
   onboardingStat: {
     flex: 1,
-    backgroundColor: "#121821",
+    backgroundColor: "#121a24",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#2b3441",
+    borderColor: "#344151",
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
@@ -629,7 +639,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: "#101318",
     borderTopWidth: 1,
-    borderTopColor: "#303846",
+    borderTopColor: "#303f4d",
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 12,
@@ -655,23 +665,19 @@ const styles = StyleSheet.create({
   primaryButtonTextDisabled: {
     color: "#8591a3",
   },
-  registerButton: {
-    minHeight: 48,
+  accountLater: {
+    minHeight: 42,
     borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#151b23",
     borderWidth: 1,
-    borderColor: "#39414f",
-    backgroundColor: "#141a22",
-    paddingHorizontal: 14,
-    paddingVertical: 11,
+    borderColor: "#283241",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 2,
   },
-  registerButtonDisabled: {
-    opacity: 0.72,
-  },
-  registerButtonText: {
+  accountLaterTitle: {
     color: "#dce4ef",
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "900",
     textAlign: "center",
   },
@@ -759,12 +765,35 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionCard: {
+    position: "relative",
     backgroundColor: "#141a22",
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#303846",
     padding: 12,
+    paddingLeft: 16,
     gap: 6,
+    overflow: "hidden",
+  },
+  actionCardTeal: {
+    borderColor: "#2a6864",
+  },
+  actionCardBerry: {
+    borderColor: "#684052",
+  },
+  actionAccent: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 4,
+    backgroundColor: "#f4b860",
+  },
+  actionAccentTeal: {
+    backgroundColor: "#52c4c8",
+  },
+  actionAccentBerry: {
+    backgroundColor: "#d06b87",
   },
   actionCardTop: {
     flexDirection: "row",
@@ -817,12 +846,12 @@ const styles = StyleSheet.create({
     color: "#0d2022",
   },
   shopCard: {
-    backgroundColor: "#141a22",
+    backgroundColor: "#151b23",
     borderRadius: 8,
     padding: 12,
     gap: 8,
     borderWidth: 1,
-    borderColor: "#303846",
+    borderColor: "#354151",
   },
   shopHeader: {
     flexDirection: "row",
@@ -864,26 +893,36 @@ const styles = StyleSheet.create({
     bottom: 12,
     flexDirection: "row",
     gap: 6,
-    backgroundColor: "#171d25",
+    backgroundColor: "#151b23",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#303846",
+    borderColor: "#344151",
     padding: 6,
   },
   navItem: {
     flex: 1,
-    minHeight: 44,
+    minHeight: 50,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 4,
+    gap: 2,
   },
   navItemActive: {
     backgroundColor: "#f4b860",
   },
+  navIcon: {
+    color: "#7f8fa3",
+    fontSize: 15,
+    fontWeight: "900",
+    lineHeight: 16,
+  },
+  navIconActive: {
+    color: "#151922",
+  },
   navLabel: {
     color: "#c4cfdd",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "900",
   },
   navLabelActive: {
