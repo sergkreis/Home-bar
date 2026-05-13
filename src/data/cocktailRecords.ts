@@ -14,8 +14,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни все ингредиенты со льдом и процеди в коктейльный бокал.",
-      "Sprinkle Мускатный орех on верх и Подавай."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Мускатный орех.",
+      "Подавай сразу."
     ]
   },
   {
@@ -30,7 +32,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коллинз",
     "steps": [
-      "Налей Кампари и vermouth over Лед в бокал, add a немного содовой и Укрась половину дольки апельсина."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Цедра лимона, Цедра апельсина.",
+      "Подавай сразу."
     ]
   },
   {
@@ -46,9 +51,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Добавь все ингредиенты в шейкер со льдом.",
-      "Хорошо встряхни и процеди в коктейльный бокал.",
-      "Укрась a Вишня."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -62,8 +67,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Шот",
     "steps": [
-      "Выложи ингредиенты слоями в шот.",
-      "Подавай with a Перемешайrer."
+      "Подготовь бокал: Шот.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -76,8 +82,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Флюте",
     "steps": [
-      "Pour Персик purée в chilled flute, add sparkling wine.",
-      "Аккуратно перемешай."
+      "Подготовь бокал: Флюте.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -93,10 +100,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Рокс",
     "steps": [
-      "Наполни бокал колотым льдом.",
-      "Собери джин, лимонный сок и сироп поверх льда.",
-      "Перемешай, и затем pour blackberry liqueur over in a circular fashion to create marbling effect.",
-      "Укрась two blackberries и дольку лимона."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -111,8 +117,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Смешай ингредиенты со льдом и Перемешай до охлаждения.",
-      "Процеди в охлажденный коктейльный бокал."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Коктейльная вишня.",
+      "Подавай сразу."
     ]
   },
   {
@@ -126,8 +134,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Рокс",
     "steps": [
-      "Place Лайм и Сахар в old fashioned бокал и Слегка разомни (mash the two ingredients together используя a Слегка разомниr or a wooden spoon).",
-      "Наполни бокал льдом и add the Cachaça."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лайм.",
+      "Подавай сразу."
     ]
   },
   {
@@ -144,11 +154,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Налей все ингредиенты в Встряхниr with кубики льда.",
-      "Хорошо встряхни.",
-      "Процеди в охлажденный коктейльный бокал.",
-      "Укрась a Лимон twist и a maraschino Вишня.",
-      "Подавай without a straw."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Вишня.",
+      "Подавай сразу."
     ]
   },
   {
@@ -162,7 +171,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Dry Встряхни ингредиенты to emulsify, add Лед, Встряхни и Подавайd straight up."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лимон.",
+      "Подавай сразу."
     ]
   },
   {
@@ -178,7 +190,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни, Процеди, straight up, коктейльный бокал rinsed with Абсент"
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -194,9 +208,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Добавь все ингредиенты в шейкер со льдом.",
-      "Хорошо встряхни и double Процеди в large коктейльный бокал.",
-      "Укрась Лайм wheel."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -210,8 +224,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Хайбол",
     "steps": [
-      "Build all ingredients in a бокал коллинз filled со льдом.",
-      "Укрась дольку лайма."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лайм.",
+      "Подавай сразу."
     ]
   },
   {
@@ -225,9 +241,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Налей все ингредиенты в Встряхниr with кубики льда.",
-      "Хорошо встряхни.",
-      "Процеди in chilled коктейльный бокал."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лайм.",
+      "Подавай сразу."
     ]
   },
   {
@@ -240,8 +257,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Хайбол",
     "steps": [
-      "In a хайбол filled со льдом add 6cl Темный ром и Долей Джинger beer.",
-      "Укрась дольку лайма."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -256,10 +274,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Налей Водка, Сухой вермут и Оливковый рассол в a cocktail Встряхниr with a handful Лед и Хорошо встряхни.",
-      "Rub the rim a martini бокал with the wedge Лимон.",
-      "Процеди the contents the cocktail Встряхниr в the бокал и add the Оливка.",
-      "A dirty Martini contains a splash Оливковый рассол or Оливка juЛед и is typically Украсьed with an Оливка."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лимон, Оливка.",
+      "Подавай сразу."
     ]
   },
   {
@@ -273,10 +291,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Straight: Налей все ингредиенты в mixing бокал with кубики льда.",
-      "Перемешай well.",
-      "Процеди in chilled martini коктейльный бокал.",
-      "Squeeze oil from Лимон peel onto the drink, or Укрась Оливка."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Оливка.",
+      "Подавай сразу."
     ]
   },
   {
@@ -290,7 +308,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Налей ингредиенты в Встряхниr filled со льдом, Встряхни vigorously, и Процеди в chilled martini бокал"
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -305,10 +325,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коллинз",
     "steps": [
-      "Смешай Джин, Сахар, и Лимон juЛед in a cocktail Встряхниr filled со льдом.",
-      "Встряхни vigorously и Процеди в a chilled Шампанское бокал.",
-      "Долей Шампанское.",
-      "Аккуратно перемешай."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Апельсин, Коктейльная вишня.",
+      "Подавай сразу."
     ]
   },
   {
@@ -321,8 +341,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Рокс",
     "steps": [
-      "Налей все ингредиенты directly в old fashioned бокал наполненный кубики льда.",
-      "Аккуратно перемешай."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -337,9 +358,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Налей все ингредиенты в Встряхниr with кубики льда.",
-      "Хорошо встряхни и Процеди в охлажденный коктейльный бокал.",
-      "Squeeze oil from Лимон peel onto the drink."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -354,9 +375,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Add all the ingredients to a Встряхниr и Наполни льдом.",
-      "Встряхни, и Процеди в охлажденный коктейльный бокал or an Old Fashioned бокал наполненный fresh Лед.",
-      "Укрась a Лайм wheel."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лайм.",
+      "Подавай сразу."
     ]
   },
   {
@@ -370,9 +392,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Хайбол",
     "steps": [
-      "Встряхни все ингредиенты со льдом cubes, except Газированная вода.",
-      "Налей в бокал.",
-      "Долей Газированная вода."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лимон.",
+      "Подавай сразу."
     ]
   },
   {
@@ -387,10 +410,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Хайбол",
     "steps": [
-      "Half-fill a tall бокал со льдом.",
-      "Mix the Джин и Гренадин together и pour over the Лед.",
-      "Add the Лайм or Лимон juЛед и верх off with Газированная вода.",
-      "Decorate the бокал with Лайм и/or дольку лимонаs."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лимон, Лайм.",
+      "Подавай сразу."
     ]
   },
   {
@@ -404,7 +427,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Хайбол",
     "steps": [
-      "Fill a хайбол со льдом, Налей Джин, Долей Тоник и squeeze a Лимон wedge и Укрась a Лимон wedge."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Цедра лимона.",
+      "Подавай сразу."
     ]
   },
   {
@@ -417,8 +443,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Рокс",
     "steps": [
-      "Налей все ингредиенты directly в old fashioned бокал наполненный кубики льда.",
-      "Аккуратно перемешай."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -433,8 +460,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Коллинз",
     "steps": [
-      "Add the Водка to a бокал коллинз filled со льдом.",
-      "Долей Грейпфрутовый сок и Перемешай."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -448,8 +476,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Коллинз",
     "steps": [
-      "Перемешай the Водка и orange juЛед со льдом in the бокал, затем Аккуратно добавь сверху the Гальяно on верх.",
-      "Укрась и Подавай."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -465,8 +494,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Налей все ингредиенты в a Встряхниr со льдом.",
-      "Встряхни."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -479,8 +509,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Бокал для айриш кофе",
     "steps": [
-      "Heat the Кофе, Виски и Сахар; do not boil.",
-      "Налей в бокал и Долей Сливки; Подавай hot."
+      "Подготовь бокал: Бокал для айриш кофе.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Взбитые сливки.",
+      "Подавай сразу."
     ]
   },
   {
@@ -494,7 +526,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни все ингредиенты со льдом, Процеди в a коктейльный бокал, и Подавай."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лайм.",
+      "Подавай сразу."
     ]
   },
   {
@@ -509,10 +544,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коллинз",
     "steps": [
-      "Налей все ингредиенты directly в хайбол filled со льдом.",
-      "Аккуратно перемешай.",
-      "Укрась.",
-      "Add a dash Ангостура."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Коктейльная вишня, Апельсин.",
+      "Подавай сразу."
     ]
   },
   {
@@ -528,8 +563,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни all ingredients together со льдом.",
-      "Процеди в бокал, Укрась и Подавай."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -542,7 +578,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Винный бокал",
     "steps": [
-      "Add the crème de cassis to the bottom the бокал, затем Долей wine."
+      "Подготовь бокал: Винный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -555,7 +593,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Флюте",
     "steps": [
-      "Pour Крем де кассис in бокал, gently pour Шампанское on верх"
+      "Подготовь бокал: Флюте.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -571,7 +611,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни со льдом и Процеди в a коктейльный бокал."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -585,7 +627,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни и Процеди в охлажденный коктейльный бокал rimmed with Сахар."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лимон.",
+      "Подавай сразу."
     ]
   },
   {
@@ -600,8 +645,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Хайбол",
     "steps": [
-      "Mix all contents in a хайбол и sitr gently.",
-      "Add dash Coca-Кола for the coloring и Укрась Лимон or Лайм twist."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Цедра лимона.",
+      "Подавай сразу."
     ]
   },
   {
@@ -615,9 +662,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коллинз",
     "steps": [
-      "Встряхни все ингредиенты со льдом.",
-      "Процеди в бокал.",
-      "Укрась и Подавай with straw."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Вишня.",
+      "Подавай сразу."
     ]
   },
   {
@@ -631,7 +679,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Перемешайred over Лед, Процедиed в a chilled бокал, Украсьed, и Подавайd up."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Коктейльная вишня, Цедра апельсина.",
+      "Подавай сразу."
     ]
   },
   {
@@ -647,10 +698,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Rub the rim the бокал with the Лайм slЛед to make the salt stick to it.",
-      "Take care to moisten only the outer rim и sprinkle the salt on it.",
-      "The salt should present to the lips the imbiber и never mix в the cocktail.",
-      "Встряхни the other ingredients со льдом, затем carefully Налей в the бокал."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Соль.",
+      "Подавай сразу."
     ]
   },
   {
@@ -665,8 +716,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Add all ingredients to a mixing бокал и Наполни льдом.",
-      "Перемешай until chilled, и Процеди в a chilled coupe бокал."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -681,7 +733,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни и Процеди в a chilled large коктейльный бокал"
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Коктейльная вишня.",
+      "Подавай сразу."
     ]
   },
   {
@@ -695,8 +750,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Флюте",
     "steps": [
-      "Ensure both ingredients are well chilled, затем mix в the бокал.",
-      "Подавай cold."
+      "Подготовь бокал: Флюте.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -710,9 +766,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коллинз",
     "steps": [
-      "In a хайбол gently Слегка разомни the Мята, Сахар и water.",
-      "Fill the бокал with cracked Лед, add Бурбон и Перемешай well until the бокал is well frosted.",
-      "Укрась a Мята sprig."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Мята.",
+      "Подавай сразу."
     ]
   },
   {
@@ -727,10 +784,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Хайбол",
     "steps": [
-      "Слегка разомни Мята leaves with Сахар и Лайм juЛед.",
-      "Add a немного содовой и fill the бокал with cracked Лед.",
-      "Налей Ром и Долей Газированная вода.",
-      "Укрась и Подавай with straw."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лайм, Мята.",
+      "Подавай сразу."
     ]
   },
   {
@@ -745,10 +802,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Медная кружка",
     "steps": [
-      "Смешай Водка и Джинger beer in a хайбол filled со льдом.",
-      "Add Лайм juЛед.",
-      "Аккуратно перемешай.",
-      "Укрась."
+      "Подготовь бокал: Медная кружка.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -762,7 +818,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Рокс",
     "steps": [
-      "Перемешай в бокал over Лед, Укрась и Подавай."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -776,9 +834,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Сауэр",
     "steps": [
-      "Встряхни Купажированный виски, juЛед Лимон, и powdered Сахар со льдом и Процеди в a Виски sour бокал.",
-      "Аккуратно добавь сверху claret on верх.",
-      "Decorate with the half-slЛед Лимон и the Вишня и Подавай."
+      "Подготовь бокал: Сауэр.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лимон, Лимон, Вишня.",
+      "Подавай сразу."
     ]
   },
   {
@@ -794,8 +853,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни a handful Мята, 2oz white Ром, 1oz Сахар syrup, 1oz Лайм juЛед и 2 dashes Ангостура со льдом.",
-      "Double Процеди в a бокал и Долей 2oz Просекко."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -810,10 +870,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Рокс",
     "steps": [
-      "Place Сахар cube in old fashioned бокал и saturate with Биттер, add a dash plain water.",
-      "Слегка разомни until dissolved.",
-      "Наполни бокал льдом cubes и add Виски.",
-      "Укрась orange twist, и a cocktail Вишня."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -825,13 +884,11 @@ export const cocktailRecords: CocktailRecord[] = [
       "strong"
     ],
     "strength": "strong",
-    "glassName": "Nick & Nora",
+    "glassName": "Ник и Нора",
     "steps": [
-      "Chill коктейльный бокал.",
-      "Add ingredients to a mixing бокал, и fill 2/3 full со льдом.",
-      "Перемешай about 20 seconds.",
-      "Empty коктейльный бокал и Процеди в the бокал.",
-      "Укрась a twist Лимон peel."
+      "Подготовь бокал: Ник и Нора.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -844,7 +901,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Коллинз",
     "steps": [
-      "Перемешай together и Подавай over Лед."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -861,7 +920,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни, Процеди, up, коктейльный бокал"
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -876,10 +937,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Рокс",
     "steps": [
-      "Встряхни Купажированный скотч, Лимон juЛед, Медовый сироп и Джинger syrup со льдом.",
-      "Процеди over large Лед in chilled rocks бокал.",
-      "Аккуратно добавь сверху smoky Скотч on верх (be sure to use a smoky Скотч such as an Islay single malt).",
-      "Укрась candied Джинger."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -892,8 +952,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Коллинз",
     "steps": [
-      "Mix with crushed Лед in blender until smooth.",
-      "Налей в chilled бокал, Укрась и Подавай."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Ананас.",
+      "Подавай сразу."
     ]
   },
   {
@@ -907,10 +969,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Бокал для белого вина",
     "steps": [
-      "Налей Биттер в a wine бокал.",
-      "Swirl the бокал to coat the inside with the Биттер, Встряхни out the excess.",
-      "Налей Джин в the бокал.",
-      "Do not add Лед."
+      "Подготовь бокал: Бокал для белого вина.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -925,7 +986,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Vigorously Встряхни и Процеди contents in a cocktail Встряхниr with кубики льда, затем Налей в бокал и Укрась Биттер."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -940,9 +1003,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Хайбол",
     "steps": [
-      "Squeeze an orange и Процеди the juЛед.",
-      "Put all the ingredients in a Встряхниr filled со льдом и Встряхни for at least 12 seconds.",
-      "Процеди в a хайбол и decorate with a pineapple wedge or fruit your choЛед."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -957,13 +1020,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Хайбол",
     "steps": [
-      "Prepare all the ingredients on the counter to be able to work well и quickly, especially the Сливки и Яичный белок.",
-      "Pour all the ingredients в a Встряхниr.",
-      "Встряхни vigorously for 1 minute: Сливки и Яичный белок must be mixed perfectly, so don't rush.",
-      "Now open the Встряхниr и put some Лед и Встряхни for 1-2 minutes.",
-      "It depends on how long you can resist!",
-      "Налей в a хайбол, add a splash soda и Укрась to taste.",
-      "Ramos Джин Fizz was once drunk as an invigorating drink or even as a breakfast, try it as an aperitif и after dinner и you will discover a little gem now lost."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   },
   {
@@ -976,9 +1035,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "medium",
     "glassName": "Рокс",
     "steps": [
-      "Налей Скотч и Драмбуи в an рокс almost наполненный кубики льда.",
-      "Перемешай well.",
-      "Укрась the Лимон twist."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Цедра лимона.",
+      "Подавай сразу."
     ]
   },
   {
@@ -994,10 +1054,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Рокс",
     "steps": [
-      "Rinse a chilled рокс with the Абсент, add crushed Лед, и set it aside.",
-      "Перемешай the remaining ingredients over Лед и set it aside.",
-      "Discard the Лед и any excess Абсент from the prepared бокал, и Процеди the drink в the бокал.",
-      "Add the Лимон peel for Укрась."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Цедра лимона.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1012,8 +1072,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Хайбол",
     "steps": [
-      "Build all ingredients in a хайбол filled со льдом.",
-      "Укрась дольку лайма."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1029,8 +1090,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Налей все ингредиенты в cocktail Встряхниr filled со льдом.",
-      "Хорошо встряхни и процеди в коктейльный бокал."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1044,7 +1106,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Рокс",
     "steps": [
-      "Build в бокал over Лед, Укрась и Подавай."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1058,10 +1122,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Хайбол",
     "steps": [
-      "Налей Текила и orange juЛед в бокал over Лед.",
-      "Add the Гренадин, which will sink to the bottom.",
-      "Аккуратно перемешай to create the sunrise effect.",
-      "Укрась и Подавай."
+      "Подготовь бокал: Хайбол.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1076,11 +1139,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Коллинз",
     "steps": [
-      "In a Встряхниr half-наполненный кубики льда, Смешай the Джин, Лимон juЛед, и Сахар.",
-      "Хорошо встряхни.",
-      "Процеди в a бокал коллинз alomst наполненный кубики льда.",
-      "Add the Содовая.",
-      "Перемешай и Укрась the Вишня и the дольку апельсина."
+      "Подготовь бокал: Коллинз.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Укрась: Коктейльная вишня, Апельсин.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1093,7 +1155,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Встряхни over Лед until well chilled, затем Процеди в a deep goblet и Укрась a thin slЛед Лимон peel."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1107,9 +1171,10 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "light",
     "glassName": "Рокс",
     "steps": [
-      "Встряхни со льдом.",
-      "Процеди в chilled бокал, Укрась и Подавай.",
-      "If Подавайd 'On the rocks', Процеди ingredients в рокс filled со льдом."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Укрась: Лимон, Вишня, Лимон.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1125,8 +1190,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Коктейльный бокал",
     "steps": [
-      "Добавь все ингредиенты в шейкер со льдом.",
-      "Хорошо встряхни и Процеди в large коктейльный бокал."
+      "Подготовь бокал: Коктейльный бокал.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1140,8 +1206,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Рокс",
     "steps": [
-      "Pour Водка и Кофе liqueur over кубики льда in an рокс.",
-      "Fill with light Сливки и Подавай."
+      "Подготовь бокал: Рокс.",
+      "Добавь ингредиенты в бокал со льдом и аккуратно перемешай.",
+      "Подавай сразу."
     ]
   },
   {
@@ -1158,11 +1225,9 @@ export const cocktailRecords: CocktailRecord[] = [
     "strength": "strong",
     "glassName": "Харрикейн",
     "steps": [
-      "Blend at high speed for no more than 5 seconds.",
-      "Налей в a бокал, add кубики льда to fill, затем add the Укрась.",
-      "*Donn’s mix: Bring 3 crushed cinnamon sticks, 1 cup Сахар и 1 cup water to a boil, Перемешайring until the Сахар is dissolved.",
-      "Simmer for 2 minutes, затем remove from the heat и let sit for at least 2 hours before Процедиing в a clean бокал bottle.",
-      "Затем add 1 part the syrup и 2 parts fresh Грейпфрутовый сок together."
+      "Подготовь бокал: Харрикейн.",
+      "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+      "Подавай сразу."
     ]
   }
 ];

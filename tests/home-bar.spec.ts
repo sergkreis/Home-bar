@@ -21,3 +21,16 @@ test("home page supports the core mobile flow", async ({ page }) => {
   await page.getByPlaceholder("Поиск по бутылкам, сокам и ингредиентам").fill("джин");
   await expect(page.getByText("Джин", { exact: true }).first()).toBeVisible();
 });
+
+test("saved starter bar opens the main app after reload", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Стартовый" }).click();
+  await page.getByRole("button", { name: "Подобрать коктейли" }).click();
+  await expect(page.getByText("Что выпить сегодня")).toBeVisible();
+
+  await page.reload();
+
+  await expect(page.getByText("Что выпить сегодня")).toBeVisible();
+  await expect(page.getByText("Что есть дома?")).toBeHidden();
+});

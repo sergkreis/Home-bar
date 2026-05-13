@@ -111,6 +111,7 @@ export default function App() {
 
         if (isMounted) {
           setSelectedIngredients(savedIngredients);
+          setHasEnteredApp(savedIngredients.length > 0);
         }
       } catch (error) {
         console.warn("Failed to load saved home bar.", error);
@@ -569,7 +570,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 12,
-    paddingBottom: 96,
+    paddingBottom: 12,
     gap: 12,
   },
   detailContent: {
@@ -599,7 +600,7 @@ const styles = StyleSheet.create({
   },
   onboardingContent: {
     padding: 12,
-    paddingBottom: 158,
+    paddingBottom: 12,
     gap: 12,
   },
   onboardingHero: {
@@ -633,10 +634,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   onboardingDock: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: "#101318",
     borderTopWidth: 1,
     borderTopColor: "#303f4d",
@@ -887,10 +884,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   bottomNav: {
-    position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: 12,
     flexDirection: "row",
     gap: 6,
     backgroundColor: "#151b23",
@@ -898,6 +891,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#344151",
     padding: 6,
+    marginHorizontal: 12,
+    marginBottom: 12,
   },
   navItem: {
     flex: 1,

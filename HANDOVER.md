@@ -206,6 +206,28 @@ Regenerate cocktail data:
 npm run import:cocktails
 ```
 
+Frontend skill bundle to use for future web app work:
+
+```text
+C:\Users\Sergej\.codex\plugins\cache\openai-curated\build-web-apps\1141b764\skills\
+```
+
+Relevant skills for this project:
+
+```text
+frontend-app-builder        - redesign/restyle/modernization and visual concept fidelity work
+frontend-testing-debugging  - rendered UI testing, responsive checks, console/layout/debugging loops
+react-best-practices        - React performance/refactor guidance for component changes
+```
+
+Notes:
+
+```text
+Prefer the Browser plugin / in-app browser for rendered frontend QA when available.
+Use Playwright as fallback or for the existing tests/home-bar.spec.ts workflow.
+shadcn, Stripe, and Supabase skills are not currently relevant unless the project adopts those stacks.
+```
+
 Last local verification on 2026-05-02:
 
 ```text

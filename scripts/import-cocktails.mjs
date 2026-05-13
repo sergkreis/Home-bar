@@ -177,7 +177,7 @@ const glassNameMap = {
   "Margarita glass": "Бокал маргарита",
   "Martini Glass": "Коктейльный бокал",
   "Mason jar": "Банка",
-  "Nick and Nora Glass": "Nick & Nora",
+  "Nick and Nora Glass": "Ник и Нора",
   "Old-fashioned glass": "Рокс",
   "Parfait glass": "Парьфе",
   "Pint glass": "Пинта",
@@ -345,6 +345,7 @@ const ingredientNameTranslations = {
   Tequila: "Текила",
   "Tonic water": "Тоник",
   "Triple sec": "Трипл-сек",
+  Vermouth: "Вермут",
   Vodka: "Водка",
   Whiskey: "Виски",
   Whisky: "Виски",
@@ -395,6 +396,7 @@ const instructionReplacements = [
   ["fill glass with ice", "Наполни бокал льдом"],
   ["top up with", "Долей"],
   ["top with", "Долей"],
+  ["on top", "сверху"],
   ["build gin, lemon juice and simple syrup over", "Собери джин, лимонный сок и сироп поверх льда"],
   ["build over ice", "Собери поверх льда"],
   ["garnish with", "Укрась"],
@@ -410,6 +412,10 @@ const instructionReplacements = [
   ["layer the ingredients", "Выложи ингредиенты слоями"],
   ["float", "Аккуратно добавь сверху"],
   ["fine strain", "Тонко процеди"],
+  ["sprinkle", "Посыпь"],
+  ["add a", "добавь немного"],
+  ["add", "добавь"],
+  ["over", "поверх"],
   ["then", "затем"],
   ["ice cubes", "кубики льда"],
   ["cocktail shaker", "шейкер"],
@@ -704,23 +710,32 @@ function translateCocktailName(name) {
   return cocktailNameTranslations[name] ?? name;
 }
 
+function replaceInstructionPhrase(value, source, target) {
+  const sourcePattern = escapeRegex(source).replace(/\\ /g, "\\s+");
+  const startsWithWord = /^[A-Za-z0-9]/.test(source);
+  const endsWithWord = /[A-Za-z0-9]$/.test(source);
+  const pattern = `${startsWithWord ? "\\b" : ""}${sourcePattern}${endsWithWord ? "\\b" : ""}`;
+
+  return value.replace(new RegExp(pattern, "gi"), target);
+}
+
 function localizeInstruction(step) {
   let translated = step.trim();
 
   for (const [source, target] of instructionReplacements) {
-    translated = translated.replace(new RegExp(source, "gi"), target);
+    translated = replaceInstructionPhrase(translated, source, target);
   }
 
   for (const [source, target] of normalizedIngredientNameTranslations.entries()) {
-    translated = translated.replace(new RegExp(source, "gi"), target);
+    translated = replaceInstructionPhrase(translated, source, target);
   }
 
   translated = translated
     .replace(/\band\b/gi, "и")
     .replace(/\binto\b/gi, "в")
     .replace(/\bfilled with\b/gi, "наполненный")
+    .replace(/\bwith\b/gi, "с")
     .replace(/\bglass\b/gi, "бокал")
-    .replace(/\btop\b/gi, "верх")
     .replace(/\bon top\b/gi, "сверху")
     .replace(/\busing\b/gi, "используя")
     .replace(/\ba\b/gi, "a")
@@ -740,6 +755,29 @@ function splitInstructions(value) {
     .filter(Boolean);
 
   return cleaned.length > 0 ? cleaned : [value.trim()];
+}
+
+function buildLocalizedRecipeSteps(recipeIngredients, glassName) {
+  const garnishNames = recipeIngredients
+    .filter((ingredient) => getIngredientMetadata(ingredient.id).isGarnish)
+    .map((ingredient) => ingredient.name);
+  const coreIngredients = recipeIngredients.filter(
+    (ingredient) => !getIngredientMetadata(ingredient.id).isGarnish,
+  );
+  const steps = [
+    `Подготовь бокал: ${glassName}.`,
+    coreIngredients.length <= 3
+      ? "Добавь ингредиенты в бокал со льдом и аккуратно перемешай."
+      : "Добавь ингредиенты в шейкер со льдом, встряхни и процеди в бокал.",
+  ];
+
+  if (garnishNames.length > 0) {
+    steps.push(`Укрась: ${garnishNames.join(", ")}.`);
+  }
+
+  steps.push("Подавай сразу.");
+
+  return steps;
 }
 
 function extractRecipeIngredients(drink) {
@@ -847,7 +885,7 @@ async function main() {
       taste,
       strength: inferStrength(recipeIngredients, glassName),
       glassName,
-      steps: splitInstructions(drink.strInstructions || "").map(localizeInstruction),
+      steps: buildLocalizedRecipeSteps(recipeIngredients, glassName),
     });
 
     recipeIngredients.forEach((ingredient, sortOrder) => {
