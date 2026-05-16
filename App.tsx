@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -8,11 +7,10 @@ import { IngredientPicker } from "./src/components/IngredientPicker";
 import { SectionPanel } from "./src/components/SectionPanel";
 import { cocktails, ingredients, TasteTag } from "./src/data/cocktails";
 import { starterIngredients } from "./src/data/starterIngredients";
+import { useSavedBar } from "./src/hooks/useSavedBar";
 import { getStrengthLabel, getTasteLabel } from "./src/utils/cocktailLabels";
 import { rankCocktails, RankedCocktail } from "./src/utils/cocktailMatcher";
 import { buildShoppingSuggestions, buildTonightHeadline } from "./src/utils/shoppingAdvisor";
-
-const SAVED_BAR_STORAGE_KEY = "domashniy-bar:selected-ingredients";
 
 const tasteFilters: { id: TasteTag; label: string }[] = [
   { id: "refreshing", label: "Свежее" },
@@ -79,65 +77,17 @@ function getIngredientName(ingredientId: string) {
 }
 
 export default function App() {
-  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const { hasLoadedSavedBar, hasSavedBar, selectedIngredients, setSelectedIngredients } = useSavedBar(ingredients);
   const [activeTaste, setActiveTaste] = useState<TasteTag | null>(null);
   const [activeTab, setActiveTab] = useState<AppTab>("today");
   const [selectedCocktail, setSelectedCocktail] = useState<RankedCocktail | null>(null);
   const [hasEnteredApp, setHasEnteredApp] = useState(false);
-  const [hasLoadedSavedBar, setHasLoadedSavedBar] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function loadSavedBar() {
-      try {
-        const storedIngredients = await AsyncStorage.getItem(SAVED_BAR_STORAGE_KEY);
-
-        if (!storedIngredients) {
-          return;
-        }
-
-        const parsedIngredients: unknown = JSON.parse(storedIngredients);
-
-        if (!Array.isArray(parsedIngredients)) {
-          return;
-        }
-
-        const knownIngredientIds = new Set(ingredients.map((ingredient) => ingredient.id));
-        const savedIngredients = parsedIngredients.filter(
-          (ingredientId): ingredientId is string =>
-            typeof ingredientId === "string" && knownIngredientIds.has(ingredientId),
-        );
-
-        if (isMounted) {
-          setSelectedIngredients(savedIngredients);
-          setHasEnteredApp(savedIngredients.length > 0);
-        }
-      } catch (error) {
-        console.warn("Failed to load saved home bar.", error);
-      } finally {
-        if (isMounted) {
-          setHasLoadedSavedBar(true);
-        }
-      }
+    if (hasSavedBar) {
+      setHasEnteredApp(true);
     }
-
-    loadSavedBar();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!hasLoadedSavedBar) {
-      return;
-    }
-
-    AsyncStorage.setItem(SAVED_BAR_STORAGE_KEY, JSON.stringify(selectedIngredients)).catch((error) => {
-      console.warn("Failed to save home bar.", error);
-    });
-  }, [hasLoadedSavedBar, selectedIngredients]);
+  }, [hasSavedBar]);
 
   const rankedCocktails = useMemo(
     () => rankCocktails(cocktails, selectedIngredients, activeTaste, ingredients),
@@ -225,7 +175,7 @@ export default function App() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
-        <ScrollView style={styles.screen} contentContainerStyle={styles.detailContent}>
+        <ScrollView key="detail" style={styles.screen} contentContainerStyle={styles.detailContent}>
           <View style={styles.detailHeader}>
             <Pressable
               accessibilityRole="button"
@@ -306,7 +256,7 @@ export default function App() {
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
         <View style={styles.onboardingShell}>
-          <ScrollView style={styles.screen} contentContainerStyle={styles.onboardingContent}>
+          <ScrollView key="onboarding" style={styles.screen} contentContainerStyle={styles.onboardingContent}>
             <View style={styles.onboardingHero}>
               <Text style={styles.eyebrow}>Домашний бар</Text>
               <Text style={styles.onboardingTitle}>Что есть дома?</Text>
@@ -369,7 +319,7 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
       <View style={styles.appShell}>
-        <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+        <ScrollView key={`app-${activeTab}`} style={styles.screen} contentContainerStyle={styles.content}>
           <View style={styles.appHeader}>
             <View style={styles.headerTop}>
               <View style={styles.headerTextBlock}>

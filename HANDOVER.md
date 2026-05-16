@@ -1,6 +1,6 @@
 # Domashniy Bar - Handover
 
-Последнее обновление: 2026-05-02
+Последнее обновление: 2026-05-16
 
 ## Быстрый Контекст
 
@@ -55,8 +55,9 @@ GitHub Actions deploy
 ## Основные Файлы
 
 ```text
-App.tsx                         - главный экран, state, screen switching, onboarding
+App.tsx                         - главный экран, screen switching, layout and tab rendering
 src/components/                 - reusable UI components
+src/hooks/useSavedBar.ts        - AsyncStorage persistence for selected home bar
 src/data/                       - generated cocktail/ingredient data
 src/utils/                      - matching and shopping suggestion logic
 tests/home-bar.spec.ts          - Playwright smoke test for core flow
@@ -91,11 +92,11 @@ Save selected home bar on device with AsyncStorage
 
 ## Данные
 
-Snapshot на 2026-05-01:
+Snapshot на 2026-05-16:
 
 ```text
 Cocktails: 72
-Ingredients: 93
+Ingredients: 90
 Recipe ingredient links: 279
 Starter ingredients: 18
 ```
@@ -209,7 +210,7 @@ npm run import:cocktails
 Frontend skill bundle to use for future web app work:
 
 ```text
-C:\Users\Sergej\.codex\plugins\cache\openai-curated\build-web-apps\1141b764\skills\
+C:\Users\Sergej\.codex\plugins\cache\openai-curated\build-web-apps\dc902811\skills\
 ```
 
 Relevant skills for this project:
@@ -228,10 +229,9 @@ Use Playwright as fallback or for the existing tests/home-bar.spec.ts workflow.
 shadcn, Stripe, and Supabase skills are not currently relevant unless the project adopts those stacks.
 ```
 
-Last local verification on 2026-05-02:
+Last local verification on 2026-05-16:
 
 ```text
-npm ci
 npx tsc --noEmit
 npm run build:web
 npm run test:ui
@@ -241,9 +241,11 @@ Result:
 
 ```text
 Type-check passed.
-Static web build passed.
-Playwright smoke test passed: 2 passed.
-npm ci reported 11 moderate severity vulnerabilities; dependencies were not changed beyond installing node_modules.
+Static web build passed and postprocessed PWA metadata into dist/.
+Playwright smoke test passed: 4 passed.
+Browser QA against http://127.0.0.1:8091/ passed for page identity, lang=ru, manifest link, viewport-fit=cover, and console health.
+Isolated Playwright mobile QA passed: onboarding -> starter bar -> main app opens at scrollTop 0.
+Expo still warns that expo and @react-native-async-storage/async-storage should be aligned to expected SDK 54 versions.
 ```
 
 ## Git/GitHub Notes
@@ -259,11 +261,11 @@ Local branch after latest deploy: main...origin/main, clean.
 
 ```text
 Registration/account sync is not implemented; onboarding now shows a muted "Аккаунт позже" info block.
-AsyncStorage persistence is implemented and covered by normal runtime use, but should still be checked on actual phones after UX changes.
-App.tsx still does too much: state, persistence, screen switching, filtering, shopping suggestions, layout.
+AsyncStorage persistence was moved to src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
+App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
 Generated data still contains a mix of translated Russian names and raw English ingredient names.
-PWA pass is still incomplete: /manifest.json returned 404 during review, and HTML lang was observed as "en" while the UI is Russian.
-UI tests still default to production because playwright.config.ts baseURL is https://kreisphoto.de unless PLAYWRIGHT_BASE_URL is set.
+PWA build pass now adds /manifest.json, lang=ru, viewport-fit=cover, apple mobile metadata, and install icons during npm run build:web.
+UI tests default to local Expo web server unless PLAYWRIGHT_BASE_URL is set.
 Deployment still uses root over SSH in GitHub Actions; consider a restricted deploy user later.
 ```
 
@@ -279,15 +281,20 @@ Design pass on 2026-05-02:
   Bottom nav has compact icon markers and larger tap zones.
   Quick-mode cards have amber/teal/berry accent strips.
 Smoke test was updated to expect "Аккаунт позже" instead of "Зарегистрироваться".
+PWA/mobile pass on 2026-05-16:
+  scripts/postprocess-web-export.mjs patches dist/index.html and writes manifest/install icons after expo export.
+  package.json build:web now runs expo export plus the postprocess script.
+  App.tsx ScrollViews have screen/tab keys so onboarding -> app transitions open at top on mobile.
+  AsyncStorage persistence moved from App.tsx to src/hooks/useSavedBar.ts.
 ```
 
 ## Следующие Шаги
 
 ```text
-1. Review the newly deployed mobile design on an actual phone at https://kreisphoto.de/ and collect UX fixes.
-2. Finish the phone-oriented web/PWA pass.
-3. Split App.tsx into screens/hooks once MVP behavior is stable.
-4. Add a small testable layer around matching/shopping logic before expanding the database further.
+1. Deploy the 2026-05-16 PWA/mobile pass after review.
+2. Review PWA installation on actual iOS/Android devices at https://kreisphoto.de/ after deploy.
+3. Split App.tsx tab/detail/onboarding screens into separate components once current changes are accepted.
+4. Add unit tests around matching/shopping logic before expanding the database further.
 5. Later: implement real registration/account sync if needed.
 ```
 
