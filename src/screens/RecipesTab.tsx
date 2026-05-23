@@ -1,0 +1,161 @@
+import { useMemo, useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+
+import { CocktailResults } from "../components/CocktailResults";
+import { SectionPanel } from "../components/SectionPanel";
+import { Ingredient, TasteTag } from "../data/cocktails";
+import { colors, pressed, radii, spacing } from "../theme";
+import { RankedCocktail } from "../utils/cocktailMatcher";
+
+type TasteFilter = { id: TasteTag; label: string };
+
+type RecipesTabProps = {
+  rankedCocktails: RankedCocktail[];
+  tasteFilters: TasteFilter[];
+  activeTaste: TasteTag | null;
+  onChangeTaste: (taste: TasteTag | null) => void;
+  ingredients: Ingredient[];
+  onSelectCocktail: (cocktail: RankedCocktail) => void;
+  isFavorite: (cocktailId: string) => boolean;
+  onToggleFavorite: (cocktailId: string) => void;
+};
+
+function normalizeText(value: string) {
+  return value.trim().toLocaleLowerCase("ru-RU");
+}
+
+export function RecipesTab({
+  rankedCocktails,
+  tasteFilters,
+  activeTaste,
+  onChangeTaste,
+  ingredients,
+  onSelectCocktail,
+  isFavorite,
+  onToggleFavorite,
+}: RecipesTabProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCocktails = useMemo(() => {
+    const normalized = normalizeText(searchQuery);
+    if (!normalized) {
+      return rankedCocktails;
+    }
+    return rankedCocktails.filter((cocktail) =>
+      normalizeText(cocktail.name).includes(normalized),
+    );
+  }, [rankedCocktails, searchQuery]);
+
+  return (
+    <>
+      <SectionPanel title="Настроение">
+        <View style={styles.filterRow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Показать все коктейли"
+            onPress={() => onChangeTaste(null)}
+            style={({ pressed: isPressed }) => [
+              styles.filterPill,
+              activeTaste === null && styles.filterPillActive,
+              isPressed && { opacity: pressed.opacity },
+            ]}
+          >
+            <Text style={[styles.filterLabel, activeTaste === null && styles.filterLabelActive]}>
+              Все
+            </Text>
+          </Pressable>
+          {tasteFilters.map((filter) => {
+            const isActive = activeTaste === filter.id;
+            return (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Фильтр: ${filter.label}`}
+                accessibilityState={{ selected: isActive }}
+                key={filter.id}
+                onPress={() => onChangeTaste(isActive ? null : filter.id)}
+                style={({ pressed: isPressed }) => [
+                  styles.filterPill,
+                  isActive && styles.filterPillActive,
+                  isPressed && { opacity: pressed.opacity },
+                ]}
+              >
+                <Text style={[styles.filterLabel, isActive && styles.filterLabelActive]}>
+                  {filter.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        <View style={styles.searchWrap}>
+          <TextInput
+            accessibilityLabel="Поиск коктейля по названию"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Найти коктейль по названию"
+            placeholderTextColor="#6f7d90"
+            style={styles.searchInput}
+          />
+        </View>
+
+        {searchQuery ? (
+          <Text style={styles.searchMeta}>Найдено: {filteredCocktails.length}</Text>
+        ) : null}
+      </SectionPanel>
+
+      <CocktailResults
+        cocktails={filteredCocktails}
+        ingredients={ingredients}
+        onSelectCocktail={onSelectCocktail}
+        isFavorite={isFavorite}
+        onToggleFavorite={onToggleFavorite}
+      />
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  filterRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  filterPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: radii.sm,
+    backgroundColor: colors.surfaceMuted,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+  },
+  filterPillActive: {
+    backgroundColor: colors.teal,
+    borderColor: colors.teal,
+  },
+  filterLabel: {
+    color: "#d5dcea",
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  filterLabelActive: {
+    color: "#0d2022",
+  },
+  searchWrap: {
+    backgroundColor: "#101720",
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: "#405061",
+    paddingHorizontal: 12,
+    marginTop: spacing.sm,
+  },
+  searchInput: {
+    color: colors.text,
+    fontSize: 15,
+    paddingVertical: 12,
+  },
+  searchMeta: {
+    color: colors.textSubtle,
+    fontSize: 12,
+    fontWeight: "800",
+  },
+});
