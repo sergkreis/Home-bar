@@ -1,14 +1,22 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { CocktailResults } from "./src/components/CocktailResults";
-import { IngredientPicker } from "./src/components/IngredientPicker";
-import { SectionPanel } from "./src/components/SectionPanel";
+import { AppHeader } from "./src/components/AppHeader";
+import { AppTab, BottomNav } from "./src/components/BottomNav";
 import { cocktails, ingredients, TasteTag } from "./src/data/cocktails";
 import { starterIngredients } from "./src/data/starterIngredients";
+import { useEnteredApp } from "./src/hooks/useEnteredApp";
+import { useFavorites } from "./src/hooks/useFavorites";
 import { useSavedBar } from "./src/hooks/useSavedBar";
-import { getStrengthLabel, getTasteLabel } from "./src/utils/cocktailLabels";
+import { BarTab } from "./src/screens/BarTab";
+import { BuyTab } from "./src/screens/BuyTab";
+import { CocktailDetailScreen } from "./src/screens/CocktailDetailScreen";
+import { FavoritesTab } from "./src/screens/FavoritesTab";
+import { OnboardingScreen } from "./src/screens/OnboardingScreen";
+import { RecipesTab } from "./src/screens/RecipesTab";
+import { QuickMode, TodayTab } from "./src/screens/TodayTab";
+import { colors, spacing } from "./src/theme";
 import { rankCocktails, RankedCocktail } from "./src/utils/cocktailMatcher";
 import { buildShoppingSuggestions, buildTonightHeadline } from "./src/utils/shoppingAdvisor";
 
@@ -32,87 +40,69 @@ const ingredientGroups = [
   { key: "other", label: "Редкое" },
 ] as const;
 
-const quickModes = [
-  {
-    id: "easy",
-    title: "Без заморочек",
-    subtitle: "Можно смешать сразу",
-    accent: "amber",
-    taste: null as TasteTag | null,
-  },
-  {
-    id: "refreshing",
-    title: "Что-то свежее",
-    subtitle: "Легкие и освежающие",
-    accent: "teal",
-    taste: "refreshing" as TasteTag,
-  },
-  {
-    id: "strong",
-    title: "Покрепче",
-    subtitle: "Короткие и мощные",
-    accent: "berry",
-    taste: "strong" as TasteTag,
-  },
-];
-
-type AppTab = "today" | "bar" | "buy" | "recipes";
-
-const tabs: { id: AppTab; label: string; icon: string }[] = [
-  { id: "today", label: "Сегодня", icon: "●" },
-  { id: "bar", label: "Мой бар", icon: "◐" },
-  { id: "buy", label: "Докупить", icon: "+" },
-  { id: "recipes", label: "Рецепты", icon: "≡" },
+const quickModeDefs = [
+  { id: "easy", title: "Без заморочек", subtitle: "Можно смешать сразу", accent: "amber" as const, taste: null },
+  { id: "refreshing", title: "Что-то свежее", subtitle: "Легкие и освежающие", accent: "teal" as const, taste: "refreshing" as TasteTag },
+  { id: "strong", title: "Покрепче", subtitle: "Короткие и мощные", accent: "berry" as const, taste: "strong" as TasteTag },
 ];
 
 const tabSubtitles: Record<AppTab, string> = {
   today: "Лучшие варианты из того, что уже есть.",
   bar: "Отметь бутылки, соки и мелочи, которые есть дома.",
   buy: "Минимальные покупки, которые откроют больше коктейлей.",
+  favorites: "Коктейли, которые ты сохранил, чтобы вернуться к ним.",
   recipes: "Полный список с фильтром по настроению.",
 };
 
-function getIngredientName(ingredientId: string) {
-  return ingredients.find((ingredient) => ingredient.id === ingredientId)?.name ?? ingredientId;
-}
+const tabLabels: Record<AppTab, string> = {
+  today: "Сегодня",
+  bar: "Мой бар",
+  buy: "Докупить",
+  favorites: "Избранное",
+  recipes: "Рецепты",
+};
 
 export default function App() {
-  const { hasLoadedSavedBar, hasSavedBar, selectedIngredients, setSelectedIngredients } = useSavedBar(ingredients);
+  const { hasLoadedSavedBar, hasSavedBar, selectedIngredients, setSelectedIngredients } =
+    useSavedBar(ingredients);
+  const { hasLoadedEntered, hasEnteredApp, markEntered } = useEnteredApp();
+  const { hasLoadedFavorites, isFavorite, toggleFavorite } = useFavorites();
+
   const [activeTaste, setActiveTaste] = useState<TasteTag | null>(null);
   const [activeTab, setActiveTab] = useState<AppTab>("today");
   const [selectedCocktail, setSelectedCocktail] = useState<RankedCocktail | null>(null);
-  const [hasEnteredApp, setHasEnteredApp] = useState(false);
 
+  // Auto-enter for returning users with a saved bar (covers fresh installs)
   useEffect(() => {
-    if (hasSavedBar) {
-      setHasEnteredApp(true);
+    if (hasLoadedSavedBar && hasLoadedEntered && hasSavedBar && !hasEnteredApp) {
+      markEntered();
     }
-  }, [hasSavedBar]);
+  }, [hasLoadedSavedBar, hasLoadedEntered, hasSavedBar, hasEnteredApp, markEntered]);
 
   const rankedCocktails = useMemo(
     () => rankCocktails(cocktails, selectedIngredients, activeTaste, ingredients),
     [activeTaste, selectedIngredients],
   );
-
   const allRankedCocktails = useMemo(
     () => rankCocktails(cocktails, selectedIngredients, null, ingredients),
     [selectedIngredients],
   );
 
-  const tonightQuickList = useMemo(
+  const tonightQuickList: QuickMode[] = useMemo(
     () =>
-      quickModes.map((mode) => ({
+      quickModeDefs.map((mode) => ({
         ...mode,
         matches: rankCocktails(cocktails, selectedIngredients, mode.taste, ingredients).slice(0, 4),
       })),
     [selectedIngredients],
   );
 
-  const perfectMatches = rankedCocktails.filter((cocktail) => cocktail.missingIngredients.length === 0);
-  const allPerfectMatches = allRankedCocktails.filter((cocktail) => cocktail.missingIngredients.length === 0);
+  const perfectMatches = rankedCocktails.filter((c) => c.missingIngredients.length === 0);
+  const allPerfectMatches = allRankedCocktails.filter((c) => c.missingIngredients.length === 0);
   const almostReady = rankedCocktails.filter(
-    (cocktail) => cocktail.missingIngredients.length > 0 && cocktail.missingIngredients.length <= 2,
+    (c) => c.missingIngredients.length > 0 && c.missingIngredients.length <= 2,
   );
+
   const shoppingSuggestions = useMemo(
     () => buildShoppingSuggestions(allRankedCocktails, ingredients),
     [allRankedCocktails],
@@ -120,6 +110,11 @@ export default function App() {
   const tonightHeadline = useMemo(
     () => buildTonightHeadline(allRankedCocktails, selectedIngredients, ingredients),
     [allRankedCocktails, selectedIngredients],
+  );
+
+  const favoriteCocktails = useMemo(
+    () => allRankedCocktails.filter((c) => isFavorite(c.id)),
+    [allRankedCocktails, isFavorite],
   );
 
   const toggleIngredient = (ingredientId: string) => {
@@ -130,8 +125,10 @@ export default function App() {
     );
   };
 
-  const openCocktail = (cocktail: RankedCocktail) => {
-    setSelectedCocktail(cocktail);
+  const addIngredientToBar = (ingredientId: string) => {
+    setSelectedIngredients((current) =>
+      current.includes(ingredientId) ? current : [...current, ingredientId],
+    );
   };
 
   const applyQuickMode = (taste: TasteTag | null) => {
@@ -139,26 +136,18 @@ export default function App() {
     setActiveTab("recipes");
   };
 
-  const resetStarterBar = () => {
-    setSelectedIngredients(starterIngredients);
-  };
-
-  const clearBar = () => {
-    setSelectedIngredients([]);
-  };
-
   const startMatching = () => {
     if (selectedIngredients.length === 0) {
       return;
     }
-
     setActiveTaste(null);
     setActiveTab("today");
     setSelectedCocktail(null);
-    setHasEnteredApp(true);
+    markEntered();
   };
 
-  if (!hasLoadedSavedBar) {
+  // Loading
+  if (!hasLoadedSavedBar || !hasLoadedEntered || !hasLoadedFavorites) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
@@ -171,336 +160,120 @@ export default function App() {
     );
   }
 
+  // Cocktail detail
   if (selectedCocktail) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
-        <ScrollView key="detail" style={styles.screen} contentContainerStyle={styles.detailContent}>
-          <View style={styles.detailHeader}>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => setSelectedCocktail(null)}
-              style={styles.backButton}
-            >
-              <Text style={styles.backButtonLabel}>Назад</Text>
-            </Pressable>
-            <Text style={styles.detailTitle}>{selectedCocktail.name}</Text>
-            <Text style={styles.detailMeta}>
-              {selectedCocktail.baseSpirit} - {getStrengthLabel(selectedCocktail.strength)}
-            </Text>
-          </View>
-
-          <View style={styles.detailStatusRow}>
-            <View style={[styles.statusBadge, selectedCocktail.missingIngredients.length === 0 ? styles.readyBadge : styles.missingBadge]}>
-              <Text style={styles.statusBadgeText}>
-                {selectedCocktail.missingIngredients.length === 0
-                  ? "Готово сейчас"
-                  : `Не хватает ${selectedCocktail.missingIngredients.length}`}
-              </Text>
-            </View>
-            <Text style={styles.matchText}>
-              {Math.round(selectedCocktail.matchRatio * 100)}% совпадение
-            </Text>
-          </View>
-
-          {selectedCocktail.missingIngredients.length > 0 ? (
-            <View style={styles.callout}>
-              <Text style={styles.calloutLabel}>Докупить</Text>
-              <Text style={styles.calloutText}>
-                {selectedCocktail.missingIngredients.map(getIngredientName).join(", ")}
-              </Text>
-            </View>
-          ) : null}
-
-          <SectionPanel title="Ингредиенты">
-            {selectedCocktail.recipeIngredients.map(({ ingredientId, amount }) => {
-              const isOwned = !selectedCocktail.missingIngredients.includes(ingredientId);
-
-              return (
-                <View key={ingredientId} style={styles.recipeRow}>
-                  <View style={styles.recipeRowMain}>
-                    <View style={[styles.dot, isOwned ? styles.dotOwned : styles.dotMissing]} />
-                    <Text style={styles.recipeRowText}>{getIngredientName(ingredientId)}</Text>
-                  </View>
-                  <Text style={styles.recipeAmount}>{amount}</Text>
-                </View>
-              );
-            })}
-          </SectionPanel>
-
-          <SectionPanel title="Как приготовить" hint={`Бокал: ${selectedCocktail.glassName}`}>
-            {selectedCocktail.steps.map((step, index) => (
-              <View key={`${selectedCocktail.id}-${index}`} style={styles.stepRow}>
-                <View style={styles.stepIndexWrap}>
-                  <Text style={styles.stepIndexText}>{index + 1}</Text>
-                </View>
-                <Text style={styles.stepText}>{step}</Text>
-              </View>
-            ))}
-            {selectedCocktail.garnish ? (
-              <View style={styles.callout}>
-                <Text style={styles.calloutLabel}>Подача</Text>
-                <Text style={styles.calloutText}>{selectedCocktail.garnish}</Text>
-              </View>
-            ) : null}
-          </SectionPanel>
-        </ScrollView>
+        <CocktailDetailScreen
+          cocktail={selectedCocktail}
+          ingredients={ingredients}
+          ownedIngredientIds={selectedIngredients}
+          isFavorite={isFavorite(selectedCocktail.id)}
+          onToggleFavorite={() => toggleFavorite(selectedCocktail.id)}
+          onAddIngredientToBar={addIngredientToBar}
+          onBack={() => setSelectedCocktail(null)}
+        />
       </SafeAreaView>
     );
   }
 
+  // Onboarding
   if (!hasEnteredApp) {
-    const canStartMatching = selectedIngredients.length > 0;
-
     return (
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
-        <View style={styles.onboardingShell}>
-          <ScrollView key="onboarding" style={styles.screen} contentContainerStyle={styles.onboardingContent}>
-            <View style={styles.onboardingHero}>
-              <Text style={styles.eyebrow}>Домашний бар</Text>
-              <Text style={styles.onboardingTitle}>Что есть дома?</Text>
-              <Text style={styles.subtitle}>
-                Отметь алкоголь, соки, цитрус и сиропы. Потом сразу покажем, что можно смешать сейчас.
-              </Text>
-
-              <View style={styles.onboardingStats}>
-                <View style={styles.onboardingStat}>
-                  <Text style={styles.summaryValue}>{selectedIngredients.length}</Text>
-                  <Text style={styles.summaryLabel}>выбрано</Text>
-                </View>
-                <View style={styles.onboardingStat}>
-                  <Text style={styles.summaryValue}>{allPerfectMatches.length}</Text>
-                  <Text style={styles.summaryLabel}>готово</Text>
-                </View>
-              </View>
-            </View>
-
-            <SectionPanel
-              title="Выбери ингредиенты"
-              hint="Начни с реальных бутылок и миксеров. Если хочешь быстро посмотреть демо, нажми «Стартовый»."
-            >
-              <IngredientPicker
-                ingredients={ingredients}
-                ingredientGroups={ingredientGroups}
-                selectedIngredients={selectedIngredients}
-                onToggleIngredient={toggleIngredient}
-                onClear={clearBar}
-                onReset={resetStarterBar}
-              />
-            </SectionPanel>
-          </ScrollView>
-
-          <View style={styles.onboardingDock}>
-            <View style={styles.onboardingActions}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityState={{ disabled: !canStartMatching }}
-                disabled={!canStartMatching}
-                onPress={startMatching}
-                style={[styles.primaryButton, !canStartMatching && styles.primaryButtonDisabled]}
-              >
-                <Text style={[styles.primaryButtonText, !canStartMatching && styles.primaryButtonTextDisabled]}>
-                  Подобрать коктейли
-                </Text>
-              </Pressable>
-              <View style={styles.accountLater}>
-                <Text style={styles.accountLaterTitle}>Аккаунт позже</Text>
-                <Text style={styles.onboardingHint}>Сейчас бар сохраняется на этом устройстве.</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+        <OnboardingScreen
+          ingredients={ingredients}
+          ingredientGroups={ingredientGroups}
+          selectedIngredients={selectedIngredients}
+          perfectMatchesCount={allPerfectMatches.length}
+          onToggleIngredient={toggleIngredient}
+          onClear={() => setSelectedIngredients([])}
+          onResetToStarter={() => setSelectedIngredients(starterIngredients)}
+          onStartMatching={startMatching}
+        />
       </SafeAreaView>
     );
   }
 
+  // Main app
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
       <View style={styles.appShell}>
-        <ScrollView key={`app-${activeTab}`} style={styles.screen} contentContainerStyle={styles.content}>
-          <View style={styles.appHeader}>
-            <View style={styles.headerTop}>
-              <View style={styles.headerTextBlock}>
-                <Text style={styles.eyebrow}>Домашний бар</Text>
-                <Text style={styles.title}>{tabs.find((tab) => tab.id === activeTab)?.label}</Text>
-              </View>
-              <View style={styles.savedPill}>
-                <Text style={styles.savedPillText}>{hasLoadedSavedBar ? "Сохранено" : "Загрузка"}</Text>
-              </View>
-            </View>
-            <Text style={styles.subtitle}>{tabSubtitles[activeTab]}</Text>
-
-            <View style={styles.summaryStrip}>
-              <View style={styles.summaryItem}>
-                <Text style={styles.summaryValue}>{selectedIngredients.length}</Text>
-                <Text style={styles.summaryLabel}>дома</Text>
-              </View>
-              <View style={styles.summaryItem}>
-                <Text style={styles.summaryValue}>{perfectMatches.length}</Text>
-                <Text style={styles.summaryLabel}>готово</Text>
-              </View>
-              <View style={styles.summaryItem}>
-                <Text style={styles.summaryValue}>{almostReady.length}</Text>
-                <Text style={styles.summaryLabel}>почти</Text>
-              </View>
-            </View>
-          </View>
+        <ScrollView
+          key={`app-${activeTab}`}
+          style={styles.screen}
+          contentContainerStyle={styles.content}
+        >
+          <AppHeader
+            title={tabLabels[activeTab]}
+            subtitle={tabSubtitles[activeTab]}
+            rightPill="Сохранено"
+            stats={[
+              { value: selectedIngredients.length, label: "дома" },
+              { value: perfectMatches.length, label: "готово" },
+              { value: almostReady.length, label: "почти" },
+            ]}
+          />
 
           {activeTab === "today" ? (
-            <>
-              <SectionPanel title="Что выпить сегодня" hint={tonightHeadline}>
-                <View style={styles.primaryActions}>
-                  {tonightQuickList.map((mode) => (
-                    <Pressable
-                      accessibilityLabel={`${mode.title}: ${mode.matches.length} коктейлей`}
-                      accessibilityRole="button"
-                      key={mode.id}
-                      onPress={() => applyQuickMode(mode.taste)}
-                      style={[
-                        styles.actionCard,
-                        mode.accent === "teal" && styles.actionCardTeal,
-                        mode.accent === "berry" && styles.actionCardBerry,
-                      ]}
-                    >
-                      <View
-                        style={[
-                          styles.actionAccent,
-                          mode.accent === "teal" && styles.actionAccentTeal,
-                          mode.accent === "berry" && styles.actionAccentBerry,
-                        ]}
-                      />
-                      <View style={styles.actionCardTop}>
-                        <Text style={styles.actionTitle}>{mode.title}</Text>
-                        <Text style={styles.actionMeta}>{mode.matches.length}</Text>
-                      </View>
-                      <Text style={styles.actionSubtitle}>{mode.subtitle}</Text>
-                      <Text style={styles.actionPreview}>
-                        {mode.matches.slice(0, 2).map((cocktail) => cocktail.name).join(", ")}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </View>
-              </SectionPanel>
-
-              <CocktailResults
-                title="Готово сейчас"
-                hint="Коктейли, для которых все уже есть дома."
-                cocktails={perfectMatches.slice(0, 6)}
-                ingredients={ingredients}
-                emptyText="Пока нет точных совпадений. Открой вкладку «Докупить» или добавь ингредиенты в «Мой бар»."
-                onSelectCocktail={openCocktail}
-              />
-
-              <CocktailResults
-                title="Ближе всего"
-                hint="Нужно докупить не больше двух ингредиентов."
-                cocktails={almostReady.slice(0, 6)}
-                ingredients={ingredients}
-                emptyText="Добавь несколько базовых ингредиентов, и здесь появятся близкие варианты."
-                onSelectCocktail={openCocktail}
-              />
-            </>
+            <TodayTab
+              quickModes={tonightQuickList}
+              tonightHeadline={tonightHeadline}
+              perfectMatches={perfectMatches}
+              almostReady={almostReady}
+              ingredients={ingredients}
+              onApplyQuickMode={applyQuickMode}
+              onSelectCocktail={setSelectedCocktail}
+              isFavorite={isFavorite}
+              onToggleFavorite={toggleFavorite}
+            />
           ) : null}
 
           {activeTab === "bar" ? (
-            <SectionPanel
-              title="Мой бар"
-              hint="Список сохраняется на этом устройстве. Начни с того, что реально есть под рукой."
-            >
-              <IngredientPicker
-                ingredients={ingredients}
-                ingredientGroups={ingredientGroups}
-                selectedIngredients={selectedIngredients}
-                onToggleIngredient={toggleIngredient}
-                onClear={clearBar}
-                onReset={resetStarterBar}
-              />
-            </SectionPanel>
+            <BarTab
+              ingredients={ingredients}
+              ingredientGroups={ingredientGroups}
+              selectedIngredients={selectedIngredients}
+              onToggleIngredient={toggleIngredient}
+              onClear={() => setSelectedIngredients([])}
+              onResetToStarter={() => setSelectedIngredients(starterIngredients)}
+            />
           ) : null}
 
-          {activeTab === "buy" ? (
-            <SectionPanel
-              title="Что докупить"
-              hint="Самые выгодные покупки: минимум ингредиентов, максимум новых коктейлей."
-            >
-              {shoppingSuggestions.length > 0 ? (
-                shoppingSuggestions.map((suggestion) => (
-                  <View key={suggestion.ids.join("-")} style={styles.shopCard}>
-                    <View style={styles.shopHeader}>
-                      <Text style={styles.shopTitle}>{suggestion.names.join(" + ")}</Text>
-                      <View style={styles.shopBadge}>
-                        <Text style={styles.shopBadgeText}>+{suggestion.cocktailCount}</Text>
-                      </View>
-                    </View>
-                    <Text style={styles.shopText}>Откроет: {suggestion.unlockedCocktails.join(", ")}</Text>
-                  </View>
-                ))
-              ) : (
-                <Text style={styles.emptyText}>Сейчас у тебя уже есть все для лучших вариантов.</Text>
-              )}
-            </SectionPanel>
+          {activeTab === "buy" ? <BuyTab shoppingSuggestions={shoppingSuggestions} /> : null}
+
+          {activeTab === "favorites" ? (
+            <FavoritesTab
+              favoriteCocktails={favoriteCocktails}
+              ingredients={ingredients}
+              onSelectCocktail={setSelectedCocktail}
+              isFavorite={isFavorite}
+              onToggleFavorite={toggleFavorite}
+            />
           ) : null}
 
           {activeTab === "recipes" ? (
-            <>
-              <SectionPanel title="Настроение">
-                <View style={styles.filterRow}>
-                  <Pressable
-                    accessibilityRole="button"
-                    onPress={() => setActiveTaste(null)}
-                    style={[styles.filterPill, activeTaste === null && styles.filterPillActive]}
-                  >
-                    <Text style={[styles.filterLabel, activeTaste === null && styles.filterLabelActive]}>
-                      Все
-                    </Text>
-                  </Pressable>
-                  {tasteFilters.map((filter) => {
-                    const isActive = activeTaste === filter.id;
-
-                    return (
-                      <Pressable
-                        accessibilityRole="button"
-                        key={filter.id}
-                        onPress={() => setActiveTaste(isActive ? null : filter.id)}
-                        style={[styles.filterPill, isActive && styles.filterPillActive]}
-                      >
-                        <Text style={[styles.filterLabel, isActive && styles.filterLabelActive]}>
-                          {filter.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              </SectionPanel>
-
-              <CocktailResults
-                cocktails={rankedCocktails}
-                ingredients={ingredients}
-                onSelectCocktail={openCocktail}
-              />
-            </>
+            <RecipesTab
+              rankedCocktails={rankedCocktails}
+              tasteFilters={tasteFilters}
+              activeTaste={activeTaste}
+              onChangeTaste={setActiveTaste}
+              ingredients={ingredients}
+              onSelectCocktail={setSelectedCocktail}
+              isFavorite={isFavorite}
+              onToggleFavorite={toggleFavorite}
+            />
           ) : null}
         </ScrollView>
 
-        <View style={styles.bottomNav}>
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-
-            return (
-              <Pressable
-                accessibilityRole="button"
-                key={tab.id}
-                onPress={() => setActiveTab(tab.id)}
-                style={[styles.navItem, isActive && styles.navItemActive]}
-              >
-                <Text style={[styles.navIcon, isActive && styles.navIconActive]}>{tab.icon}</Text>
-                <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>{tab.label}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <BottomNav
+          activeTab={activeTab}
+          onChangeTab={setActiveTab}
+          favoritesCount={favoriteCocktails.length}
+        />
       </View>
     </SafeAreaView>
   );
@@ -509,24 +282,19 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#101318",
+    backgroundColor: colors.background,
   },
   appShell: {
     flex: 1,
   },
   screen: {
     flex: 1,
-    backgroundColor: "#101318",
+    backgroundColor: colors.background,
   },
   content: {
-    padding: 12,
-    paddingBottom: 12,
-    gap: 12,
-  },
-  detailContent: {
-    padding: 12,
-    paddingBottom: 40,
-    gap: 12,
+    padding: spacing.md,
+    paddingBottom: spacing.md,
+    gap: spacing.md,
   },
   loadingScreen: {
     flex: 1,
@@ -534,479 +302,21 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 8,
   },
+  eyebrow: {
+    color: colors.accent,
+    fontSize: 12,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
   loadingTitle: {
-    color: "#f8fafc",
+    color: colors.text,
     fontSize: 26,
     fontWeight: "900",
     lineHeight: 31,
   },
   loadingText: {
-    color: "#b7c2d3",
+    color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
-  },
-  onboardingShell: {
-    flex: 1,
-  },
-  onboardingContent: {
-    padding: 12,
-    paddingBottom: 12,
-    gap: 12,
-  },
-  onboardingHero: {
-    backgroundColor: "#1b2029",
-    borderRadius: 8,
-    padding: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#313b48",
-  },
-  onboardingTitle: {
-    color: "#f8fafc",
-    fontSize: 30,
-    fontWeight: "900",
-    lineHeight: 34,
-  },
-  onboardingStats: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  onboardingStat: {
-    flex: 1,
-    backgroundColor: "#121a24",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#344151",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  onboardingActions: {
-    gap: 8,
-  },
-  onboardingDock: {
-    backgroundColor: "#101318",
-    borderTopWidth: 1,
-    borderTopColor: "#303f4d",
-    paddingHorizontal: 12,
-    paddingTop: 10,
-    paddingBottom: 12,
-  },
-  primaryButton: {
-    minHeight: 52,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f4b860",
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  primaryButtonDisabled: {
-    backgroundColor: "#303846",
-  },
-  primaryButtonText: {
-    color: "#151922",
-    fontSize: 16,
-    fontWeight: "900",
-    textAlign: "center",
-  },
-  primaryButtonTextDisabled: {
-    color: "#8591a3",
-  },
-  accountLater: {
-    minHeight: 42,
-    borderRadius: 8,
-    backgroundColor: "#151b23",
-    borderWidth: 1,
-    borderColor: "#283241",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 2,
-  },
-  accountLaterTitle: {
-    color: "#dce4ef",
-    fontSize: 13,
-    fontWeight: "900",
-    textAlign: "center",
-  },
-  onboardingHint: {
-    color: "#91a0b4",
-    fontSize: 12,
-    lineHeight: 17,
-    textAlign: "center",
-  },
-  appHeader: {
-    backgroundColor: "#1a1f27",
-    borderRadius: 8,
-    padding: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#252d38",
-  },
-  headerTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    alignItems: "flex-start",
-  },
-  headerTextBlock: {
-    flex: 1,
-    gap: 2,
-  },
-  eyebrow: {
-    color: "#f4b860",
-    fontSize: 12,
-    fontWeight: "800",
-    textTransform: "uppercase",
-  },
-  title: {
-    color: "#f8fafc",
-    fontSize: 28,
-    fontWeight: "900",
-    lineHeight: 32,
-  },
-  subtitle: {
-    color: "#b7c2d3",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  savedPill: {
-    backgroundColor: "#142922",
-    borderColor: "#285840",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  savedPillText: {
-    color: "#7ce0ab",
-    fontSize: 12,
-    fontWeight: "800",
-  },
-  summaryStrip: {
-    flexDirection: "row",
-    backgroundColor: "#121821",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#2b3441",
-    overflow: "hidden",
-  },
-  summaryItem: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRightWidth: 1,
-    borderRightColor: "#2b3441",
-  },
-  summaryValue: {
-    color: "#f8fafc",
-    fontSize: 22,
-    fontWeight: "900",
-  },
-  summaryLabel: {
-    color: "#91a0b4",
-    fontSize: 11,
-    fontWeight: "800",
-    textTransform: "uppercase",
-  },
-  primaryActions: {
-    gap: 8,
-  },
-  actionCard: {
-    position: "relative",
-    backgroundColor: "#141a22",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#303846",
-    padding: 12,
-    paddingLeft: 16,
-    gap: 6,
-    overflow: "hidden",
-  },
-  actionCardTeal: {
-    borderColor: "#2a6864",
-  },
-  actionCardBerry: {
-    borderColor: "#684052",
-  },
-  actionAccent: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    backgroundColor: "#f4b860",
-  },
-  actionAccentTeal: {
-    backgroundColor: "#52c4c8",
-  },
-  actionAccentBerry: {
-    backgroundColor: "#d06b87",
-  },
-  actionCardTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  actionTitle: {
-    color: "#f8fafc",
-    fontSize: 16,
-    fontWeight: "900",
-  },
-  actionMeta: {
-    color: "#f4b860",
-    fontSize: 16,
-    fontWeight: "900",
-  },
-  actionSubtitle: {
-    color: "#9fb0c5",
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  actionPreview: {
-    color: "#e4ebf5",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  filterRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  filterPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 8,
-    backgroundColor: "#141a22",
-    borderWidth: 1,
-    borderColor: "#39414f",
-  },
-  filterPillActive: {
-    backgroundColor: "#52c4c8",
-    borderColor: "#52c4c8",
-  },
-  filterLabel: {
-    color: "#d5dcea",
-    fontSize: 14,
-    fontWeight: "800",
-  },
-  filterLabelActive: {
-    color: "#0d2022",
-  },
-  shopCard: {
-    backgroundColor: "#151b23",
-    borderRadius: 8,
-    padding: 12,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: "#354151",
-  },
-  shopHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    alignItems: "flex-start",
-  },
-  shopTitle: {
-    flex: 1,
-    color: "#f8fafc",
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  shopBadge: {
-    backgroundColor: "#214b35",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  shopBadgeText: {
-    color: "#f8fafc",
-    fontSize: 12,
-    fontWeight: "800",
-  },
-  shopText: {
-    color: "#97a3b6",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  emptyText: {
-    color: "#97a3b6",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  bottomNav: {
-    flexDirection: "row",
-    gap: 6,
-    backgroundColor: "#151b23",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#344151",
-    padding: 6,
-    marginHorizontal: 12,
-    marginBottom: 12,
-  },
-  navItem: {
-    flex: 1,
-    minHeight: 50,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 4,
-    gap: 2,
-  },
-  navItemActive: {
-    backgroundColor: "#f4b860",
-  },
-  navIcon: {
-    color: "#7f8fa3",
-    fontSize: 15,
-    fontWeight: "900",
-    lineHeight: 16,
-  },
-  navIconActive: {
-    color: "#151922",
-  },
-  navLabel: {
-    color: "#c4cfdd",
-    fontSize: 11,
-    fontWeight: "900",
-  },
-  navLabelActive: {
-    color: "#151922",
-  },
-  detailHeader: {
-    backgroundColor: "#1a1f27",
-    borderRadius: 8,
-    padding: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#252d38",
-  },
-  backButton: {
-    alignSelf: "flex-start",
-    backgroundColor: "#141a22",
-    borderWidth: 1,
-    borderColor: "#303846",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-  },
-  backButtonLabel: {
-    color: "#f8fafc",
-    fontSize: 14,
-    fontWeight: "900",
-  },
-  detailTitle: {
-    color: "#f8fafc",
-    fontSize: 30,
-    fontWeight: "900",
-    lineHeight: 34,
-  },
-  detailMeta: {
-    color: "#9fb0c5",
-    fontSize: 15,
-    lineHeight: 20,
-  },
-  detailStatusRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  statusBadge: {
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  readyBadge: {
-    backgroundColor: "#214b35",
-  },
-  missingBadge: {
-    backgroundColor: "#5f4a1f",
-  },
-  statusBadgeText: {
-    color: "#f8fafc",
-    fontSize: 13,
-    fontWeight: "900",
-  },
-  matchText: {
-    color: "#c4cfdd",
-    fontSize: 13,
-    fontWeight: "800",
-  },
-  callout: {
-    backgroundColor: "#151b23",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#303846",
-    padding: 12,
-    gap: 4,
-  },
-  calloutLabel: {
-    color: "#f4b860",
-    fontSize: 12,
-    fontWeight: "900",
-    textTransform: "uppercase",
-  },
-  calloutText: {
-    color: "#d7deea",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  recipeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  recipeRowMain: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    flex: 1,
-  },
-  recipeRowText: {
-    color: "#d7deea",
-    fontSize: 15,
-  },
-  recipeAmount: {
-    color: "#f4b860",
-    fontSize: 14,
-    fontWeight: "900",
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  dotOwned: {
-    backgroundColor: "#62d29b",
-  },
-  dotMissing: {
-    backgroundColor: "#f4b860",
-  },
-  stepRow: {
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "flex-start",
-  },
-  stepIndexWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: "#52c4c8",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  stepIndexText: {
-    color: "#102124",
-    fontSize: 14,
-    fontWeight: "900",
-  },
-  stepText: {
-    flex: 1,
-    color: "#d7deea",
-    fontSize: 15,
-    lineHeight: 22,
   },
 });
