@@ -1,9 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from "react";
 
 import { Ingredient } from "../data/cocktails";
 
 const SAVED_BAR_STORAGE_KEY = "domashniy-bar:selected-ingredients";
+const SAVE_DEBOUNCE_MS = 250;
 
 type UseSavedBarResult = {
   hasLoadedSavedBar: boolean;
@@ -16,6 +17,7 @@ export function useSavedBar(ingredients: Ingredient[]): UseSavedBarResult {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [hasLoadedSavedBar, setHasLoadedSavedBar] = useState(false);
   const [hasSavedBar, setHasSavedBar] = useState(false);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -60,14 +62,29 @@ export function useSavedBar(ingredients: Ingredient[]): UseSavedBarResult {
     };
   }, [ingredients]);
 
+  // Debounced save — rapid toggles batch into a single write.
   useEffect(() => {
     if (!hasLoadedSavedBar) {
       return;
     }
 
-    AsyncStorage.setItem(SAVED_BAR_STORAGE_KEY, JSON.stringify(selectedIngredients)).catch((error) => {
-      console.warn("Failed to save home bar.", error);
-    });
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current);
+    }
+
+    saveTimer.current = setTimeout(() => {
+      AsyncStorage.setItem(SAVED_BAR_STORAGE_KEY, JSON.stringify(selectedIngredients)).catch(
+        (error) => {
+          console.warn("Failed to save home bar.", error);
+        },
+      );
+    }, SAVE_DEBOUNCE_MS);
+
+    return () => {
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+      }
+    };
   }, [hasLoadedSavedBar, selectedIngredients]);
 
   return {
