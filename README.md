@@ -11,7 +11,8 @@
 - рейтинг совпадений с количеством недостающих ингредиентов;
 - раскрываемые карточки с рецептом, бокалом, составом, шагами и подачей;
 - подсказки, какие 1-2 ингредиента докупить, чтобы открыть больше коктейлей;
-- сохранение выбранного домашнего бара между запусками приложения.
+- сохранение выбранного домашнего бара между запусками приложения;
+- опциональная регистрация и синхронизация бара через Supabase.
 
 ## Текущий объем базы
 
@@ -28,7 +29,8 @@
 - React 19;
 - React Native 0.81;
 - TypeScript в strict mode;
-- `@react-native-async-storage/async-storage` для локального сохранения бара.
+- `@react-native-async-storage/async-storage` для локального сохранения бара;
+- Supabase Auth + Postgres для облачного сохранения бара.
 
 ## Запуск
 
@@ -68,6 +70,19 @@ npx tsc --noEmit
 npm run import:cocktails
 ```
 
+## Supabase
+
+Облачная синхронизация включается только если заданы публичные Expo-переменные:
+
+```bash
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+Для локальной разработки можно скопировать `.env.example` в `.env`. Для GitHub Actions deploy добавь эти же значения в repository secrets.
+
+SQL-схема с RLS находится в `supabase/schema.sql`. Ее нужно выполнить в Supabase SQL Editor перед включением синхронизации.
+
 ## Структура
 
 ```text
@@ -76,6 +91,10 @@ src/components/                 UI-компоненты
 src/components/CocktailResults.tsx
 src/components/IngredientPicker.tsx
 src/components/SectionPanel.tsx
+src/hooks/useAuth.ts              состояние Supabase Auth
+src/hooks/useSavedBar.ts          локальное сохранение + облачная синхронизация бара
+src/lib/supabase.ts               Supabase client с AsyncStorage session persistence
+src/services/userBarService.ts    чтение/запись user_bars
 src/data/                       сгенерированные данные коктейлей и ингредиентов
 src/utils/cocktailMatcher.ts    ранжирование коктейлей по совпадению
 src/utils/shoppingAdvisor.ts    рекомендации, что докупить
@@ -86,7 +105,7 @@ HANDOVER.md                     состояние проекта для буд�
 
 ## Ближайшие задачи
 
-- проверить сохранение домашнего бара в Expo Go и web;
+- проверить регистрацию и синхронизацию на реальном Supabase project;
 - продолжить вынос экранов из `App.tsx` в отдельные компоненты;
 - разделить главный экран и экран подборки на отдельные компоненты;
 - проверить PWA-установку на реальных iOS/Android устройствах;

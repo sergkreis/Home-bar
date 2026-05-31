@@ -2,10 +2,13 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { AccountPanel } from "./src/components/AccountPanel";
 import { AppHeader } from "./src/components/AppHeader";
 import { AppTab, BottomNav } from "./src/components/BottomNav";
+import { SectionPanel } from "./src/components/SectionPanel";
 import { cocktails, ingredients, TasteTag } from "./src/data/cocktails";
 import { starterIngredients } from "./src/data/starterIngredients";
+import { useAuth } from "./src/hooks/useAuth";
 import { useEnteredApp } from "./src/hooks/useEnteredApp";
 import { useFavorites } from "./src/hooks/useFavorites";
 import { useSavedBar } from "./src/hooks/useSavedBar";
@@ -52,6 +55,7 @@ const tabSubtitles: Record<AppTab, string> = {
   buy: "Минимальные покупки, которые откроют больше коктейлей.",
   favorites: "Коктейли, которые ты сохранил, чтобы вернуться к ним.",
   recipes: "Полный список с фильтром по настроению.",
+  account: "Сохрани бар в аккаунте и перенеси его на другое устройство.",
 };
 
 const tabLabels: Record<AppTab, string> = {
@@ -60,11 +64,52 @@ const tabLabels: Record<AppTab, string> = {
   buy: "Докупить",
   favorites: "Избранное",
   recipes: "Рецепты",
+  account: "Аккаунт",
 };
 
+function getSyncPillLabel({
+  authUserEmail,
+  isSyncingBar,
+  syncError,
+}: {
+  authUserEmail?: string;
+  isSyncingBar: boolean;
+  syncError: string | null;
+}) {
+  if (syncError) {
+    return "Ошибка";
+  }
+
+  if (isSyncingBar) {
+    return "Синхронизация";
+  }
+
+  return authUserEmail ? "Аккаунт" : "Локально";
+}
+
 export default function App() {
-  const { hasLoadedSavedBar, hasSavedBar, selectedIngredients, setSelectedIngredients } =
-    useSavedBar(ingredients);
+  const {
+    authError,
+    authMessage,
+    authMode,
+    authUser,
+    isAuthReady,
+    isAuthLoading,
+    isSupabaseConfigured,
+    setAuthMode,
+    signIn,
+    signOut,
+    signUp,
+  } = useAuth();
+  const {
+    hasLoadedSavedBar,
+    hasSavedBar,
+    isSyncingBar,
+    selectedIngredients,
+    setSelectedIngredients,
+    syncError,
+    syncStatus,
+  } = useSavedBar(ingredients, authUser?.id);
   const { hasLoadedEntered, hasEnteredApp, markEntered } = useEnteredApp();
   const { hasLoadedFavorites, isFavorite, toggleFavorite } = useFavorites();
 
@@ -72,7 +117,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<AppTab>("today");
   const [selectedCocktail, setSelectedCocktail] = useState<RankedCocktail | null>(null);
 
-  // Auto-enter for returning users with a saved bar (covers fresh installs)
   useEffect(() => {
     if (hasLoadedSavedBar && hasLoadedEntered && hasSavedBar && !hasEnteredApp) {
       markEntered();
@@ -117,6 +161,23 @@ export default function App() {
     [allRankedCocktails, isFavorite],
   );
 
+  const accountPanel = (
+    <AccountPanel
+      authError={authError}
+      authMessage={authMessage}
+      authMode={authMode}
+      authUserEmail={authUser?.email}
+      isAuthLoading={isAuthLoading}
+      isSupabaseConfigured={isSupabaseConfigured}
+      syncError={syncError}
+      syncStatus={syncStatus}
+      onSetAuthMode={setAuthMode}
+      onSignIn={signIn}
+      onSignOut={signOut}
+      onSignUp={signUp}
+    />
+  );
+
   const toggleIngredient = (ingredientId: string) => {
     setSelectedIngredients((current) =>
       current.includes(ingredientId)
@@ -140,14 +201,14 @@ export default function App() {
     if (selectedIngredients.length === 0) {
       return;
     }
+
     setActiveTaste(null);
     setActiveTab("today");
     setSelectedCocktail(null);
     markEntered();
   };
 
-  // Loading
-  if (!hasLoadedSavedBar || !hasLoadedEntered || !hasLoadedFavorites) {
+  if (!hasLoadedSavedBar || !hasLoadedEntered || !hasLoadedFavorites || !isAuthReady) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="light" />
@@ -160,7 +221,6 @@ export default function App() {
     );
   }
 
-  // Cocktail detail
   if (selectedCocktail) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -178,7 +238,6 @@ export default function App() {
     );
   }
 
-  // Onboarding
   if (!hasEnteredApp) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -188,6 +247,7 @@ export default function App() {
           ingredientGroups={ingredientGroups}
           selectedIngredients={selectedIngredients}
           perfectMatchesCount={allPerfectMatches.length}
+          accountPanel={accountPanel}
           onToggleIngredient={toggleIngredient}
           onClear={() => setSelectedIngredients([])}
           onResetToStarter={() => setSelectedIngredients(starterIngredients)}
@@ -197,7 +257,6 @@ export default function App() {
     );
   }
 
-  // Main app
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -210,7 +269,11 @@ export default function App() {
           <AppHeader
             title={tabLabels[activeTab]}
             subtitle={tabSubtitles[activeTab]}
-            rightPill="Сохранено"
+            rightPill={getSyncPillLabel({
+              authUserEmail: authUser?.email,
+              isSyncingBar,
+              syncError,
+            })}
             stats={[
               { value: selectedIngredients.length, label: "дома" },
               { value: perfectMatches.length, label: "готово" },
@@ -266,6 +329,15 @@ export default function App() {
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
             />
+          ) : null}
+
+          {activeTab === "account" ? (
+            <SectionPanel
+              title="Аккаунт"
+              hint="Синхронизация включится после входа. Локальный бар останется на устройстве."
+            >
+              {accountPanel}
+            </SectionPanel>
           ) : null}
         </ScrollView>
 

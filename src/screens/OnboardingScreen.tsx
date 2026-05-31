@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { IngredientPicker } from "../components/IngredientPicker";
@@ -15,6 +16,7 @@ type OnboardingScreenProps = {
   ingredientGroups: readonly IngredientGroup[];
   selectedIngredients: string[];
   perfectMatchesCount: number;
+  accountPanel?: ReactNode;
   onToggleIngredient: (ingredientId: string) => void;
   onClear: () => void;
   onResetToStarter: () => void;
@@ -26,6 +28,7 @@ export function OnboardingScreen({
   ingredientGroups,
   selectedIngredients,
   perfectMatchesCount,
+  accountPanel,
   onToggleIngredient,
   onClear,
   onResetToStarter,
@@ -92,10 +95,12 @@ export function OnboardingScreen({
             Подобрать коктейли
           </Text>
         </Pressable>
-        <View style={styles.accountLater}>
-          <Text style={styles.accountLaterTitle}>Аккаунт позже</Text>
-          <Text style={styles.hint}>Сейчас бар сохраняется на этом устройстве.</Text>
-        </View>
+        {accountPanel ?? (
+          <View style={styles.accountLater}>
+            <Text style={styles.accountLaterTitle}>Аккаунт позже</Text>
+            <Text style={styles.hint}>Сейчас бар сохраняется на этом устройстве.</Text>
+          </View>
+        )}
       </View>
     </View>
   );

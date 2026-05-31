@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors, pressed, radii, spacing } from "../theme";
 
-export type AppTab = "today" | "bar" | "buy" | "favorites" | "recipes";
+export type AppTab = "today" | "bar" | "buy" | "favorites" | "recipes" | "account";
 
 type TabConfig = {
   id: AppTab;
@@ -16,6 +16,7 @@ const tabs: TabConfig[] = [
   { id: "buy", label: "Докупить", icon: "+" },
   { id: "favorites", label: "Избранное", icon: "★" },
   { id: "recipes", label: "Рецепты", icon: "≡" },
+  { id: "account", label: "Аккаунт", icon: "@" },
 ];
 
 type BottomNavProps = {

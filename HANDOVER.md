@@ -1,6 +1,6 @@
 # Domashniy Bar - Handover
 
-Последнее обновление: 2026-05-16
+Последнее обновление: 2026-05-25
 
 ## Быстрый Контекст
 
@@ -50,6 +50,7 @@ npm / package-lock.json
 Static web export served by nginx
 Playwright UI tests
 GitHub Actions deploy
+Optional Supabase Auth/Postgres account sync
 ```
 
 ## Основные Файлы
@@ -57,7 +58,11 @@ GitHub Actions deploy
 ```text
 App.tsx                         - главный экран, screen switching, layout and tab rendering
 src/components/                 - reusable UI components
-src/hooks/useSavedBar.ts        - AsyncStorage persistence for selected home bar
+src/hooks/useAuth.ts            - Supabase auth session state and email/password actions
+src/hooks/useSavedBar.ts        - AsyncStorage persistence plus optional Supabase sync for selected home bar
+src/lib/supabase.ts             - Supabase client using Expo public env vars
+src/services/userBarService.ts  - user_bars load/upsert helpers
+supabase/schema.sql             - user_bars table and RLS policies
 src/data/                       - generated cocktail/ingredient data
 src/utils/                      - matching and shopping suggestion logic
 tests/home-bar.spec.ts          - Playwright smoke test for core flow
@@ -88,6 +93,7 @@ Compact cocktail cards
 Dedicated bar screen
 Dedicated recipe detail screen
 Save selected home bar on device with AsyncStorage
+Optional account tab for Supabase email/password sign-in and cloud bar sync
 ```
 
 ## Данные
@@ -136,6 +142,7 @@ Local edit -> type-check/build/test -> commit -> push to GitHub main.
 GitHub Actions builds Expo web export and deploys dist/ to VPS over SSH.
 Workflow file: .github/workflows/deploy.yml
 Required GitHub secret: VPS_SSH_KEY
+Optional GitHub secrets for cloud sync build: EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY
 Server deploy key comment: github-actions-home-bar
 Password SSH was left enabled on the VPS.
 ```
@@ -207,6 +214,15 @@ Regenerate cocktail data:
 npm run import:cocktails
 ```
 
+Supabase setup:
+
+```text
+1. Create Supabase project.
+2. Run supabase/schema.sql in Supabase SQL Editor.
+3. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY locally or as GitHub Actions secrets.
+4. Without these env vars the app stays in local-only mode.
+```
+
 Frontend skill bundle to use for future web app work:
 
 ```text
@@ -260,13 +276,14 @@ Local branch after latest deploy: main...origin/main, clean.
 ## Текущая Незавершенная Работа
 
 ```text
-Registration/account sync is not implemented; onboarding now shows a muted "Аккаунт позже" info block.
-AsyncStorage persistence was moved to src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
+Registration/account sync is implemented as an optional Supabase-backed flow; it still needs real Supabase project credentials and end-to-end QA against that project.
+AsyncStorage persistence plus optional remote sync lives in src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
 Generated data still contains a mix of translated Russian names and raw English ingredient names.
 PWA build pass now adds /manifest.json, lang=ru, viewport-fit=cover, apple mobile metadata, and install icons during npm run build:web.
 UI tests default to local Expo web server unless PLAYWRIGHT_BASE_URL is set.
 Deployment still uses root over SSH in GitHub Actions; consider a restricted deploy user later.
+Bundle size increased after adding supabase-js; consider lazy-loading auth if this becomes a performance issue.
 ```
 
 ## Известные Review Notes
@@ -286,16 +303,23 @@ PWA/mobile pass on 2026-05-16:
   package.json build:web now runs expo export plus the postprocess script.
   App.tsx ScrollViews have screen/tab keys so onboarding -> app transitions open at top on mobile.
   AsyncStorage persistence moved from App.tsx to src/hooks/useSavedBar.ts.
+Account sync pass on 2026-05-25:
+  Added @supabase/supabase-js and react-native-url-polyfill.
+  Aligned Expo SDK dependencies with expo install: expo ~54.0.34 and AsyncStorage 2.2.0.
+  Added AccountPanel and account tab.
+  Added optional Supabase client and auth hook.
+  Added user_bars upsert/load service and RLS SQL schema.
+  GitHub Actions now passes optional EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY secrets into build.
 ```
 
 ## Следующие Шаги
 
 ```text
-1. Deploy the 2026-05-16 PWA/mobile pass after review.
-2. Review PWA installation on actual iOS/Android devices at https://kreisphoto.de/ after deploy.
-3. Split App.tsx tab/detail/onboarding screens into separate components once current changes are accepted.
-4. Add unit tests around matching/shopping logic before expanding the database further.
-5. Later: implement real registration/account sync if needed.
+1. Create/configure the Supabase project and run supabase/schema.sql.
+2. Add Supabase public env values locally and as GitHub Actions secrets.
+3. Test sign-up/sign-in/sync on web and actual phones.
+4. Split App.tsx tab/detail/onboarding screens into separate components once current changes are accepted.
+5. Add unit tests around matching/shopping logic before expanding the database further.
 ```
 
 ## Запрещено

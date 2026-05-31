@@ -5,7 +5,7 @@ test("home page supports the core mobile flow", async ({ page }) => {
 
   await expect(page.getByText("Домашний бар")).toBeVisible();
   await expect(page.getByText("Что есть дома?")).toBeVisible();
-  await expect(page.getByText("Аккаунт позже")).toBeVisible();
+  await expect(page.getByText("Бар сохраняется на этом устройстве.")).toBeVisible();
 
   await page.getByRole("button", { name: "Стартовый" }).click();
   await page.getByRole("button", { name: "Подобрать коктейли" }).click();
@@ -33,4 +33,15 @@ test("saved starter bar opens the main app after reload", async ({ page }) => {
 
   await expect(page.getByText("Что выпить сегодня")).toBeVisible();
   await expect(page.getByText("Что есть дома?")).toBeHidden();
+});
+
+test("account tab explains local-only sync when Supabase is not configured", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Стартовый" }).click();
+  await page.getByRole("button", { name: "Подобрать коктейли" }).click();
+  await page.getByRole("button", { name: "Аккаунт" }).click();
+
+  await expect(page.getByText("Сохрани бар в аккаунте и перенеси его на другое устройство.")).toBeVisible();
+  await expect(page.getByText("Бар сохраняется на этом устройстве.")).toBeVisible();
 });
