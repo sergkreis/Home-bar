@@ -285,7 +285,7 @@ Local branch after latest deploy: main...origin/main, clean.
 
 ```text
 Registration/account sync is implemented as an optional Supabase-backed flow for bar and favorites; it still needs real Supabase project credentials, schema execution, redirect URL configuration, and end-to-end QA against that project.
-GitHub Secrets currently include VPS_SSH_KEY only; EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY still need to be added before production accounts appear.
+GitHub Secrets include VPS_SSH_KEY, EXPO_PUBLIC_SUPABASE_URL, and EXPO_PUBLIC_SUPABASE_ANON_KEY for the Supabase project created on 2026-06-07.
 AsyncStorage persistence plus optional remote sync lives in src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
 Generated data still contains a mix of translated Russian names and raw English ingredient names.
@@ -335,17 +335,20 @@ Account isolation pass on 2026-06-07:
   useSavedBar and useFavorites now wait for auth readiness before choosing guest/account storage.
   Authenticated local storage keys are scoped by user id, preventing one account's bar/favorites from leaking into another account on the same device.
   Guest bar/favorites are carried into Supabase only on explicit guest-to-account sign-in, not on restored sessions.
+Supabase enablement on 2026-06-07:
+  User created the Supabase project and ran supabase/schema.sql successfully in SQL Editor.
+  GitHub Actions secrets EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY were added.
+  Deployed commit b1ec616; live smoke confirmed account form is visible and local-only mode is gone.
 ```
 
 ## Следующие Шаги
 
 ```text
-1. Create/configure the Supabase project and run the updated supabase/schema.sql, including user_favorites.
-2. Add Supabase public env values locally and as GitHub Actions secrets.
-3. Configure Supabase Auth site URL/redirect URLs for the production domain.
-4. Test sign-up/sign-in/password recovery/bar sync/favorites sync on web and actual phones.
-5. Split App.tsx tab/detail/onboarding screens into separate components once current changes are accepted.
-6. Add unit tests around matching/shopping logic before expanding the database further.
+1. Configure Supabase Auth site URL/redirect URLs for the production domain if not already saved.
+2. Test sign-up/sign-in/password recovery/bar sync/favorites sync on web and actual phones.
+3. Split App.tsx tab/detail/onboarding screens into separate components once current changes are accepted.
+4. Add unit tests around account-local merge behavior and remote sync edge cases.
+5. Add unit tests around matching/shopping logic before expanding the database further.
 ```
 
 ## Запрещено
