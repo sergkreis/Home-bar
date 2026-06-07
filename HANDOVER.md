@@ -99,6 +99,7 @@ Optional account tab for Supabase email/password sign-in and cloud bar sync
 Production account flow with sign-up, sign-in, password reset, and password update after recovery link
 Favorite cocktails sync through Supabase user_favorites
 Light production UI pass with centered desktop layout, cleaner section structure, updated cards, and revised account screen
+Account-local AsyncStorage keys are separated by user id; guest data is imported only after a real guest-to-account sign-in
 ```
 
 ## Данные
@@ -284,6 +285,7 @@ Local branch after latest deploy: main...origin/main, clean.
 
 ```text
 Registration/account sync is implemented as an optional Supabase-backed flow for bar and favorites; it still needs real Supabase project credentials, schema execution, redirect URL configuration, and end-to-end QA against that project.
+GitHub Secrets currently include VPS_SSH_KEY only; EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY still need to be added before production accounts appear.
 AsyncStorage persistence plus optional remote sync lives in src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
 Generated data still contains a mix of translated Russian names and raw English ingredient names.
@@ -329,6 +331,10 @@ UI refinement pass on 2026-06-07:
   Bottom nav and FavoriteButton now use line icons instead of text symbols.
   Today tab now uses a lighter plan card and compact icon quick-mode cards instead of a large dark hero plus wide pastel bars.
   Lucide imports intentionally target individual CJS icon files to keep the Expo web bundle near 1 MB; Metro warns about private package exports, but root imports pulled the bundle to about 2.74 MB.
+Account isolation pass on 2026-06-07:
+  useSavedBar and useFavorites now wait for auth readiness before choosing guest/account storage.
+  Authenticated local storage keys are scoped by user id, preventing one account's bar/favorites from leaking into another account on the same device.
+  Guest bar/favorites are carried into Supabase only on explicit guest-to-account sign-in, not on restored sessions.
 ```
 
 ## Следующие Шаги

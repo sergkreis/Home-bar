@@ -115,7 +115,7 @@ export default function App() {
     setSelectedIngredients,
     syncError,
     syncStatus,
-  } = useSavedBar(ingredients, authUser?.id);
+  } = useSavedBar(ingredients, authUser?.id, isAuthReady);
   const { hasLoadedEntered, hasEnteredApp, markEntered } = useEnteredApp();
   const knownCocktailIds = useMemo(() => cocktails.map((cocktail) => cocktail.id), []);
   const {
@@ -125,7 +125,7 @@ export default function App() {
     favoritesSyncError,
     favoritesSyncStatus,
     toggleFavorite,
-  } = useFavorites(knownCocktailIds, authUser?.id);
+  } = useFavorites(knownCocktailIds, authUser?.id, isAuthReady);
 
   const [activeTaste, setActiveTaste] = useState<TasteTag | null>(null);
   const [activeTab, setActiveTab] = useState<AppTab>("today");

@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { type Dispatch, type SetStateAction, useEffect, useRef, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 
 import { Ingredient } from "../data/cocktails";
 import { loadRemoteUserBar, saveRemoteUserBar } from "../services/userBarService";
@@ -34,7 +34,16 @@ function equalIds(left: string[], right: string[]) {
   return left.every((value, index) => value === right[index]);
 }
 
-export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSavedBarResult {
+function getStorageKey(userId?: string) {
+  return userId ? `${SAVED_BAR_STORAGE_KEY}:user:${userId}` : SAVED_BAR_STORAGE_KEY;
+}
+
+export function useSavedBar(
+  ingredients: Ingredient[],
+  userId?: string,
+  isAuthReady = true,
+): UseSavedBarResult {
+  const storageKey = useMemo(() => getStorageKey(userId), [userId]);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [hasLoadedSavedBar, setHasLoadedSavedBar] = useState(false);
   const [hasSavedBar, setHasSavedBar] = useState(false);
@@ -42,15 +51,49 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
   const [isSyncingBar, setIsSyncingBar] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previousUserId = useRef<string | undefined>(userId);
+  const loadedStorageKey = useRef<string | null>(null);
+  const pendingGuestIngredients = useRef<string[] | null>(null);
 
   useEffect(() => {
+    if (!isAuthReady) {
+      return;
+    }
+
+    const previous = previousUserId.current;
+
+    if (
+      !previous &&
+      userId &&
+      loadedStorageKey.current === SAVED_BAR_STORAGE_KEY &&
+      selectedIngredients.length > 0
+    ) {
+      pendingGuestIngredients.current = selectedIngredients;
+    }
+
+    previousUserId.current = userId;
+  }, [isAuthReady, selectedIngredients, userId]);
+
+  useEffect(() => {
+    if (!isAuthReady) {
+      return;
+    }
+
     let isMounted = true;
 
     async function loadSavedBar() {
+      setHasLoadedSavedBar(false);
+      setHasMergedRemoteBar(false);
+      setSyncError(null);
+
       try {
-        const storedIngredients = await AsyncStorage.getItem(SAVED_BAR_STORAGE_KEY);
+        const storedIngredients = await AsyncStorage.getItem(storageKey);
 
         if (!storedIngredients) {
+          if (isMounted) {
+            setSelectedIngredients([]);
+            setHasSavedBar(false);
+          }
           return;
         }
 
@@ -71,6 +114,7 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
         console.warn("Failed to load saved home bar.", error);
       } finally {
         if (isMounted) {
+          loadedStorageKey.current = storageKey;
           setHasLoadedSavedBar(true);
         }
       }
@@ -81,10 +125,10 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
     return () => {
       isMounted = false;
     };
-  }, [ingredients]);
+  }, [ingredients, isAuthReady, storageKey]);
 
   useEffect(() => {
-    if (!hasLoadedSavedBar) {
+    if (!isAuthReady || !hasLoadedSavedBar) {
       return;
     }
 
@@ -93,7 +137,7 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
     }
 
     saveTimer.current = setTimeout(() => {
-      AsyncStorage.setItem(SAVED_BAR_STORAGE_KEY, JSON.stringify(selectedIngredients)).catch(
+      AsyncStorage.setItem(storageKey, JSON.stringify(selectedIngredients)).catch(
         (error) => {
           console.warn("Failed to save home bar.", error);
         },
@@ -105,15 +149,10 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
         clearTimeout(saveTimer.current);
       }
     };
-  }, [hasLoadedSavedBar, selectedIngredients]);
+  }, [hasLoadedSavedBar, isAuthReady, selectedIngredients, storageKey]);
 
   useEffect(() => {
-    setHasMergedRemoteBar(false);
-    setSyncError(null);
-  }, [userId]);
-
-  useEffect(() => {
-    if (!hasLoadedSavedBar || !userId || hasMergedRemoteBar) {
+    if (!isAuthReady || !hasLoadedSavedBar || !userId || hasMergedRemoteBar) {
       return;
     }
 
@@ -133,10 +172,14 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
 
         const knownIngredientIds = new Set(ingredients.map((ingredient) => ingredient.id));
 
+        const guestIngredientIds = pendingGuestIngredients.current
+          ? uniqueKnownIds(pendingGuestIngredients.current, knownIngredientIds)
+          : [];
+
         if (remoteBar && remoteBar.ingredientIds.length > 0) {
           const remoteIngredientIds = uniqueKnownIds(remoteBar.ingredientIds, knownIngredientIds);
           const mergedIngredientIds = uniqueKnownIds(
-            [...remoteIngredientIds, ...selectedIngredients],
+            [...remoteIngredientIds, ...selectedIngredients, ...guestIngredientIds],
             knownIngredientIds,
           );
 
@@ -146,10 +189,20 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
           if (!equalIds(remoteIngredientIds, mergedIngredientIds)) {
             await saveRemoteUserBar(currentUserId, mergedIngredientIds);
           }
-        } else if (selectedIngredients.length > 0) {
-          await saveRemoteUserBar(currentUserId, selectedIngredients);
+        } else {
+          const mergedIngredientIds = uniqueKnownIds(
+            [...selectedIngredients, ...guestIngredientIds],
+            knownIngredientIds,
+          );
+
+          if (mergedIngredientIds.length > 0) {
+            setSelectedIngredients(mergedIngredientIds);
+            setHasSavedBar(true);
+            await saveRemoteUserBar(currentUserId, mergedIngredientIds);
+          }
         }
 
+        pendingGuestIngredients.current = null;
         setHasMergedRemoteBar(true);
       } catch (error) {
         console.warn("Failed to sync saved home bar.", error);
@@ -168,10 +221,17 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
     return () => {
       isMounted = false;
     };
-  }, [hasLoadedSavedBar, hasMergedRemoteBar, ingredients, selectedIngredients, userId]);
+  }, [
+    hasLoadedSavedBar,
+    hasMergedRemoteBar,
+    ingredients,
+    isAuthReady,
+    selectedIngredients,
+    userId,
+  ]);
 
   useEffect(() => {
-    if (!hasLoadedSavedBar || !userId || !hasMergedRemoteBar) {
+    if (!isAuthReady || !hasLoadedSavedBar || !userId || !hasMergedRemoteBar) {
       return;
     }
 
@@ -193,7 +253,7 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [hasLoadedSavedBar, hasMergedRemoteBar, selectedIngredients, userId]);
+  }, [hasLoadedSavedBar, hasMergedRemoteBar, isAuthReady, selectedIngredients, userId]);
 
   const syncStatus = syncError ? "error" : isSyncingBar ? "syncing" : userId ? "remote" : "local";
 

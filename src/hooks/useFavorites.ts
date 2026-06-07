@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   loadRemoteUserFavorites,
@@ -37,21 +37,65 @@ function equalIds(left: string[], right: string[]) {
   return left.every((value, index) => value === right[index]);
 }
 
-export function useFavorites(knownCocktailIds: string[], userId?: string): UseFavoritesResult {
+function getStorageKey(userId?: string) {
+  return userId ? `${STORAGE_KEY}:user:${userId}` : STORAGE_KEY;
+}
+
+export function useFavorites(
+  knownCocktailIds: string[],
+  userId?: string,
+  isAuthReady = true,
+): UseFavoritesResult {
+  const storageKey = useMemo(() => getStorageKey(userId), [userId]);
   const knownIds = useMemo(() => new Set(knownCocktailIds), [knownCocktailIds]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [hasLoadedFavorites, setHasLoadedFavorites] = useState(false);
   const [hasMergedRemoteFavorites, setHasMergedRemoteFavorites] = useState(false);
   const [isSyncingFavorites, setIsSyncingFavorites] = useState(false);
   const [favoritesSyncError, setFavoritesSyncError] = useState<string | null>(null);
+  const previousUserId = useRef<string | undefined>(userId);
+  const loadedStorageKey = useRef<string | null>(null);
+  const pendingGuestFavorites = useRef<string[] | null>(null);
 
   useEffect(() => {
+    if (!isAuthReady) {
+      return;
+    }
+
+    const previous = previousUserId.current;
+
+    if (
+      !previous &&
+      userId &&
+      loadedStorageKey.current === STORAGE_KEY &&
+      favorites.length > 0
+    ) {
+      pendingGuestFavorites.current = favorites;
+    }
+
+    previousUserId.current = userId;
+  }, [favorites, isAuthReady, userId]);
+
+  useEffect(() => {
+    if (!isAuthReady) {
+      return;
+    }
+
     let isMounted = true;
 
     async function load() {
+      setHasLoadedFavorites(false);
+      setHasMergedRemoteFavorites(false);
+      setFavoritesSyncError(null);
+
       try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
-        if (!stored) return;
+        const stored = await AsyncStorage.getItem(storageKey);
+        if (!stored) {
+          if (isMounted) {
+            setFavorites([]);
+          }
+          return;
+        }
 
         const parsed: unknown = JSON.parse(stored);
         if (!Array.isArray(parsed)) return;
@@ -64,7 +108,10 @@ export function useFavorites(knownCocktailIds: string[], userId?: string): UseFa
       } catch (error) {
         console.warn("Failed to load favorites.", error);
       } finally {
-        if (isMounted) setHasLoadedFavorites(true);
+        if (isMounted) {
+          loadedStorageKey.current = storageKey;
+          setHasLoadedFavorites(true);
+        }
       }
     }
 
@@ -72,23 +119,18 @@ export function useFavorites(knownCocktailIds: string[], userId?: string): UseFa
     return () => {
       isMounted = false;
     };
-  }, [knownIds]);
+  }, [isAuthReady, knownIds, storageKey]);
 
   useEffect(() => {
-    if (!hasLoadedFavorites) return;
+    if (!isAuthReady || !hasLoadedFavorites) return;
 
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(favorites)).catch((error) => {
+    AsyncStorage.setItem(storageKey, JSON.stringify(favorites)).catch((error) => {
       console.warn("Failed to save favorites.", error);
     });
-  }, [favorites, hasLoadedFavorites]);
+  }, [favorites, hasLoadedFavorites, isAuthReady, storageKey]);
 
   useEffect(() => {
-    setHasMergedRemoteFavorites(false);
-    setFavoritesSyncError(null);
-  }, [userId]);
-
-  useEffect(() => {
-    if (!hasLoadedFavorites || !userId || hasMergedRemoteFavorites) {
+    if (!isAuthReady || !hasLoadedFavorites || !userId || hasMergedRemoteFavorites) {
       return;
     }
 
@@ -106,19 +148,29 @@ export function useFavorites(knownCocktailIds: string[], userId?: string): UseFa
           return;
         }
 
+        const guestFavorites = pendingGuestFavorites.current
+          ? uniqueKnownIds(pendingGuestFavorites.current, knownIds)
+          : [];
+
         if (remoteFavorites && remoteFavorites.cocktailIds.length > 0) {
           const remoteIds = uniqueKnownIds(remoteFavorites.cocktailIds, knownIds);
-          const mergedIds = uniqueKnownIds([...remoteIds, ...favorites], knownIds);
+          const mergedIds = uniqueKnownIds([...remoteIds, ...favorites, ...guestFavorites], knownIds);
 
           setFavorites(mergedIds);
 
           if (!equalIds(remoteIds, mergedIds)) {
             await saveRemoteUserFavorites(currentUserId, mergedIds);
           }
-        } else if (favorites.length > 0) {
-          await saveRemoteUserFavorites(currentUserId, favorites);
+        } else {
+          const mergedIds = uniqueKnownIds([...favorites, ...guestFavorites], knownIds);
+
+          if (mergedIds.length > 0) {
+            setFavorites(mergedIds);
+            await saveRemoteUserFavorites(currentUserId, mergedIds);
+          }
         }
 
+        pendingGuestFavorites.current = null;
         setHasMergedRemoteFavorites(true);
       } catch (error) {
         console.warn("Failed to sync favorites.", error);
@@ -137,10 +189,10 @@ export function useFavorites(knownCocktailIds: string[], userId?: string): UseFa
     return () => {
       isMounted = false;
     };
-  }, [favorites, hasLoadedFavorites, hasMergedRemoteFavorites, knownIds, userId]);
+  }, [favorites, hasLoadedFavorites, hasMergedRemoteFavorites, isAuthReady, knownIds, userId]);
 
   useEffect(() => {
-    if (!hasLoadedFavorites || !userId || !hasMergedRemoteFavorites) {
+    if (!isAuthReady || !hasLoadedFavorites || !userId || !hasMergedRemoteFavorites) {
       return;
     }
 
@@ -162,7 +214,7 @@ export function useFavorites(knownCocktailIds: string[], userId?: string): UseFa
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [favorites, hasLoadedFavorites, hasMergedRemoteFavorites, userId]);
+  }, [favorites, hasLoadedFavorites, hasMergedRemoteFavorites, isAuthReady, userId]);
 
   const isFavorite = useCallback(
     (cocktailId: string) => favorites.includes(cocktailId),
