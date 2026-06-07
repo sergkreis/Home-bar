@@ -157,15 +157,16 @@ Recent deployment state:
 ```text
 VPS was cleaned on 2026-05-01.
 Old KIKU files and services were backed up to /root/home-bar-cleanup-backups/20260501-131803 before removal.
-The current Expo Web build was deployed to https://kreisphoto.de/ through GitHub Actions on 2026-05-02 after the mobile design pass.
-Latest commits:
-  926278c Update onboarding smoke test
-  ace311e Improve mobile design flow
-Latest GitHub Actions deploy succeeded: https://github.com/sergkreis/Home-bar/actions/runs/25257173436
+Production UI/auth pass was deployed to https://kreisphoto.de/ through GitHub Actions on 2026-06-07.
+App change commit:
+  e940a7c Polish production UI and account sync
+GitHub Actions deploy succeeded:
+  https://github.com/sergkreis/Home-bar/actions/runs/27084502544
 Production check after deploy:
   https://kreisphoto.de/ returned 200 OK.
-  index.html Last-Modified: Sat, 02 May 2026 17:05:45 GMT.
-  Current deployed JS bundle: /_expo/static/js/web/index-795913e8550391e9d13e59aa217cccb2.js
+  Current deployed JS bundle: /_expo/static/js/web/index-44caf7dbdce743e29aaceb4374f08f17.js
+  Production Playwright smoke suite passed: 6 passed.
+  Supabase env is not configured on production as of this check; account tab shows local-only mode.
 ```
 
 ## Проверка И Команды
