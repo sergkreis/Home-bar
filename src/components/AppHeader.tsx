@@ -16,6 +16,7 @@ export function AppHeader({ title, subtitle, stats, rightPill }: AppHeaderProps)
         <View style={styles.headerTextBlock}>
           <Text style={styles.eyebrow}>Домашний бар</Text>
           <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
         </View>
         {rightPill ? (
           <View style={styles.savedPill}>
@@ -23,7 +24,6 @@ export function AppHeader({ title, subtitle, stats, rightPill }: AppHeaderProps)
           </View>
         ) : null}
       </View>
-      <Text style={styles.subtitle}>{subtitle}</Text>
 
       {stats.length > 0 ? (
         <View style={styles.summaryStrip}>
@@ -41,7 +41,7 @@ export function AppHeader({ title, subtitle, stats, rightPill }: AppHeaderProps)
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 4,
+    paddingTop: 2,
     gap: spacing.md,
   },
   headerTop: {
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
   headerTextBlock: {
     flex: 1,
-    gap: 3,
+    gap: 5,
   },
   eyebrow: {
     color: colors.teal,
@@ -63,14 +63,14 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.text,
-    fontSize: 34,
-    fontWeight: "900",
-    lineHeight: 38,
+    fontSize: 31,
+    fontWeight: "800",
+    lineHeight: 35,
   },
   subtitle: {
     color: colors.textMuted,
     fontSize: 15,
-    lineHeight: 22,
+    lineHeight: 21,
     maxWidth: 720,
   },
   savedPill: {
@@ -84,33 +84,34 @@ const styles = StyleSheet.create({
   savedPillText: {
     color: colors.text,
     fontSize: 12,
-    fontWeight: "900",
+    fontWeight: "800",
   },
   summaryStrip: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
   },
   summaryItem: {
-    flex: 1,
-    minHeight: 72,
+    minWidth: 102,
+    minHeight: 50,
     backgroundColor: colors.surface,
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 11,
     justifyContent: "center",
   },
   summaryValue: {
     color: colors.text,
-    fontSize: 25,
-    fontWeight: "900",
-    lineHeight: 29,
+    fontSize: 22,
+    fontWeight: "800",
+    lineHeight: 25,
   },
   summaryLabel: {
     color: colors.textSubtle,
     fontSize: 11,
-    fontWeight: "900",
+    fontWeight: "800",
     letterSpacing: 0,
     textTransform: "uppercase",
   },

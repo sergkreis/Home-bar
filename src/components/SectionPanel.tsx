@@ -31,9 +31,9 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: colors.text,
-    fontSize: 22,
-    fontWeight: "900",
-    lineHeight: 27,
+    fontSize: 21,
+    fontWeight: "800",
+    lineHeight: 26,
   },
   sectionHint: {
     color: colors.textMuted,

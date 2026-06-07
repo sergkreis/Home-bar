@@ -324,6 +324,11 @@ Production UI/auth pass on 2026-06-07:
   Added password reset/update support to useAuth and AccountPanel.
   Added user_favorites cloud sync service, useFavorites remote merge/save, and RLS SQL schema.
   Saved local bar/favorites now merge with remote data after sign-in instead of blindly replacing local state.
+UI refinement pass on 2026-06-07:
+  Added lucide-react-native and react-native-svg for proper SVG icons.
+  Bottom nav and FavoriteButton now use line icons instead of text symbols.
+  Today tab now uses a lighter plan card and compact icon quick-mode cards instead of a large dark hero plus wide pastel bars.
+  Lucide imports intentionally target individual CJS icon files to keep the Expo web bundle near 1 MB; Metro warns about private package exports, but root imports pulled the bundle to about 2.74 MB.
 ```
 
 ## Следующие Шаги

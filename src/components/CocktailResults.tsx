@@ -121,13 +121,14 @@ const styles = StyleSheet.create({
   resultCard: {
     backgroundColor: colors.surface,
     borderRadius: radii.md,
-    padding: spacing.md,
-    gap: 8,
+    padding: 14,
+    gap: 9,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderMuted,
   },
   resultCardReady: {
     borderColor: "#b8d8c6",
+    backgroundColor: "#fbfdfb",
   },
   resultHeader: {
     flexDirection: "row",
@@ -146,8 +147,8 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: "900",
+    fontSize: 17,
+    fontWeight: "800",
     lineHeight: 23,
   },
   resultMeta: {
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   progressTrack: {
-    height: 5,
+    height: 4,
     borderRadius: radii.pill,
     backgroundColor: colors.surfaceMuted,
     overflow: "hidden",
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    minWidth: 54,
+    minWidth: 50,
     alignItems: "center",
   },
   badgeReady: {
@@ -187,12 +188,12 @@ const styles = StyleSheet.create({
   badgeLabel: {
     color: colors.text,
     fontSize: 12,
-    fontWeight: "900",
+    fontWeight: "800",
   },
   resultMatch: {
     color: colors.textMuted,
     fontSize: 13,
-    fontWeight: "900",
+    fontWeight: "800",
   },
   resultMissing: {
     color: colors.warning,

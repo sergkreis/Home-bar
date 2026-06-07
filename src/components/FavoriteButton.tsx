@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
+import Star from "lucide-react-native/dist/cjs/icons/star";
 
 import { colors, pressed, radii } from "../theme";
 
@@ -11,6 +12,7 @@ type FavoriteButtonProps = {
 
 export function FavoriteButton({ isFavorite, onToggle, label, size = "small" }: FavoriteButtonProps) {
   const isLarge = size === "large";
+  const iconSize = isLarge ? 24 : 19;
 
   return (
     <Pressable
@@ -31,53 +33,39 @@ export function FavoriteButton({ isFavorite, onToggle, label, size = "small" }: 
         isPressed && { opacity: pressed.opacity },
       ]}
     >
-      <Text style={[isLarge ? styles.largeLabel : styles.smallLabel, isFavorite && styles.activeLabel]}>
-        {isFavorite ? "★" : "☆"}
-      </Text>
+      <Star
+        color={isFavorite ? colors.accent : colors.textSubtle}
+        fill={isFavorite ? colors.accentSoft : "transparent"}
+        size={iconSize}
+        strokeWidth={isFavorite ? 2.7 : 2.35}
+      />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   small: {
-    minWidth: 36,
-    minHeight: 36,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: radii.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    paddingHorizontal: 8,
-  },
-  large: {
-    minWidth: 48,
-    minHeight: 48,
+    width: 40,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
-    paddingHorizontal: 12,
+  },
+  large: {
+    width: 50,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
   },
   active: {
     backgroundColor: colors.accentSoft,
     borderColor: colors.accent,
-  },
-  smallLabel: {
-    color: colors.textSubtle,
-    fontSize: 18,
-    fontWeight: "900",
-    lineHeight: 22,
-  },
-  largeLabel: {
-    color: colors.textSubtle,
-    fontSize: 24,
-    fontWeight: "900",
-    lineHeight: 28,
-  },
-  activeLabel: {
-    color: colors.accent,
   },
 });

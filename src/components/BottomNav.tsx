@@ -1,22 +1,37 @@
+import type { ComponentType } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import BookOpen from "lucide-react-native/dist/cjs/icons/book-open";
+import Martini from "lucide-react-native/dist/cjs/icons/martini";
+import ShoppingBasket from "lucide-react-native/dist/cjs/icons/shopping-basket";
+import Sparkles from "lucide-react-native/dist/cjs/icons/sparkles";
+import Star from "lucide-react-native/dist/cjs/icons/star";
+import UserRound from "lucide-react-native/dist/cjs/icons/user-round";
 
 import { colors, pressed, radii, spacing } from "../theme";
 
 export type AppTab = "today" | "bar" | "buy" | "favorites" | "recipes" | "account";
 
+type IconProps = {
+  color?: string;
+  fill?: string;
+  size?: number | string;
+  strokeWidth?: number | string;
+};
+
 type TabConfig = {
   id: AppTab;
   label: string;
-  icon: string;
+  accessibilityLabel?: string;
+  Icon: ComponentType<IconProps>;
 };
 
 const tabs: TabConfig[] = [
-  { id: "today", label: "Сегодня", icon: "●" },
-  { id: "bar", label: "Бар", icon: "◐" },
-  { id: "buy", label: "Купить", icon: "+" },
-  { id: "favorites", label: "Любимые", icon: "★" },
-  { id: "recipes", label: "Рецепты", icon: "≡" },
-  { id: "account", label: "Аккаунт", icon: "@" },
+  { id: "today", label: "Сегодня", Icon: Sparkles },
+  { id: "bar", label: "Бар", Icon: Martini },
+  { id: "buy", label: "Купить", Icon: ShoppingBasket },
+  { id: "favorites", label: "Любим.", accessibilityLabel: "Любимые", Icon: Star },
+  { id: "recipes", label: "Рецепты", Icon: BookOpen },
+  { id: "account", label: "Аккаунт", Icon: UserRound },
 ];
 
 type BottomNavProps = {
@@ -32,11 +47,13 @@ export function BottomNav({ activeTab, onChangeTab, favoritesCount = 0 }: Bottom
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === "favorites" && favoritesCount > 0;
+          const iconColor = isActive ? colors.text : colors.textSubtle;
+          const Icon = tab.Icon;
 
           return (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={`Перейти на вкладку ${tab.label}`}
+              accessibilityLabel={`Перейти на вкладку ${tab.accessibilityLabel ?? tab.label}`}
               accessibilityState={{ selected: isActive }}
               key={tab.id}
               onPress={() => onChangeTab(tab.id)}
@@ -46,15 +63,22 @@ export function BottomNav({ activeTab, onChangeTab, favoritesCount = 0 }: Bottom
                 isPressed && { opacity: pressed.opacity },
               ]}
             >
-              <View style={styles.navIconRow}>
-                <Text style={[styles.navIcon, isActive && styles.navIconActive]}>{tab.icon}</Text>
+              <View style={[styles.iconPlate, isActive && styles.iconPlateActive]}>
+                <Icon
+                  color={iconColor}
+                  fill={tab.id === "favorites" && isActive ? colors.accentSoft : "transparent"}
+                  size={19}
+                  strokeWidth={isActive ? 2.7 : 2.35}
+                />
                 {showBadge ? (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>{favoritesCount}</Text>
                   </View>
                 ) : null}
               </View>
-              <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>{tab.label}</Text>
+              <Text style={[styles.navLabel, isActive && styles.navLabelActive]} numberOfLines={1}>
+                {tab.label}
+              </Text>
             </Pressable>
           );
         })}
@@ -67,7 +91,7 @@ export { tabs as bottomNavTabs };
 
 const styles = StyleSheet.create({
   navWrap: {
-    backgroundColor: "rgba(244, 245, 242, 0.96)",
+    backgroundColor: "rgba(244, 245, 242, 0.97)",
     borderTopWidth: 1,
     borderTopColor: colors.border,
     paddingHorizontal: spacing.md,
@@ -79,48 +103,48 @@ const styles = StyleSheet.create({
     maxWidth: 920,
     alignSelf: "center",
     flexDirection: "row",
-    gap: 4,
+    gap: 5,
     backgroundColor: colors.surface,
-    borderRadius: radii.md,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 5,
+    padding: 6,
   },
   navItem: {
     flex: 1,
-    minHeight: 52,
-    borderRadius: radii.sm,
+    minHeight: 58,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 2,
-    gap: 2,
-  },
-  navItemActive: {
-    backgroundColor: colors.surfaceDark,
-  },
-  navIconRow: {
-    flexDirection: "row",
-    alignItems: "center",
     gap: 4,
   },
-  navIcon: {
-    color: colors.textDim,
-    fontSize: 15,
-    fontWeight: "900",
-    lineHeight: 16,
+  navItemActive: {
+    backgroundColor: colors.accentSoft,
   },
-  navIconActive: {
-    color: colors.textInverse,
+  iconPlate: {
+    width: 28,
+    height: 24,
+    borderRadius: radii.pill,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconPlateActive: {
+    backgroundColor: "rgba(255, 255, 255, 0.56)",
   },
   navLabel: {
     color: colors.textMuted,
-    fontSize: 10,
-    fontWeight: "900",
+    fontSize: 9,
+    fontWeight: "800",
   },
   navLabelActive: {
-    color: colors.textInverse,
+    color: colors.text,
+    fontWeight: "900",
   },
   badge: {
+    position: "absolute",
+    top: -5,
+    right: -8,
     minWidth: 16,
     height: 16,
     borderRadius: 8,
