@@ -6,6 +6,7 @@ import { Ingredient } from "../data/cocktails";
 import { colors, pressed, radii, spacing } from "../theme";
 import { getStrengthLabel } from "../utils/cocktailLabels";
 import { RankedCocktail } from "../utils/cocktailMatcher";
+import { formatRecipeAmount, formatRecipeStep } from "../utils/recipeFormatting";
 
 type CocktailDetailScreenProps = {
   cocktail: RankedCocktail;
@@ -113,7 +114,7 @@ export function CocktailDetailScreen({
                   </Text>
                 </View>
                 <View style={styles.recipeRowRight}>
-                  <Text style={styles.recipeAmount}>{amount}</Text>
+                  <Text style={styles.recipeAmount}>{formatRecipeAmount(amount)}</Text>
                   {isMissing ? (
                     <Pressable
                       accessibilityRole="button"
@@ -141,7 +142,7 @@ export function CocktailDetailScreen({
               <View style={styles.stepIndexWrap}>
                 <Text style={styles.stepIndexText}>{index + 1}</Text>
               </View>
-              <Text style={styles.stepText}>{step}</Text>
+              <Text style={styles.stepText}>{formatRecipeStep(step)}</Text>
             </View>
           ))}
         </View>
