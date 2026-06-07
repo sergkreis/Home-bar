@@ -12,9 +12,9 @@ type TabConfig = {
 
 const tabs: TabConfig[] = [
   { id: "today", label: "Сегодня", icon: "●" },
-  { id: "bar", label: "Мой бар", icon: "◐" },
-  { id: "buy", label: "Докупить", icon: "+" },
-  { id: "favorites", label: "Избранное", icon: "★" },
+  { id: "bar", label: "Бар", icon: "◐" },
+  { id: "buy", label: "Купить", icon: "+" },
+  { id: "favorites", label: "Любимые", icon: "★" },
   { id: "recipes", label: "Рецепты", icon: "≡" },
   { id: "account", label: "Аккаунт", icon: "@" },
 ];
@@ -27,36 +27,38 @@ type BottomNavProps = {
 
 export function BottomNav({ activeTab, onChangeTab, favoritesCount = 0 }: BottomNavProps) {
   return (
-    <View style={styles.bottomNav}>
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.id;
-        const showBadge = tab.id === "favorites" && favoritesCount > 0;
+    <View style={styles.navWrap}>
+      <View style={styles.bottomNav}>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          const showBadge = tab.id === "favorites" && favoritesCount > 0;
 
-        return (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Перейти на вкладку ${tab.label}`}
-            accessibilityState={{ selected: isActive }}
-            key={tab.id}
-            onPress={() => onChangeTab(tab.id)}
-            style={({ pressed: isPressed }) => [
-              styles.navItem,
-              isActive && styles.navItemActive,
-              isPressed && { opacity: pressed.opacity },
-            ]}
-          >
-            <View style={styles.navIconRow}>
-              <Text style={[styles.navIcon, isActive && styles.navIconActive]}>{tab.icon}</Text>
-              {showBadge ? (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{favoritesCount}</Text>
-                </View>
-              ) : null}
-            </View>
-            <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>{tab.label}</Text>
-          </Pressable>
-        );
-      })}
+          return (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Перейти на вкладку ${tab.label}`}
+              accessibilityState={{ selected: isActive }}
+              key={tab.id}
+              onPress={() => onChangeTab(tab.id)}
+              style={({ pressed: isPressed }) => [
+                styles.navItem,
+                isActive && styles.navItemActive,
+                isPressed && { opacity: pressed.opacity },
+              ]}
+            >
+              <View style={styles.navIconRow}>
+                <Text style={[styles.navIcon, isActive && styles.navIconActive]}>{tab.icon}</Text>
+                {showBadge ? (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{favoritesCount}</Text>
+                  </View>
+                ) : null}
+              </View>
+              <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>{tab.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -64,20 +66,29 @@ export function BottomNav({ activeTab, onChangeTab, favoritesCount = 0 }: Bottom
 export { tabs as bottomNavTabs };
 
 const styles = StyleSheet.create({
+  navWrap: {
+    backgroundColor: "rgba(244, 245, 242, 0.96)",
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
+  },
   bottomNav: {
+    width: "100%",
+    maxWidth: 920,
+    alignSelf: "center",
     flexDirection: "row",
-    gap: 6,
-    backgroundColor: "#151b23",
+    gap: 4,
+    backgroundColor: colors.surface,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#344151",
-    padding: 6,
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.md,
+    borderColor: colors.border,
+    padding: 5,
   },
   navItem: {
     flex: 1,
-    minHeight: 50,
+    minHeight: 52,
     borderRadius: radii.sm,
     alignItems: "center",
     justifyContent: "center",
@@ -85,7 +96,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   navItemActive: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.surfaceDark,
   },
   navIconRow: {
     flexDirection: "row",
@@ -93,33 +104,33 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   navIcon: {
-    color: "#7f8fa3",
+    color: colors.textDim,
     fontSize: 15,
     fontWeight: "900",
     lineHeight: 16,
   },
   navIconActive: {
-    color: colors.accentText,
+    color: colors.textInverse,
   },
   navLabel: {
-    color: "#c4cfdd",
+    color: colors.textMuted,
     fontSize: 10,
     fontWeight: "900",
   },
   navLabelActive: {
-    color: colors.accentText,
+    color: colors.textInverse,
   },
   badge: {
     minWidth: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: "#d06b87",
+    backgroundColor: colors.berry,
     paddingHorizontal: 4,
     alignItems: "center",
     justifyContent: "center",
   },
   badgeText: {
-    color: colors.text,
+    color: colors.textInverse,
     fontSize: 10,
     fontWeight: "900",
   },

@@ -57,26 +57,26 @@ export function CocktailDetailScreen({
         </View>
         <Text style={styles.title}>{cocktail.name}</Text>
         <Text style={styles.meta}>
-          {cocktail.baseSpirit} - {getStrengthLabel(cocktail.strength)}
+          {cocktail.baseSpirit} · {getStrengthLabel(cocktail.strength)} · {cocktail.glassName}
         </Text>
-      </View>
 
-      <View style={styles.statusRow}>
-        <View
-          style={[styles.statusBadge, missingCount === 0 ? styles.readyBadge : styles.missingBadge]}
-        >
-          <Text style={styles.statusBadgeText}>
-            {missingCount === 0 ? "Готово сейчас" : `Не хватает ${missingCount}`}
+        <View style={styles.statusRow}>
+          <View
+            style={[styles.statusBadge, missingCount === 0 ? styles.readyBadge : styles.missingBadge]}
+          >
+            <Text style={styles.statusBadgeText}>
+              {missingCount === 0 ? "Готово сейчас" : `Не хватает ${missingCount}`}
+            </Text>
+          </View>
+          <Text style={styles.matchText}>
+            {cocktail.availableCount}/{cocktail.ingredients.length} ингредиентов
           </Text>
         </View>
-        <Text style={styles.matchText}>
-          {cocktail.availableCount}/{cocktail.ingredients.length} ингредиентов
-        </Text>
       </View>
 
       {missingCount > 0 ? (
         <View style={styles.callout}>
-          <Text style={styles.calloutLabel}>Докупить</Text>
+          <Text style={styles.calloutLabel}>Докупи и отметь</Text>
           <View style={styles.shoppingChips}>
             {cocktail.missingIngredients.map((ingredientId) => (
               <Pressable
@@ -95,53 +95,56 @@ export function CocktailDetailScreen({
               </Pressable>
             ))}
           </View>
-          <Text style={styles.calloutHint}>Нажми, чтобы отметить как купленное.</Text>
         </View>
       ) : null}
 
       <SectionPanel title="Ингредиенты">
-        {cocktail.recipeIngredients.map(({ ingredientId, amount }) => {
-          const isOwned = ownedSet.has(ingredientId);
-          const isMissing = cocktail.missingIngredients.includes(ingredientId);
+        <View style={styles.recipeList}>
+          {cocktail.recipeIngredients.map(({ ingredientId, amount }) => {
+            const isOwned = ownedSet.has(ingredientId);
+            const isMissing = cocktail.missingIngredients.includes(ingredientId);
 
-          return (
-            <View key={ingredientId} style={styles.recipeRow}>
-              <View style={styles.recipeRowMain}>
-                <View style={[styles.dot, isOwned ? styles.dotOwned : styles.dotMissing]} />
-                <Text style={styles.recipeRowText}>
-                  {getIngredientName(ingredients, ingredientId)}
-                </Text>
+            return (
+              <View key={ingredientId} style={styles.recipeRow}>
+                <View style={styles.recipeRowMain}>
+                  <View style={[styles.dot, isOwned ? styles.dotOwned : styles.dotMissing]} />
+                  <Text style={styles.recipeRowText}>
+                    {getIngredientName(ingredients, ingredientId)}
+                  </Text>
+                </View>
+                <View style={styles.recipeRowRight}>
+                  <Text style={styles.recipeAmount}>{amount}</Text>
+                  {isMissing ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`Добавить ${getIngredientName(ingredients, ingredientId)} в мой бар`}
+                      onPress={() => onAddIngredientToBar(ingredientId)}
+                      style={({ pressed: isPressed }) => [
+                        styles.addButton,
+                        isPressed && { opacity: pressed.opacity },
+                      ]}
+                    >
+                      <Text style={styles.addButtonText}>+ В бар</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
               </View>
-              <View style={styles.recipeRowRight}>
-                <Text style={styles.recipeAmount}>{amount}</Text>
-                {isMissing ? (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={`Добавить ${getIngredientName(ingredients, ingredientId)} в мой бар`}
-                    onPress={() => onAddIngredientToBar(ingredientId)}
-                    style={({ pressed: isPressed }) => [
-                      styles.addButton,
-                      isPressed && { opacity: pressed.opacity },
-                    ]}
-                  >
-                    <Text style={styles.addButtonText}>+ В бар</Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            </View>
-          );
-        })}
+            );
+          })}
+        </View>
       </SectionPanel>
 
-      <SectionPanel title="Как приготовить" hint={`Бокал: ${cocktail.glassName}`}>
-        {cocktail.steps.map((step, index) => (
-          <View key={`${cocktail.id}-${index}`} style={styles.stepRow}>
-            <View style={styles.stepIndexWrap}>
-              <Text style={styles.stepIndexText}>{index + 1}</Text>
+      <SectionPanel title="Как приготовить">
+        <View style={styles.steps}>
+          {cocktail.steps.map((step, index) => (
+            <View key={`${cocktail.id}-${index}`} style={styles.stepRow}>
+              <View style={styles.stepIndexWrap}>
+                <Text style={styles.stepIndexText}>{index + 1}</Text>
+              </View>
+              <Text style={styles.stepText}>{step}</Text>
             </View>
-            <Text style={styles.stepText}>{step}</Text>
-          </View>
-        ))}
+          ))}
+        </View>
         {cocktail.garnish ? (
           <View style={styles.callout}>
             <Text style={styles.calloutLabel}>Подача</Text>
@@ -159,17 +162,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
+    width: "100%",
+    maxWidth: 920,
+    alignSelf: "center",
     padding: spacing.md,
     paddingBottom: 40,
-    gap: spacing.md,
+    gap: spacing.xl,
   },
   header: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceDark,
     borderRadius: radii.md,
-    padding: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
+    padding: spacing.lg,
+    gap: spacing.md,
   },
   headerTop: {
     flexDirection: "row",
@@ -178,28 +182,28 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   backButton: {
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: "#272923",
     borderWidth: 1,
-    borderColor: colors.borderMuted,
+    borderColor: "#3a3e35",
     borderRadius: radii.sm,
     paddingHorizontal: 12,
     paddingVertical: 9,
   },
   backButtonLabel: {
-    color: colors.text,
+    color: colors.textInverse,
     fontSize: 14,
     fontWeight: "900",
   },
   title: {
-    color: colors.text,
-    fontSize: 30,
+    color: colors.textInverse,
+    fontSize: 36,
     fontWeight: "900",
-    lineHeight: 34,
+    lineHeight: 40,
   },
   meta: {
-    color: "#9fb0c5",
+    color: "#d7ded8",
     fontSize: 15,
-    lineHeight: 20,
+    lineHeight: 21,
   },
   statusRow: {
     flexDirection: "row",
@@ -208,7 +212,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   statusBadge: {
-    borderRadius: radii.sm,
+    borderRadius: radii.pill,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
@@ -224,17 +228,17 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   matchText: {
-    color: "#c4cfdd",
+    color: "#d7ded8",
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "900",
   },
   callout: {
-    backgroundColor: "#151b23",
+    backgroundColor: colors.surface,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.borderMuted,
-    padding: 12,
-    gap: 8,
+    borderColor: colors.border,
+    padding: spacing.md,
+    gap: spacing.sm,
   },
   calloutLabel: {
     color: colors.accent,
@@ -243,14 +247,9 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   calloutText: {
-    color: "#d7deea",
+    color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
-  },
-  calloutHint: {
-    color: colors.textSubtle,
-    fontSize: 12,
-    fontStyle: "italic",
   },
   shoppingChips: {
     flexDirection: "row",
@@ -258,23 +257,35 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   shoppingChip: {
-    backgroundColor: "#3a2f17",
-    borderColor: colors.accent,
+    backgroundColor: colors.warningBg,
+    borderColor: "#dfc37d",
     borderWidth: 1,
-    borderRadius: radii.sm,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    borderRadius: radii.pill,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
   },
   shoppingChipText: {
-    color: colors.accent,
+    color: colors.warning,
     fontSize: 13,
     fontWeight: "900",
+  },
+  recipeList: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: "hidden",
   },
   recipeRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 10,
+    minHeight: 52,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderMuted,
   },
   recipeRowMain: {
     flexDirection: "row",
@@ -283,7 +294,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   recipeRowText: {
-    color: "#d7deea",
+    color: colors.text,
     fontSize: 15,
   },
   recipeRowRight: {
@@ -292,20 +303,20 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   recipeAmount: {
-    color: colors.accent,
+    color: colors.text,
     fontSize: 14,
     fontWeight: "900",
   },
   addButton: {
-    backgroundColor: "#3a2f17",
-    borderColor: colors.accent,
+    backgroundColor: colors.warningBg,
+    borderColor: "#dfc37d",
     borderWidth: 1,
-    borderRadius: radii.sm,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    borderRadius: radii.pill,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
   },
   addButtonText: {
-    color: colors.accent,
+    color: colors.warning,
     fontSize: 11,
     fontWeight: "900",
   },
@@ -315,33 +326,41 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   dotOwned: {
-    backgroundColor: "#62d29b",
+    backgroundColor: colors.success,
   },
   dotMissing: {
     backgroundColor: colors.accent,
   },
+  steps: {
+    gap: spacing.sm,
+  },
   stepRow: {
     flexDirection: "row",
-    gap: 12,
+    gap: spacing.md,
     alignItems: "flex-start",
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
   },
   stepIndexWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: radii.sm,
+    width: 30,
+    height: 30,
+    borderRadius: radii.pill,
     backgroundColor: colors.teal,
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
   },
   stepIndexText: {
-    color: "#102124",
+    color: colors.textInverse,
     fontSize: 14,
     fontWeight: "900",
   },
   stepText: {
     flex: 1,
-    color: "#d7deea",
+    color: colors.text,
     fontSize: 15,
     lineHeight: 22,
   },

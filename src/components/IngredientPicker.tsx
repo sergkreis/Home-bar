@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { Ingredient, IngredientCategory } from "../data/cocktails";
+import { colors, pressed, radii, spacing } from "../theme";
 
 type IngredientGroup = {
   key: IngredientCategory;
@@ -84,36 +85,51 @@ export function IngredientPicker({
           <Text style={styles.toolbarLabel}>выбрано из {ingredients.length}</Text>
         </View>
         <View style={styles.toolbarActions}>
-          <Pressable accessibilityRole="button" onPress={onReset} style={styles.secondaryButton}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onReset}
+            style={({ pressed: isPressed }) => [styles.secondaryButton, isPressed && { opacity: pressed.opacity }]}
+          >
             <Text style={styles.secondaryButtonText}>Стартовый</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={onClear} style={styles.secondaryButton}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onClear}
+            style={({ pressed: isPressed }) => [styles.secondaryButton, isPressed && { opacity: pressed.opacity }]}
+          >
             <Text style={styles.secondaryButtonText}>Очистить</Text>
           </Pressable>
         </View>
       </View>
 
       {selectedIngredientNames.length > 0 ? (
-        <View style={styles.selectedWrap}>
-          {selectedIngredientNames.slice(0, 12).map((name) => (
-            <Text key={name} style={styles.selectedChip}>
-              {name}
-            </Text>
-          ))}
-          {selectedIngredientNames.length > 12 ? (
-            <Text style={styles.selectedMore}>+{selectedIngredientNames.length - 12}</Text>
-          ) : null}
+        <View style={styles.selectedBlock}>
+          <Text style={styles.selectedTitle}>В баре</Text>
+          <View style={styles.selectedWrap}>
+            {selectedIngredientNames.slice(0, 12).map((name) => (
+              <Text key={name} style={styles.selectedChip}>
+                {name}
+              </Text>
+            ))}
+            {selectedIngredientNames.length > 12 ? (
+              <Text style={styles.selectedMore}>+{selectedIngredientNames.length - 12}</Text>
+            ) : null}
+          </View>
         </View>
       ) : (
-        <Text style={styles.emptySelection}>Бар пуст. Добавь несколько базовых ингредиентов.</Text>
+        <View style={styles.emptySelection}>
+          <Text style={styles.emptyTitle}>Бар пока пуст</Text>
+          <Text style={styles.emptyText}>Добавь пару бутылок, цитрус или миксер, и подборка оживет.</Text>
+        </View>
       )}
 
       <View style={styles.searchWrap}>
         <TextInput
+          accessibilityLabel="Поиск ингредиента"
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Поиск по бутылкам, сокам и ингредиентам"
-          placeholderTextColor="#6f7d90"
+          placeholderTextColor={colors.textDim}
           style={styles.searchInput}
         />
       </View>
@@ -137,7 +153,12 @@ export function IngredientPicker({
                   accessibilityRole="button"
                   key={ingredient.id}
                   onPress={() => onToggleIngredient(ingredient.id)}
-                  style={[styles.chip, styles.featuredChip, isActive && styles.chipActive]}
+                  style={({ pressed: isPressed }) => [
+                    styles.chip,
+                    styles.featuredChip,
+                    isActive && styles.chipActive,
+                    isPressed && { opacity: pressed.opacity },
+                  ]}
                 >
                   <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
                     {ingredient.name}
@@ -165,7 +186,10 @@ export function IngredientPicker({
               accessibilityRole="button"
               accessibilityState={{ expanded: isExpanded }}
               onPress={() => toggleGroup(group.key)}
-              style={styles.groupHeader}
+              style={({ pressed: isPressed }) => [
+                styles.groupHeader,
+                isPressed && { opacity: pressed.opacity },
+              ]}
             >
               <Text style={styles.groupTitle}>{group.label}</Text>
               <View style={styles.groupMeta}>
@@ -183,7 +207,11 @@ export function IngredientPicker({
                       accessibilityRole="button"
                       key={ingredient.id}
                       onPress={() => onToggleIngredient(ingredient.id)}
-                      style={[styles.chip, isActive && styles.chipActive]}
+                      style={({ pressed: isPressed }) => [
+                        styles.chip,
+                        isActive && styles.chipActive,
+                        isPressed && { opacity: pressed.opacity },
+                      ]}
                     >
                       <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
                         {ingredient.name}
@@ -200,9 +228,7 @@ export function IngredientPicker({
       {filteredIngredients.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>Ничего не нашлось</Text>
-          <Text style={styles.emptyText}>
-            Попробуй другое название ингредиента или очисти поиск.
-          </Text>
+          <Text style={styles.emptyText}>Попробуй другое название ингредиента или очисти поиск.</Text>
         </View>
       ) : null}
     </View>
@@ -211,51 +237,60 @@ export function IngredientPicker({
 
 const styles = StyleSheet.create({
   container: {
-    gap: 12,
+    gap: spacing.md,
   },
   toolbar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 12,
+    gap: spacing.md,
     alignItems: "flex-start",
-    backgroundColor: "#121923",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#2f3d4a",
-    padding: 12,
+    backgroundColor: colors.surfaceDark,
+    borderRadius: radii.md,
+    padding: spacing.md,
   },
   toolbarCopy: {
     flex: 1,
   },
   toolbarValue: {
-    color: "#f8fafc",
-    fontSize: 22,
+    color: colors.textInverse,
+    fontSize: 26,
     fontWeight: "900",
+    lineHeight: 30,
   },
   toolbarLabel: {
-    color: "#91a0b4",
+    color: "#c8d0c8",
     fontSize: 11,
     fontWeight: "900",
+    letterSpacing: 0,
     textTransform: "uppercase",
   },
   toolbarActions: {
     flexDirection: "row",
-    gap: 8,
+    gap: spacing.sm,
     flexWrap: "wrap",
     justifyContent: "flex-end",
   },
   secondaryButton: {
-    backgroundColor: "#17212b",
-    borderColor: "#405061",
+    backgroundColor: "#272923",
+    borderColor: "#3a3e35",
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: radii.sm,
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
   secondaryButtonText: {
-    color: "#dce4ef",
+    color: colors.textInverse,
     fontSize: 12,
     fontWeight: "900",
+  },
+  selectedBlock: {
+    gap: spacing.sm,
+  },
+  selectedTitle: {
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: "900",
+    textTransform: "uppercase",
   },
   selectedWrap: {
     flexDirection: "row",
@@ -263,44 +298,47 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   selectedChip: {
-    color: "#15202a",
-    backgroundColor: "#f4b860",
-    borderRadius: 8,
-    paddingHorizontal: 9,
+    color: colors.tealDark,
+    backgroundColor: colors.tealSoft,
+    borderRadius: radii.pill,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     fontSize: 12,
     fontWeight: "900",
     overflow: "hidden",
   },
   selectedMore: {
-    color: "#f8fafc",
-    backgroundColor: "#303846",
-    borderRadius: 8,
-    paddingHorizontal: 9,
+    color: colors.text,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radii.pill,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     fontSize: 12,
     fontWeight: "900",
     overflow: "hidden",
   },
   emptySelection: {
-    color: "#97a3b6",
-    fontSize: 14,
-    lineHeight: 20,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    gap: 4,
   },
   searchWrap: {
-    backgroundColor: "#101720",
-    borderRadius: 8,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#405061",
+    borderColor: colors.borderStrong,
     paddingHorizontal: 12,
   },
   searchInput: {
-    color: "#f8fafc",
+    color: colors.text,
     fontSize: 15,
     paddingVertical: 12,
   },
   searchMeta: {
-    color: "#97a3b6",
+    color: colors.textSubtle,
     fontSize: 12,
     fontWeight: "800",
   },
@@ -309,11 +347,11 @@ const styles = StyleSheet.create({
   },
   featuredBlock: {
     gap: 10,
-    backgroundColor: "#132221",
-    borderRadius: 8,
+    backgroundColor: colors.tealSoft,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#24524a",
-    padding: 12,
+    borderColor: "#b8d8d2",
+    padding: spacing.md,
   },
   featuredHeader: {
     flexDirection: "row",
@@ -326,21 +364,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 10,
     alignItems: "center",
-    minHeight: 38,
-    backgroundColor: "#151b23",
-    borderRadius: 8,
+    minHeight: 42,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#2d3948",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    borderColor: colors.border,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
   },
   groupTitle: {
-    color: "#cfd7e3",
+    color: colors.text,
     fontSize: 14,
     fontWeight: "900",
   },
   groupCount: {
-    color: "#7f8fa3",
+    color: colors.textSubtle,
     fontSize: 12,
     fontWeight: "900",
   },
@@ -350,7 +388,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   groupChevron: {
-    color: "#f4b860",
+    color: colors.accent,
     fontSize: 18,
     fontWeight: "900",
     lineHeight: 20,
@@ -364,43 +402,42 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderWidth: 1,
-    borderColor: "#3a4250",
-    backgroundColor: "#141a22",
-    borderRadius: 8,
-    paddingHorizontal: 11,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radii.pill,
+    paddingHorizontal: 12,
     paddingVertical: 9,
   },
   featuredChip: {
-    backgroundColor: "#182c2b",
-    borderColor: "#32645d",
+    borderColor: "#9bc8c0",
   },
   chipActive: {
-    backgroundColor: "#f4b860",
-    borderColor: "#f4b860",
+    backgroundColor: colors.surfaceDark,
+    borderColor: colors.surfaceDark,
   },
   chipLabel: {
-    color: "#d5dcea",
+    color: colors.text,
     fontSize: 14,
     fontWeight: "800",
   },
   chipLabelActive: {
-    color: "#1a1d24",
+    color: colors.textInverse,
   },
   emptyState: {
-    backgroundColor: "#141a22",
-    borderRadius: 8,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#303846",
-    padding: 12,
+    borderColor: colors.border,
+    padding: spacing.md,
     gap: 6,
   },
   emptyTitle: {
-    color: "#f8fafc",
+    color: colors.text,
     fontSize: 15,
     fontWeight: "900",
   },
   emptyText: {
-    color: "#97a3b6",
+    color: colors.textSubtle,
     fontSize: 14,
     lineHeight: 20,
   },

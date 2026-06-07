@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
 
+import { colors, spacing } from "../theme";
+
 type SectionPanelProps = {
   title: string;
   hint?: string;
@@ -10,32 +12,33 @@ type SectionPanelProps = {
 
 export function SectionPanel({ title, hint, children, style }: SectionPanelProps) {
   return (
-    <View style={[styles.panel, style]}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {hint ? <Text style={styles.sectionHint}>{hint}</Text> : null}
+    <View style={[styles.section, style]}>
+      <View style={styles.header}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        {hint ? <Text style={styles.sectionHint}>{hint}</Text> : null}
+      </View>
       {children}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  panel: {
-    backgroundColor: "#1b1f27",
-    borderRadius: 8,
-    padding: 14,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: "#252d38",
+  section: {
+    gap: spacing.md,
+  },
+  header: {
+    gap: 4,
   },
   sectionTitle: {
-    color: "#f8fafc",
-    fontSize: 21,
+    color: colors.text,
+    fontSize: 22,
     fontWeight: "900",
-    lineHeight: 26,
+    lineHeight: 27,
   },
   sectionHint: {
-    color: "#97a3b6",
+    color: colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
+    maxWidth: 720,
   },
 });

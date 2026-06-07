@@ -27,7 +27,7 @@ export function FavoriteButton({ isFavorite, onToggle, label, size = "small" }: 
       hitSlop={8}
       style={({ pressed: isPressed }) => [
         isLarge ? styles.large : styles.small,
-        isFavorite && (isLarge ? styles.largeActive : styles.smallActive),
+        isFavorite && styles.active,
         isPressed && { opacity: pressed.opacity },
       ]}
     >
@@ -46,19 +46,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: radii.sm,
     borderWidth: 1,
-    borderColor: colors.borderMuted,
-    backgroundColor: colors.surfaceMuted,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
     paddingHorizontal: 8,
-  },
-  smallActive: {
-    backgroundColor: "#3a2f17",
-    borderColor: colors.accent,
-  },
-  smallLabel: {
-    color: colors.textSubtle,
-    fontSize: 18,
-    fontWeight: "900",
-    lineHeight: 22,
   },
   large: {
     minWidth: 48,
@@ -67,13 +57,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.borderMuted,
-    backgroundColor: colors.surfaceMuted,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
     paddingHorizontal: 12,
   },
-  largeActive: {
-    backgroundColor: "#3a2f17",
+  active: {
+    backgroundColor: colors.accentSoft,
     borderColor: colors.accent,
+  },
+  smallLabel: {
+    color: colors.textSubtle,
+    fontSize: 18,
+    fontWeight: "900",
+    lineHeight: 22,
   },
   largeLabel: {
     color: colors.textSubtle,

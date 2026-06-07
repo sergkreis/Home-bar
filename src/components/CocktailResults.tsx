@@ -36,60 +36,77 @@ export function CocktailResults({
     <SectionPanel title={title} hint={hint} style={styles.resultsPanel}>
       {cocktails.length === 0 ? <Text style={styles.emptyText}>{emptyText}</Text> : null}
 
-      {cocktails.map((cocktail) => {
-        const isPerfect = cocktail.missingIngredients.length === 0;
-        const missingNames = cocktail.missingIngredients
-          .map((ingredientId) => getIngredientName(ingredients, ingredientId))
-          .join(", ");
+      <View style={styles.resultGrid}>
+        {cocktails.map((cocktail) => {
+          const isPerfect = cocktail.missingIngredients.length === 0;
+          const missingNames = cocktail.missingIngredients
+            .map((ingredientId) => getIngredientName(ingredients, ingredientId))
+            .join(", ");
+          const progress = Math.max(
+            0,
+            Math.min(100, Math.round((cocktail.availableCount / cocktail.ingredients.length) * 100)),
+          );
 
-        return (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Открыть ${cocktail.name}. ${cocktail.availableCount} из ${cocktail.ingredients.length} ингредиентов.`}
-            key={cocktail.id}
-            onPress={() => onSelectCocktail(cocktail)}
-            style={({ pressed: isPressed }) => [
-              styles.resultCard,
-              isPressed && { opacity: pressed.opacity },
-            ]}
-          >
-            <View style={styles.resultHeader}>
-              <View style={styles.resultHeaderInfo}>
-                <Text style={styles.resultTitle}>{cocktail.name}</Text>
-                <Text style={styles.resultMeta}>
-                  {cocktail.baseSpirit} - {getStrengthLabel(cocktail.strength)}
-                </Text>
-              </View>
-              <View style={styles.resultHeaderRight}>
-                {isFavorite && onToggleFavorite ? (
-                  <FavoriteButton
-                    isFavorite={isFavorite(cocktail.id)}
-                    onToggle={() => onToggleFavorite(cocktail.id)}
-                    label={cocktail.name}
-                  />
-                ) : null}
-                <View style={[styles.badge, isPerfect ? styles.badgeReady : styles.badgeAlmost]}>
-                  <Text style={styles.badgeLabel}>
-                    {isPerfect ? "Готов" : `-${cocktail.missingIngredients.length}`}
+          return (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Открыть ${cocktail.name}. ${cocktail.availableCount} из ${cocktail.ingredients.length} ингредиентов.`}
+              key={cocktail.id}
+              onPress={() => onSelectCocktail(cocktail)}
+              style={({ pressed: isPressed }) => [
+                styles.resultCard,
+                isPerfect && styles.resultCardReady,
+                isPressed && { opacity: pressed.opacity },
+              ]}
+            >
+              <View style={styles.resultHeader}>
+                <View style={styles.resultHeaderInfo}>
+                  <Text style={styles.resultTitle}>{cocktail.name}</Text>
+                  <Text style={styles.resultMeta}>
+                    {cocktail.baseSpirit} · {getStrengthLabel(cocktail.strength)}
                   </Text>
                 </View>
+                <View style={styles.resultHeaderRight}>
+                  {isFavorite && onToggleFavorite ? (
+                    <FavoriteButton
+                      isFavorite={isFavorite(cocktail.id)}
+                      onToggle={() => onToggleFavorite(cocktail.id)}
+                      label={cocktail.name}
+                    />
+                  ) : null}
+                  <View style={[styles.badge, isPerfect ? styles.badgeReady : styles.badgeAlmost]}>
+                    <Text style={styles.badgeLabel}>
+                      {isPerfect ? "Готов" : `-${cocktail.missingIngredients.length}`}
+                    </Text>
+                  </View>
+                </View>
               </View>
-            </View>
 
-            <Text style={styles.resultMatch}>
-              {cocktail.availableCount}/{cocktail.ingredients.length} ингредиентов
-            </Text>
+              <View style={styles.progressTrack}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    isPerfect ? styles.progressFillReady : styles.progressFillAlmost,
+                    { width: `${progress}%` },
+                  ]}
+                />
+              </View>
 
-            {isPerfect ? (
-              <Text style={styles.resultReady}>Можно смешивать прямо сейчас.</Text>
-            ) : (
-              <Text style={styles.resultMissing} numberOfLines={2}>
-                Нужно: {missingNames}
+              <Text style={styles.resultMatch}>
+                {cocktail.availableCount}/{cocktail.ingredients.length} ингредиентов
               </Text>
-            )}
-          </Pressable>
-        );
-      })}
+
+              {isPerfect ? (
+                <Text style={styles.resultReady}>Можно смешивать сейчас.</Text>
+              ) : (
+                <Text style={styles.resultMissing} numberOfLines={2}>
+                  Нужно: {missingNames}
+                </Text>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
     </SectionPanel>
   );
 }
@@ -98,13 +115,19 @@ const styles = StyleSheet.create({
   resultsPanel: {
     gap: spacing.sm,
   },
+  resultGrid: {
+    gap: spacing.sm,
+  },
   resultCard: {
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: colors.surface,
     borderRadius: radii.md,
     padding: spacing.md,
-    gap: 7,
+    gap: 8,
     borderWidth: 1,
-    borderColor: colors.borderMuted,
+    borderColor: colors.border,
+  },
+  resultCardReady: {
+    borderColor: "#b8d8c6",
   },
   resultHeader: {
     flexDirection: "row",
@@ -123,17 +146,33 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     color: colors.text,
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "900",
-    lineHeight: 22,
+    lineHeight: 23,
   },
   resultMeta: {
     color: colors.textSubtle,
     fontSize: 13,
     lineHeight: 18,
   },
+  progressTrack: {
+    height: 5,
+    borderRadius: radii.pill,
+    backgroundColor: colors.surfaceMuted,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: radii.pill,
+  },
+  progressFillReady: {
+    backgroundColor: colors.success,
+  },
+  progressFillAlmost: {
+    backgroundColor: colors.accent,
+  },
   badge: {
-    borderRadius: radii.sm,
+    borderRadius: radii.pill,
     paddingHorizontal: 10,
     paddingVertical: 6,
     minWidth: 54,
@@ -151,9 +190,9 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   resultMatch: {
-    color: "#dce4ef",
+    color: colors.textMuted,
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "900",
   },
   resultMissing: {
     color: colors.warning,
@@ -164,6 +203,7 @@ const styles = StyleSheet.create({
     color: colors.success,
     fontSize: 13,
     lineHeight: 18,
+    fontWeight: "800",
   },
   emptyText: {
     color: colors.textSubtle,

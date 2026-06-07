@@ -18,6 +18,22 @@ type UseSavedBarResult = {
   setSelectedIngredients: Dispatch<SetStateAction<string[]>>;
 };
 
+function uniqueKnownIds(values: unknown[], knownIds: Set<string>): string[] {
+  return Array.from(
+    new Set(
+      values.filter((value): value is string => typeof value === "string" && knownIds.has(value)),
+    ),
+  );
+}
+
+function equalIds(left: string[], right: string[]) {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  return left.every((value, index) => value === right[index]);
+}
+
 export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSavedBarResult {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [hasLoadedSavedBar, setHasLoadedSavedBar] = useState(false);
@@ -45,10 +61,7 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
         }
 
         const knownIngredientIds = new Set(ingredients.map((ingredient) => ingredient.id));
-        const savedIngredients = parsedIngredients.filter(
-          (ingredientId): ingredientId is string =>
-            typeof ingredientId === "string" && knownIngredientIds.has(ingredientId),
-        );
+        const savedIngredients = uniqueKnownIds(parsedIngredients, knownIngredientIds);
 
         if (isMounted) {
           setSelectedIngredients(savedIngredients);
@@ -118,9 +131,21 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
           return;
         }
 
+        const knownIngredientIds = new Set(ingredients.map((ingredient) => ingredient.id));
+
         if (remoteBar && remoteBar.ingredientIds.length > 0) {
-          setSelectedIngredients(remoteBar.ingredientIds);
+          const remoteIngredientIds = uniqueKnownIds(remoteBar.ingredientIds, knownIngredientIds);
+          const mergedIngredientIds = uniqueKnownIds(
+            [...remoteIngredientIds, ...selectedIngredients],
+            knownIngredientIds,
+          );
+
+          setSelectedIngredients(mergedIngredientIds);
           setHasSavedBar(true);
+
+          if (!equalIds(remoteIngredientIds, mergedIngredientIds)) {
+            await saveRemoteUserBar(currentUserId, mergedIngredientIds);
+          }
         } else if (selectedIngredients.length > 0) {
           await saveRemoteUserBar(currentUserId, selectedIngredients);
         }
@@ -143,7 +168,7 @@ export function useSavedBar(ingredients: Ingredient[], userId?: string): UseSave
     return () => {
       isMounted = false;
     };
-  }, [hasLoadedSavedBar, hasMergedRemoteBar, selectedIngredients, userId]);
+  }, [hasLoadedSavedBar, hasMergedRemoteBar, ingredients, selectedIngredients, userId]);
 
   useEffect(() => {
     if (!hasLoadedSavedBar || !userId || !hasMergedRemoteBar) {

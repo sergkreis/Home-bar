@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 
-type AuthMode = "sign-in" | "sign-up";
+export type AuthMode = "sign-in" | "sign-up" | "reset-password" | "update-password";
 
 type UseAuthResult = {
   authError: string | null;
@@ -13,15 +13,27 @@ type UseAuthResult = {
   isAuthReady: boolean;
   isAuthLoading: boolean;
   isSupabaseConfigured: boolean;
+  resetPassword: (email: string) => Promise<void>;
   setAuthMode: (mode: AuthMode) => void;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
 };
 
 function getAuthErrorMessage(error: AuthError) {
-  if (error.message.toLowerCase().includes("invalid login credentials")) {
+  const message = error.message.toLowerCase();
+
+  if (message.includes("invalid login credentials")) {
     return "Неверная почта или пароль.";
+  }
+
+  if (message.includes("email not confirmed")) {
+    return "Почта еще не подтверждена.";
+  }
+
+  if (message.includes("password")) {
+    return "Проверь пароль: минимум 6 символов.";
   }
 
   return error.message;
@@ -31,8 +43,16 @@ function getSessionUser(session: Session | null) {
   return session?.user ?? null;
 }
 
+function getAuthRedirectUrl() {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+
+  return window.location.origin;
+}
+
 export function useAuth(): UseAuthResult {
-  const [authMode, setAuthMode] = useState<AuthMode>("sign-in");
+  const [authMode, setAuthModeState] = useState<AuthMode>("sign-in");
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(!isSupabaseConfigured);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
@@ -59,9 +79,14 @@ export function useAuth(): UseAuthResult {
       setIsAuthReady(true);
     });
 
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
       setAuthUser(getSessionUser(session));
       setIsAuthReady(true);
+
+      if (event === "PASSWORD_RECOVERY") {
+        setAuthModeState("update-password");
+        setAuthMessage("Введи новый пароль для аккаунта.");
+      }
     });
 
     return () => {
@@ -69,6 +94,12 @@ export function useAuth(): UseAuthResult {
       data.subscription.unsubscribe();
     };
   }, []);
+
+  const setAuthMode = (mode: AuthMode) => {
+    setAuthModeState(mode);
+    setAuthError(null);
+    setAuthMessage(null);
+  };
 
   const signIn = async (email: string, password: string) => {
     if (!supabase) {
@@ -97,12 +128,63 @@ export function useAuth(): UseAuthResult {
     setAuthError(null);
     setAuthMessage(null);
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: getAuthRedirectUrl(),
+      },
+    });
 
     if (error) {
       setAuthError(getAuthErrorMessage(error));
     } else if (!data.session) {
       setAuthMessage("Проверь почту и подтверди регистрацию.");
+    } else {
+      setAuthMessage("Аккаунт создан. Бар и избранное синхронизируются.");
+    }
+
+    setIsAuthLoading(false);
+  };
+
+  const resetPassword = async (email: string) => {
+    if (!supabase) {
+      return;
+    }
+
+    setIsAuthLoading(true);
+    setAuthError(null);
+    setAuthMessage(null);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getAuthRedirectUrl(),
+    });
+
+    if (error) {
+      setAuthError(getAuthErrorMessage(error));
+    } else {
+      setAuthMessage("Отправили письмо для восстановления пароля.");
+    }
+
+    setIsAuthLoading(false);
+  };
+
+  const updatePassword = async (password: string) => {
+    if (!supabase) {
+      return;
+    }
+
+    setIsAuthLoading(true);
+    setAuthError(null);
+    setAuthMessage(null);
+
+    const { error } = await supabase.auth.updateUser({ password });
+
+    if (error) {
+      setAuthError(getAuthErrorMessage(error));
+    } else {
+      setAuthModeState("sign-in");
+      setAuthMessage("Пароль обновлен.");
     }
 
     setIsAuthLoading(false);
@@ -134,9 +216,11 @@ export function useAuth(): UseAuthResult {
     isAuthReady,
     isAuthLoading,
     isSupabaseConfigured,
+    resetPassword,
     setAuthMode,
     signIn,
     signOut,
     signUp,
+    updatePassword,
   };
 }

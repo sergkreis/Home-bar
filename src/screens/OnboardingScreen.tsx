@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { IngredientPicker } from "../components/IngredientPicker";
@@ -16,7 +15,6 @@ type OnboardingScreenProps = {
   ingredientGroups: readonly IngredientGroup[];
   selectedIngredients: string[];
   perfectMatchesCount: number;
-  accountPanel?: ReactNode;
   onToggleIngredient: (ingredientId: string) => void;
   onClear: () => void;
   onResetToStarter: () => void;
@@ -28,7 +26,6 @@ export function OnboardingScreen({
   ingredientGroups,
   selectedIngredients,
   perfectMatchesCount,
-  accountPanel,
   onToggleIngredient,
   onClear,
   onResetToStarter,
@@ -41,9 +38,9 @@ export function OnboardingScreen({
       <ScrollView key="onboarding" style={styles.screen} contentContainerStyle={styles.content}>
         <View style={styles.hero}>
           <Text style={styles.eyebrow}>Домашний бар</Text>
-          <Text style={styles.heroTitle}>Что есть дома?</Text>
+          <Text style={styles.heroTitle}>Что можно смешать из того, что есть дома?</Text>
           <Text style={styles.subtitle}>
-            Отметь алкоголь, соки, цитрус и сиропы. Потом сразу покажем, что можно смешать сейчас.
+            Отметь бутылки, соки, цитрус и сиропы. Подборка сразу покажет готовые рецепты и самые выгодные покупки.
           </Text>
 
           <View style={styles.statsRow}>
@@ -59,8 +56,8 @@ export function OnboardingScreen({
         </View>
 
         <SectionPanel
-          title="Выбери ингредиенты"
-          hint="Начни с реальных бутылок и миксеров. Если хочешь быстро посмотреть демо, нажми «Стартовый»."
+          title="Собери бар"
+          hint="Начни с реальных бутылок и миксеров. Для быстрой проверки можно взять стартовый набор."
         >
           <IngredientPicker
             ingredients={ingredients}
@@ -74,33 +71,30 @@ export function OnboardingScreen({
       </ScrollView>
 
       <View style={styles.dock}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Подобрать коктейли из выбранных ингредиентов"
-          accessibilityState={{ disabled: !canStartMatching }}
-          disabled={!canStartMatching}
-          onPress={onStartMatching}
-          style={({ pressed: isPressed }) => [
-            styles.primaryButton,
-            !canStartMatching && styles.primaryButtonDisabled,
-            isPressed && canStartMatching && { opacity: pressed.opacity },
-          ]}
-        >
-          <Text
-            style={[
-              styles.primaryButtonText,
-              !canStartMatching && styles.primaryButtonTextDisabled,
+        <View style={styles.dockInner}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Подобрать коктейли из выбранных ингредиентов"
+            accessibilityState={{ disabled: !canStartMatching }}
+            disabled={!canStartMatching}
+            onPress={onStartMatching}
+            style={({ pressed: isPressed }) => [
+              styles.primaryButton,
+              !canStartMatching && styles.primaryButtonDisabled,
+              isPressed && canStartMatching && { opacity: pressed.opacity },
             ]}
           >
-            Подобрать коктейли
-          </Text>
-        </Pressable>
-        {accountPanel ?? (
-          <View style={styles.accountLater}>
-            <Text style={styles.accountLaterTitle}>Аккаунт позже</Text>
-            <Text style={styles.hint}>Сейчас бар сохраняется на этом устройстве.</Text>
-          </View>
-        )}
+            <Text
+              style={[
+                styles.primaryButtonText,
+                !canStartMatching && styles.primaryButtonTextDisabled,
+              ]}
+            >
+              Подобрать коктейли
+            </Text>
+          </Pressable>
+          <Text style={styles.dockHint}>Аккаунт можно создать позже, бар сохранится на устройстве.</Text>
+        </View>
       </View>
     </View>
   );
@@ -115,107 +109,100 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
+    width: "100%",
+    maxWidth: 920,
+    alignSelf: "center",
     padding: spacing.md,
-    paddingBottom: spacing.md,
-    gap: spacing.md,
+    paddingBottom: 118,
+    gap: spacing.xl,
   },
   hero: {
-    backgroundColor: colors.surfaceLight,
+    backgroundColor: colors.surfaceDark,
     borderRadius: radii.md,
-    padding: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#313b48",
+    padding: spacing.lg,
+    gap: spacing.md,
   },
   eyebrow: {
-    color: colors.accent,
+    color: "#b7d9d4",
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "900",
     textTransform: "uppercase",
   },
   heroTitle: {
-    color: colors.text,
-    fontSize: 30,
+    color: colors.textInverse,
+    fontSize: 34,
     fontWeight: "900",
-    lineHeight: 34,
+    lineHeight: 38,
+    maxWidth: 760,
   },
   subtitle: {
-    color: colors.textMuted,
-    fontSize: 14,
-    lineHeight: 20,
+    color: "#d7ded8",
+    fontSize: 15,
+    lineHeight: 22,
+    maxWidth: 720,
   },
   statsRow: {
     flexDirection: "row",
-    gap: 8,
+    gap: spacing.sm,
   },
   stat: {
     flex: 1,
-    backgroundColor: "#121a24",
+    backgroundColor: "#252820",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#344151",
+    borderColor: "#3f4437",
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
   statValue: {
-    color: colors.text,
-    fontSize: 22,
+    color: colors.textInverse,
+    fontSize: 24,
     fontWeight: "900",
+    lineHeight: 28,
   },
   statLabel: {
-    color: "#91a0b4",
+    color: "#c8d0c8",
     fontSize: 11,
-    fontWeight: "800",
+    fontWeight: "900",
     textTransform: "uppercase",
   },
   dock: {
-    backgroundColor: colors.background,
+    backgroundColor: "rgba(244, 245, 242, 0.96)",
     borderTopWidth: 1,
-    borderTopColor: "#303f4d",
+    borderTopColor: colors.border,
     paddingHorizontal: spacing.md,
-    paddingTop: 10,
+    paddingTop: spacing.sm,
     paddingBottom: spacing.md,
-    gap: 8,
+  },
+  dockInner: {
+    width: "100%",
+    maxWidth: 920,
+    alignSelf: "center",
+    gap: 7,
   },
   primaryButton: {
     minHeight: 52,
     borderRadius: radii.md,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.accent,
+    backgroundColor: colors.surfaceDark,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
   primaryButtonDisabled: {
-    backgroundColor: "#303846",
+    backgroundColor: colors.borderStrong,
   },
   primaryButtonText: {
-    color: colors.accentText,
+    color: colors.textInverse,
     fontSize: 16,
     fontWeight: "900",
     textAlign: "center",
   },
   primaryButtonTextDisabled: {
-    color: "#8591a3",
+    color: colors.textDim,
   },
-  accountLater: {
-    minHeight: 42,
-    borderRadius: radii.md,
-    backgroundColor: "#151b23",
-    borderWidth: 1,
-    borderColor: "#283241",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 2,
-  },
-  accountLaterTitle: {
-    color: "#dce4ef",
-    fontSize: 13,
-    fontWeight: "900",
-    textAlign: "center",
-  },
-  hint: {
-    color: "#91a0b4",
+  dockHint: {
+    color: colors.textSubtle,
     fontSize: 12,
     lineHeight: 17,
     textAlign: "center",

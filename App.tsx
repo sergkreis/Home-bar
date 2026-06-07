@@ -44,25 +44,25 @@ const ingredientGroups = [
 ] as const;
 
 const quickModeDefs = [
-  { id: "easy", title: "Без заморочек", subtitle: "Можно смешать сразу", accent: "amber" as const, taste: null },
-  { id: "refreshing", title: "Что-то свежее", subtitle: "Легкие и освежающие", accent: "teal" as const, taste: "refreshing" as TasteTag },
-  { id: "strong", title: "Покрепче", subtitle: "Короткие и мощные", accent: "berry" as const, taste: "strong" as TasteTag },
+  { id: "easy", title: "Без заморочек", subtitle: "Простые рецепты из того, что уже есть", accent: "amber" as const, taste: null },
+  { id: "refreshing", title: "Что-то свежее", subtitle: "Легкие и освежающие варианты", accent: "teal" as const, taste: "refreshing" as TasteTag },
+  { id: "strong", title: "Покрепче", subtitle: "Короткие и более насыщенные рецепты", accent: "berry" as const, taste: "strong" as TasteTag },
 ];
 
 const tabSubtitles: Record<AppTab, string> = {
-  today: "Лучшие варианты из того, что уже есть.",
-  bar: "Отметь бутылки, соки и мелочи, которые есть дома.",
-  buy: "Минимальные покупки, которые откроют больше коктейлей.",
-  favorites: "Коктейли, которые ты сохранил, чтобы вернуться к ним.",
-  recipes: "Полный список с фильтром по настроению.",
-  account: "Сохрани бар в аккаунте и перенеси его на другое устройство.",
+  today: "Лучшие варианты из текущего бара и быстрые сценарии на вечер.",
+  bar: "Инвентарь бутылок, миксеров и мелочей, которые есть дома.",
+  buy: "Покупки, которые открывают больше всего новых коктейлей.",
+  favorites: "Любимые рецепты, сохраненные для быстрого возврата.",
+  recipes: "Полный список с поиском и фильтрами по настроению.",
+  account: "Регистрация, вход и синхронизация бара с избранным.",
 };
 
 const tabLabels: Record<AppTab, string> = {
   today: "Сегодня",
   bar: "Мой бар",
-  buy: "Докупить",
-  favorites: "Избранное",
+  buy: "Купить",
+  favorites: "Любимые",
   recipes: "Рецепты",
   account: "Аккаунт",
 };
@@ -70,17 +70,21 @@ const tabLabels: Record<AppTab, string> = {
 function getSyncPillLabel({
   authUserEmail,
   isSyncingBar,
+  isSyncingFavorites,
   syncError,
+  favoritesSyncError,
 }: {
   authUserEmail?: string;
   isSyncingBar: boolean;
+  isSyncingFavorites: boolean;
   syncError: string | null;
+  favoritesSyncError: string | null;
 }) {
-  if (syncError) {
+  if (syncError || favoritesSyncError) {
     return "Ошибка";
   }
 
-  if (isSyncingBar) {
+  if (isSyncingBar || isSyncingFavorites) {
     return "Синхронизация";
   }
 
@@ -96,10 +100,12 @@ export default function App() {
     isAuthReady,
     isAuthLoading,
     isSupabaseConfigured,
+    resetPassword,
     setAuthMode,
     signIn,
     signOut,
     signUp,
+    updatePassword,
   } = useAuth();
   const {
     hasLoadedSavedBar,
@@ -111,7 +117,15 @@ export default function App() {
     syncStatus,
   } = useSavedBar(ingredients, authUser?.id);
   const { hasLoadedEntered, hasEnteredApp, markEntered } = useEnteredApp();
-  const { hasLoadedFavorites, isFavorite, toggleFavorite } = useFavorites();
+  const knownCocktailIds = useMemo(() => cocktails.map((cocktail) => cocktail.id), []);
+  const {
+    hasLoadedFavorites,
+    isFavorite,
+    isSyncingFavorites,
+    favoritesSyncError,
+    favoritesSyncStatus,
+    toggleFavorite,
+  } = useFavorites(knownCocktailIds, authUser?.id);
 
   const [activeTaste, setActiveTaste] = useState<TasteTag | null>(null);
   const [activeTab, setActiveTab] = useState<AppTab>("today");
@@ -167,14 +181,18 @@ export default function App() {
       authMessage={authMessage}
       authMode={authMode}
       authUserEmail={authUser?.email}
+      barSyncError={syncError}
+      barSyncStatus={syncStatus}
+      favoritesSyncError={favoritesSyncError}
+      favoritesSyncStatus={favoritesSyncStatus}
       isAuthLoading={isAuthLoading}
       isSupabaseConfigured={isSupabaseConfigured}
-      syncError={syncError}
-      syncStatus={syncStatus}
+      onResetPassword={resetPassword}
       onSetAuthMode={setAuthMode}
       onSignIn={signIn}
       onSignOut={signOut}
       onSignUp={signUp}
+      onUpdatePassword={updatePassword}
     />
   );
 
@@ -211,11 +229,11 @@ export default function App() {
   if (!hasLoadedSavedBar || !hasLoadedEntered || !hasLoadedFavorites || !isAuthReady) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <View style={styles.loadingScreen}>
           <Text style={styles.eyebrow}>Домашний бар</Text>
           <Text style={styles.loadingTitle}>Загружаем твой бар</Text>
-          <Text style={styles.loadingText}>Проверяем сохраненные ингредиенты на этом устройстве.</Text>
+          <Text style={styles.loadingText}>Проверяем локальные данные и сессию аккаунта.</Text>
         </View>
       </SafeAreaView>
     );
@@ -224,7 +242,7 @@ export default function App() {
   if (selectedCocktail) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <CocktailDetailScreen
           cocktail={selectedCocktail}
           ingredients={ingredients}
@@ -241,13 +259,12 @@ export default function App() {
   if (!hasEnteredApp) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <OnboardingScreen
           ingredients={ingredients}
           ingredientGroups={ingredientGroups}
           selectedIngredients={selectedIngredients}
           perfectMatchesCount={allPerfectMatches.length}
-          accountPanel={accountPanel}
           onToggleIngredient={toggleIngredient}
           onClear={() => setSelectedIngredients([])}
           onResetToStarter={() => setSelectedIngredients(starterIngredients)}
@@ -259,7 +276,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <View style={styles.appShell}>
         <ScrollView
           key={`app-${activeTab}`}
@@ -272,7 +289,9 @@ export default function App() {
             rightPill={getSyncPillLabel({
               authUserEmail: authUser?.email,
               isSyncingBar,
+              isSyncingFavorites,
               syncError,
+              favoritesSyncError,
             })}
             stats={[
               { value: selectedIngredients.length, label: "дома" },
@@ -334,7 +353,7 @@ export default function App() {
           {activeTab === "account" ? (
             <SectionPanel
               title="Аккаунт"
-              hint="Синхронизация включится после входа. Локальный бар останется на устройстве."
+              hint="Регистрация не обязательна для первого запуска, но нужна для синхронизации между устройствами."
             >
               {accountPanel}
             </SectionPanel>
@@ -364,9 +383,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
+    width: "100%",
+    maxWidth: 920,
+    alignSelf: "center",
     padding: spacing.md,
-    paddingBottom: spacing.md,
-    gap: spacing.md,
+    paddingBottom: 112,
+    gap: spacing.xl,
   },
   loadingScreen: {
     flex: 1,
@@ -375,16 +397,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   eyebrow: {
-    color: colors.accent,
+    color: colors.teal,
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "900",
     textTransform: "uppercase",
   },
   loadingTitle: {
     color: colors.text,
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "900",
-    lineHeight: 31,
+    lineHeight: 32,
   },
   loadingText: {
     color: colors.textMuted,

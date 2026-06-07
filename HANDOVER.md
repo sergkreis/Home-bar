@@ -1,6 +1,6 @@
 # Domashniy Bar - Handover
 
-Последнее обновление: 2026-05-25
+Последнее обновление: 2026-06-07
 
 ## Быстрый Контекст
 
@@ -50,7 +50,7 @@ npm / package-lock.json
 Static web export served by nginx
 Playwright UI tests
 GitHub Actions deploy
-Optional Supabase Auth/Postgres account sync
+Optional Supabase Auth/Postgres account sync for bar and favorites
 ```
 
 ## Основные Файлы
@@ -58,11 +58,13 @@ Optional Supabase Auth/Postgres account sync
 ```text
 App.tsx                         - главный экран, screen switching, layout and tab rendering
 src/components/                 - reusable UI components
-src/hooks/useAuth.ts            - Supabase auth session state and email/password actions
+src/hooks/useAuth.ts            - Supabase auth session state, email/password actions, password reset/update
 src/hooks/useSavedBar.ts        - AsyncStorage persistence plus optional Supabase sync for selected home bar
+src/hooks/useFavorites.ts       - AsyncStorage persistence plus optional Supabase sync for favorite cocktails
 src/lib/supabase.ts             - Supabase client using Expo public env vars
 src/services/userBarService.ts  - user_bars load/upsert helpers
-supabase/schema.sql             - user_bars table and RLS policies
+src/services/userFavoritesService.ts - user_favorites load/upsert helpers
+supabase/schema.sql             - user_bars/user_favorites tables and RLS policies
 src/data/                       - generated cocktail/ingredient data
 src/utils/                      - matching and shopping suggestion logic
 tests/home-bar.spec.ts          - Playwright smoke test for core flow
@@ -94,6 +96,9 @@ Dedicated bar screen
 Dedicated recipe detail screen
 Save selected home bar on device with AsyncStorage
 Optional account tab for Supabase email/password sign-in and cloud bar sync
+Production account flow with sign-up, sign-in, password reset, and password update after recovery link
+Favorite cocktails sync through Supabase user_favorites
+Light production UI pass with centered desktop layout, cleaner section structure, updated cards, and revised account screen
 ```
 
 ## Данные
@@ -221,6 +226,7 @@ Supabase setup:
 2. Run supabase/schema.sql in Supabase SQL Editor.
 3. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY locally or as GitHub Actions secrets.
 4. Without these env vars the app stays in local-only mode.
+5. Configure Auth site URL/redirect URLs so sign-up confirmation and password recovery return to the deployed domain.
 ```
 
 Frontend skill bundle to use for future web app work:
@@ -276,7 +282,7 @@ Local branch after latest deploy: main...origin/main, clean.
 ## Текущая Незавершенная Работа
 
 ```text
-Registration/account sync is implemented as an optional Supabase-backed flow; it still needs real Supabase project credentials and end-to-end QA against that project.
+Registration/account sync is implemented as an optional Supabase-backed flow for bar and favorites; it still needs real Supabase project credentials, schema execution, redirect URL configuration, and end-to-end QA against that project.
 AsyncStorage persistence plus optional remote sync lives in src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
 Generated data still contains a mix of translated Russian names and raw English ingredient names.
@@ -310,16 +316,24 @@ Account sync pass on 2026-05-25:
   Added optional Supabase client and auth hook.
   Added user_bars upsert/load service and RLS SQL schema.
   GitHub Actions now passes optional EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY secrets into build.
+Production UI/auth pass on 2026-06-07:
+  Switched from dark dashboard styling to a lighter production UI with centered desktop content.
+  Made SectionPanel unframed so cards are not nested inside cards.
+  Reworked onboarding, today, recipe cards, buy suggestions, detail screen, bottom nav, and account panel.
+  Added password reset/update support to useAuth and AccountPanel.
+  Added user_favorites cloud sync service, useFavorites remote merge/save, and RLS SQL schema.
+  Saved local bar/favorites now merge with remote data after sign-in instead of blindly replacing local state.
 ```
 
 ## Следующие Шаги
 
 ```text
-1. Create/configure the Supabase project and run supabase/schema.sql.
+1. Create/configure the Supabase project and run the updated supabase/schema.sql, including user_favorites.
 2. Add Supabase public env values locally and as GitHub Actions secrets.
-3. Test sign-up/sign-in/sync on web and actual phones.
-4. Split App.tsx tab/detail/onboarding screens into separate components once current changes are accepted.
-5. Add unit tests around matching/shopping logic before expanding the database further.
+3. Configure Supabase Auth site URL/redirect URLs for the production domain.
+4. Test sign-up/sign-in/password recovery/bar sync/favorites sync on web and actual phones.
+5. Split App.tsx tab/detail/onboarding screens into separate components once current changes are accepted.
+6. Add unit tests around matching/shopping logic before expanding the database further.
 ```
 
 ## Запрещено

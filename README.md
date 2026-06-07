@@ -12,7 +12,7 @@
 - раскрываемые карточки с рецептом, бокалом, составом, шагами и подачей;
 - подсказки, какие 1-2 ингредиента докупить, чтобы открыть больше коктейлей;
 - сохранение выбранного домашнего бара между запусками приложения;
-- опциональная регистрация и синхронизация бара через Supabase.
+- опциональная регистрация, восстановление пароля и синхронизация бара/избранного через Supabase.
 
 ## Текущий объем базы
 
@@ -30,7 +30,7 @@
 - React Native 0.81;
 - TypeScript в strict mode;
 - `@react-native-async-storage/async-storage` для локального сохранения бара;
-- Supabase Auth + Postgres для облачного сохранения бара.
+- Supabase Auth + Postgres для облачного сохранения бара и избранного.
 
 ## Запуск
 
@@ -93,8 +93,10 @@ src/components/IngredientPicker.tsx
 src/components/SectionPanel.tsx
 src/hooks/useAuth.ts              состояние Supabase Auth
 src/hooks/useSavedBar.ts          локальное сохранение + облачная синхронизация бара
+src/hooks/useFavorites.ts         локальное избранное + облачная синхронизация избранного
 src/lib/supabase.ts               Supabase client с AsyncStorage session persistence
 src/services/userBarService.ts    чтение/запись user_bars
+src/services/userFavoritesService.ts чтение/запись user_favorites
 src/data/                       сгенерированные данные коктейлей и ингредиентов
 src/utils/cocktailMatcher.ts    ранжирование коктейлей по совпадению
 src/utils/shoppingAdvisor.ts    рекомендации, что докупить

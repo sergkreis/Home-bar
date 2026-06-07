@@ -48,7 +48,7 @@ export function RecipesTab({
 
   return (
     <>
-      <SectionPanel title="Настроение">
+      <SectionPanel title="Фильтр рецептов" hint="Поиск и настроение влияют на порядок выдачи. Готовые варианты остаются выше.">
         <View style={styles.filterRow}>
           <Pressable
             accessibilityRole="button"
@@ -93,7 +93,7 @@ export function RecipesTab({
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Найти коктейль по названию"
-            placeholderTextColor="#6f7d90"
+            placeholderTextColor={colors.textDim}
             style={styles.searchInput}
           />
         </View>
@@ -123,28 +123,28 @@ const styles = StyleSheet.create({
   filterPill: {
     paddingHorizontal: 12,
     paddingVertical: 9,
-    borderRadius: radii.sm,
-    backgroundColor: colors.surfaceMuted,
+    borderRadius: radii.pill,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.borderStrong,
+    borderColor: colors.border,
   },
   filterPillActive: {
-    backgroundColor: colors.teal,
-    borderColor: colors.teal,
+    backgroundColor: colors.surfaceDark,
+    borderColor: colors.surfaceDark,
   },
   filterLabel: {
-    color: "#d5dcea",
+    color: colors.text,
     fontSize: 14,
-    fontWeight: "800",
+    fontWeight: "900",
   },
   filterLabelActive: {
-    color: "#0d2022",
+    color: colors.textInverse,
   },
   searchWrap: {
-    backgroundColor: "#101720",
+    backgroundColor: colors.surface,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#405061",
+    borderColor: colors.borderStrong,
     paddingHorizontal: 12,
     marginTop: spacing.sm,
   },

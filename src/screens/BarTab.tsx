@@ -21,8 +21,8 @@ export function BarTab({
 }: BarTabProps) {
   return (
     <SectionPanel
-      title="Мой бар"
-      hint="Список сохраняется на этом устройстве. Начни с того, что реально есть под рукой."
+      title="Инвентарь"
+      hint="Отметь, что реально есть под рукой. После входа бар синхронизируется между устройствами."
     >
       <IngredientPicker
         ingredients={ingredients}

@@ -14,7 +14,8 @@ export const supabase = isSupabaseConfigured
         storage: AsyncStorage,
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: false,
+        detectSessionInUrl: typeof window !== "undefined",
+        flowType: "pkce",
       },
     })
   : null;

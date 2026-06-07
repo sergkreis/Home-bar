@@ -1,37 +1,60 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-type AuthMode = "sign-in" | "sign-up";
+import { AuthMode } from "../hooks/useAuth";
+import { colors, pressed, radii, spacing } from "../theme";
+
+type SyncStatus = "local" | "remote" | "syncing" | "error";
 
 type AccountPanelProps = {
   authError: string | null;
   authMessage: string | null;
   authMode: AuthMode;
   authUserEmail?: string;
+  barSyncError: string | null;
+  barSyncStatus: SyncStatus;
+  favoritesSyncError: string | null;
+  favoritesSyncStatus: SyncStatus;
   isAuthLoading: boolean;
   isSupabaseConfigured: boolean;
-  syncError: string | null;
-  syncStatus: "local" | "remote" | "syncing" | "error";
+  onResetPassword: (email: string) => Promise<void>;
   onSetAuthMode: (mode: AuthMode) => void;
   onSignIn: (email: string, password: string) => Promise<void>;
   onSignOut: () => Promise<void>;
   onSignUp: (email: string, password: string) => Promise<void>;
+  onUpdatePassword: (password: string) => Promise<void>;
 };
 
-function getSyncLabel(syncStatus: AccountPanelProps["syncStatus"]) {
+function getSyncLabel(syncStatus: SyncStatus) {
   if (syncStatus === "remote") {
-    return "Сохранено в аккаунте";
+    return "В аккаунте";
   }
 
   if (syncStatus === "syncing") {
-    return "Синхронизируем";
+    return "Синхронизация";
   }
 
   if (syncStatus === "error") {
-    return "Нужна повторная синхронизация";
+    return "Нужна проверка";
   }
 
-  return "Сохранено на устройстве";
+  return "На устройстве";
+}
+
+function getModeTitle(authMode: AuthMode) {
+  if (authMode === "sign-up") {
+    return "Создать аккаунт";
+  }
+
+  if (authMode === "reset-password") {
+    return "Восстановить пароль";
+  }
+
+  if (authMode === "update-password") {
+    return "Новый пароль";
+  }
+
+  return "Войти";
 }
 
 export function AccountPanel({
@@ -39,22 +62,46 @@ export function AccountPanel({
   authMessage,
   authMode,
   authUserEmail,
+  barSyncError,
+  barSyncStatus,
+  favoritesSyncError,
+  favoritesSyncStatus,
   isAuthLoading,
   isSupabaseConfigured,
-  syncError,
-  syncStatus,
+  onResetPassword,
   onSetAuthMode,
   onSignIn,
   onSignOut,
   onSignUp,
+  onUpdatePassword,
 }: AccountPanelProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordRepeat, setPasswordRepeat] = useState("");
   const isSignUp = authMode === "sign-up";
-  const canSubmit = email.trim().length > 0 && password.length >= 6 && !isAuthLoading;
+  const isReset = authMode === "reset-password";
+  const isUpdatePassword = authMode === "update-password";
+  const passwordsMatch = password.length >= 6 && (!isSignUp || password === passwordRepeat);
+  const canSubmit =
+    !isAuthLoading &&
+    (isReset
+      ? email.trim().length > 0
+      : isUpdatePassword
+        ? password.length >= 6
+        : email.trim().length > 0 && passwordsMatch);
 
   const submit = () => {
     if (!canSubmit) {
+      return;
+    }
+
+    if (isReset) {
+      onResetPassword(email.trim());
+      return;
+    }
+
+    if (isUpdatePassword) {
+      onUpdatePassword(password);
       return;
     }
 
@@ -70,12 +117,14 @@ export function AccountPanel({
     return (
       <View style={styles.accountBox}>
         <View style={styles.statusRow}>
-          <Text style={styles.statusTitle}>Аккаунт</Text>
+          <View style={styles.statusCopy}>
+            <Text style={styles.statusTitle}>Аккаунты не включены</Text>
+            <Text style={styles.accountText}>
+              Бар и избранное сохраняются на устройстве. Для production нужно задать Supabase env и выполнить SQL-схему.
+            </Text>
+          </View>
           <Text style={styles.localBadge}>Локально</Text>
         </View>
-        <Text style={styles.accountText}>
-          Бар сохраняется на этом устройстве. Для облачной синхронизации добавь Supabase env-переменные.
-        </Text>
       </View>
     );
   }
@@ -86,14 +135,38 @@ export function AccountPanel({
         <View style={styles.statusRow}>
           <View style={styles.statusCopy}>
             <Text style={styles.statusTitle}>{authUserEmail}</Text>
-            <Text style={styles.accountText}>{getSyncLabel(syncStatus)}</Text>
+            <Text style={styles.accountText}>Бар и избранное доступны на других устройствах после входа.</Text>
           </View>
-          <Text style={[styles.syncBadge, syncStatus === "error" && styles.syncBadgeError]}>
-            {syncStatus === "error" ? "Ошибка" : "Аккаунт"}
-          </Text>
+          <Text style={styles.syncBadge}>Аккаунт</Text>
         </View>
-        {syncError ? <Text style={styles.errorText}>{syncError}</Text> : null}
-        <Pressable accessibilityRole="button" onPress={onSignOut} style={styles.secondaryButton}>
+
+        <View style={styles.syncGrid}>
+          <View style={styles.syncItem}>
+            <Text style={styles.syncTitle}>Бар</Text>
+            <Text style={[styles.syncState, barSyncStatus === "error" && styles.errorState]}>
+              {getSyncLabel(barSyncStatus)}
+            </Text>
+          </View>
+          <View style={styles.syncItem}>
+            <Text style={styles.syncTitle}>Избранное</Text>
+            <Text style={[styles.syncState, favoritesSyncStatus === "error" && styles.errorState]}>
+              {getSyncLabel(favoritesSyncStatus)}
+            </Text>
+          </View>
+        </View>
+
+        {barSyncError ? <Text style={styles.errorText}>{barSyncError}</Text> : null}
+        {favoritesSyncError ? <Text style={styles.errorText}>{favoritesSyncError}</Text> : null}
+        {authMessage ? <Text style={styles.messageText}>{authMessage}</Text> : null}
+
+        <Pressable
+          accessibilityRole="button"
+          onPress={onSignOut}
+          style={({ pressed: isPressed }) => [
+            styles.secondaryButton,
+            isPressed && { opacity: pressed.opacity },
+          ]}
+        >
           <Text style={styles.secondaryButtonText}>{isAuthLoading ? "Выходим" : "Выйти"}</Text>
         </Pressable>
       </View>
@@ -102,52 +175,99 @@ export function AccountPanel({
 
   return (
     <View style={styles.accountBox}>
-      <View style={styles.statusRow}>
-        <View style={styles.statusCopy}>
-          <Text style={styles.statusTitle}>Сохранить бар</Text>
-          <Text style={styles.accountText}>Войди или создай аккаунт, чтобы перенести бар на другое устройство.</Text>
+      <View style={styles.statusCopy}>
+        <Text style={styles.statusTitle}>{getModeTitle(authMode)}</Text>
+        <Text style={styles.accountText}>
+          {isReset
+            ? "Пришлем ссылку для восстановления на почту."
+            : isUpdatePassword
+              ? "После перехода из письма задай новый пароль."
+              : "Сохрани бар и любимые рецепты в аккаунте, чтобы не терять их между устройствами."}
+        </Text>
+      </View>
+
+      {!isUpdatePassword ? (
+        <View style={styles.modeRow}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => onSetAuthMode("sign-in")}
+            style={({ pressed: isPressed }) => [
+              styles.modeButton,
+              authMode === "sign-in" && styles.modeButtonActive,
+              isPressed && { opacity: pressed.opacity },
+            ]}
+          >
+            <Text style={[styles.modeButtonText, authMode === "sign-in" && styles.modeButtonTextActive]}>Войти</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => onSetAuthMode("sign-up")}
+            style={({ pressed: isPressed }) => [
+              styles.modeButton,
+              authMode === "sign-up" && styles.modeButtonActive,
+              isPressed && { opacity: pressed.opacity },
+            ]}
+          >
+            <Text style={[styles.modeButtonText, authMode === "sign-up" && styles.modeButtonTextActive]}>Создать</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => onSetAuthMode("reset-password")}
+            style={({ pressed: isPressed }) => [
+              styles.modeButton,
+              authMode === "reset-password" && styles.modeButtonActive,
+              isPressed && { opacity: pressed.opacity },
+            ]}
+          >
+            <Text style={[styles.modeButtonText, authMode === "reset-password" && styles.modeButtonTextActive]}>
+              Сброс
+            </Text>
+          </Pressable>
         </View>
-        <Text style={styles.localBadge}>{getSyncLabel(syncStatus)}</Text>
-      </View>
+      ) : null}
 
-      <View style={styles.modeRow}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => onSetAuthMode("sign-in")}
-          style={[styles.modeButton, !isSignUp && styles.modeButtonActive]}
-        >
-          <Text style={[styles.modeButtonText, !isSignUp && styles.modeButtonTextActive]}>Войти</Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => onSetAuthMode("sign-up")}
-          style={[styles.modeButton, isSignUp && styles.modeButtonActive]}
-        >
-          <Text style={[styles.modeButtonText, isSignUp && styles.modeButtonTextActive]}>Создать</Text>
-        </Pressable>
-      </View>
+      {!isUpdatePassword ? (
+        <TextInput
+          autoCapitalize="none"
+          autoComplete="email"
+          inputMode="email"
+          onChangeText={setEmail}
+          placeholder="email"
+          placeholderTextColor={colors.textDim}
+          style={styles.input}
+          value={email}
+        />
+      ) : null}
 
-      <TextInput
-        autoCapitalize="none"
-        autoComplete="email"
-        inputMode="email"
-        onChangeText={setEmail}
-        placeholder="email"
-        placeholderTextColor="#6f7d90"
-        style={styles.input}
-        value={email}
-      />
-      <TextInput
-        autoCapitalize="none"
-        autoComplete="password"
-        onChangeText={setPassword}
-        placeholder="пароль от 6 символов"
-        placeholderTextColor="#6f7d90"
-        secureTextEntry
-        style={styles.input}
-        value={password}
-      />
+      {!isReset ? (
+        <TextInput
+          autoCapitalize="none"
+          autoComplete={isSignUp ? "new-password" : "password"}
+          onChangeText={setPassword}
+          placeholder="пароль от 6 символов"
+          placeholderTextColor={colors.textDim}
+          secureTextEntry
+          style={styles.input}
+          value={password}
+        />
+      ) : null}
 
+      {isSignUp ? (
+        <TextInput
+          autoCapitalize="none"
+          autoComplete="new-password"
+          onChangeText={setPasswordRepeat}
+          placeholder="повтори пароль"
+          placeholderTextColor={colors.textDim}
+          secureTextEntry
+          style={styles.input}
+          value={passwordRepeat}
+        />
+      ) : null}
+
+      {isSignUp && passwordRepeat.length > 0 && password !== passwordRepeat ? (
+        <Text style={styles.errorText}>Пароли не совпадают.</Text>
+      ) : null}
       {authError ? <Text style={styles.errorText}>{authError}</Text> : null}
       {authMessage ? <Text style={styles.messageText}>{authMessage}</Text> : null}
 
@@ -156,10 +276,22 @@ export function AccountPanel({
         accessibilityState={{ disabled: !canSubmit }}
         disabled={!canSubmit}
         onPress={submit}
-        style={[styles.primaryButton, !canSubmit && styles.primaryButtonDisabled]}
+        style={({ pressed: isPressed }) => [
+          styles.primaryButton,
+          !canSubmit && styles.primaryButtonDisabled,
+          isPressed && canSubmit && { opacity: pressed.opacity },
+        ]}
       >
         <Text style={[styles.primaryButtonText, !canSubmit && styles.primaryButtonTextDisabled]}>
-          {isAuthLoading ? "Проверяем" : isSignUp ? "Создать аккаунт" : "Войти"}
+          {isAuthLoading
+            ? "Проверяем"
+            : isReset
+              ? "Отправить письмо"
+              : isUpdatePassword
+                ? "Сохранить пароль"
+                : isSignUp
+                  ? "Создать аккаунт"
+                  : "Войти"}
         </Text>
       </Pressable>
     </View>
@@ -168,12 +300,12 @@ export function AccountPanel({
 
 const styles = StyleSheet.create({
   accountBox: {
-    backgroundColor: "#121923",
-    borderRadius: 8,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#2f3d4a",
-    padding: 12,
-    gap: 10,
+    borderColor: colors.border,
+    padding: spacing.md,
+    gap: spacing.md,
   },
   statusRow: {
     flexDirection: "row",
@@ -183,41 +315,64 @@ const styles = StyleSheet.create({
   },
   statusCopy: {
     flex: 1,
-    gap: 3,
+    gap: 4,
   },
   statusTitle: {
-    color: "#f8fafc",
-    fontSize: 16,
+    color: colors.text,
+    fontSize: 18,
     fontWeight: "900",
+    lineHeight: 23,
   },
   accountText: {
-    color: "#9fb0c5",
-    fontSize: 13,
-    lineHeight: 18,
+    color: colors.textMuted,
+    fontSize: 14,
+    lineHeight: 20,
   },
   localBadge: {
-    color: "#dce4ef",
-    backgroundColor: "#17212b",
-    borderRadius: 8,
+    color: colors.text,
+    backgroundColor: colors.surfaceMuted,
+    borderRadius: radii.pill,
     overflow: "hidden",
-    paddingHorizontal: 9,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     fontSize: 11,
     fontWeight: "900",
   },
   syncBadge: {
-    color: "#7ce0ab",
-    backgroundColor: "#142922",
-    borderRadius: 8,
+    color: colors.success,
+    backgroundColor: colors.successBg,
+    borderRadius: radii.pill,
     overflow: "hidden",
-    paddingHorizontal: 9,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     fontSize: 11,
     fontWeight: "900",
   },
-  syncBadgeError: {
-    color: "#ffc3c3",
-    backgroundColor: "#3a1f22",
+  syncGrid: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  syncItem: {
+    flex: 1,
+    backgroundColor: colors.surfaceLight,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.borderMuted,
+    padding: spacing.md,
+    gap: 4,
+  },
+  syncTitle: {
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  syncState: {
+    color: colors.textSubtle,
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  errorState: {
+    color: colors.danger,
   },
   modeRow: {
     flexDirection: "row",
@@ -226,79 +381,79 @@ const styles = StyleSheet.create({
   modeButton: {
     flex: 1,
     minHeight: 40,
-    borderRadius: 8,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: "#405061",
+    borderColor: colors.borderStrong,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#17212b",
+    backgroundColor: colors.surfaceLight,
   },
   modeButtonActive: {
-    backgroundColor: "#52c4c8",
-    borderColor: "#52c4c8",
+    backgroundColor: colors.surfaceDark,
+    borderColor: colors.surfaceDark,
   },
   modeButtonText: {
-    color: "#dce4ef",
+    color: colors.text,
     fontSize: 13,
     fontWeight: "900",
   },
   modeButtonTextActive: {
-    color: "#0d2022",
+    color: colors.textInverse,
   },
   input: {
-    color: "#f8fafc",
-    backgroundColor: "#101720",
-    borderRadius: 8,
+    color: colors.text,
+    backgroundColor: colors.surfaceLight,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#405061",
+    borderColor: colors.borderStrong,
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 15,
   },
   primaryButton: {
-    minHeight: 46,
-    borderRadius: 8,
+    minHeight: 48,
+    borderRadius: radii.md,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f4b860",
+    backgroundColor: colors.surfaceDark,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
   primaryButtonDisabled: {
-    backgroundColor: "#303846",
+    backgroundColor: colors.borderStrong,
   },
   primaryButtonText: {
-    color: "#151922",
+    color: colors.textInverse,
     fontSize: 14,
     fontWeight: "900",
     textAlign: "center",
   },
   primaryButtonTextDisabled: {
-    color: "#8591a3",
+    color: colors.textDim,
   },
   secondaryButton: {
-    minHeight: 42,
-    borderRadius: 8,
+    minHeight: 44,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#405061",
+    borderColor: colors.borderStrong,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#17212b",
+    backgroundColor: colors.surfaceLight,
     paddingHorizontal: 12,
     paddingVertical: 9,
   },
   secondaryButtonText: {
-    color: "#dce4ef",
+    color: colors.text,
     fontSize: 13,
     fontWeight: "900",
   },
   errorText: {
-    color: "#ffc3c3",
+    color: colors.danger,
     fontSize: 13,
     lineHeight: 18,
   },
   messageText: {
-    color: "#7ce0ab",
+    color: colors.success,
     fontSize: 13,
     lineHeight: 18,
   },

@@ -27,6 +27,18 @@ type TodayTabProps = {
   onToggleFavorite: (cocktailId: string) => void;
 };
 
+function getAccentStyle(accent: QuickMode["accent"]) {
+  if (accent === "teal") {
+    return styles.actionCardTeal;
+  }
+
+  if (accent === "berry") {
+    return styles.actionCardBerry;
+  }
+
+  return styles.actionCardAmber;
+}
+
 export function TodayTab({
   quickModes,
   tonightHeadline,
@@ -38,9 +50,45 @@ export function TodayTab({
   isFavorite,
   onToggleFavorite,
 }: TodayTabProps) {
+  const heroCocktail = perfectMatches[0] ?? almostReady[0] ?? null;
+
   return (
     <>
-      <SectionPanel title="Что выпить сегодня" hint={tonightHeadline}>
+      <View style={styles.hero}>
+        <Text style={styles.heroLabel}>Сегодня</Text>
+        <Text style={styles.heroTitle}>
+          {perfectMatches.length > 0
+            ? `${perfectMatches.length} готовых коктейлей`
+            : almostReady.length > 0
+              ? "Почти готово"
+              : "Собери первый бар"}
+        </Text>
+        <Text style={styles.heroText}>{tonightHeadline}</Text>
+
+        {heroCocktail ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Открыть ${heroCocktail.name}`}
+            onPress={() => onSelectCocktail(heroCocktail)}
+            style={({ pressed: isPressed }) => [
+              styles.heroPick,
+              isPressed && { opacity: pressed.opacity },
+            ]}
+          >
+            <View style={styles.heroPickCopy}>
+              <Text style={styles.heroPickLabel}>Лучший вариант</Text>
+              <Text style={styles.heroPickTitle}>{heroCocktail.name}</Text>
+            </View>
+            <Text style={styles.heroPickMeta}>
+              {heroCocktail.missingIngredients.length === 0
+                ? "Готов"
+                : `Не хватает ${heroCocktail.missingIngredients.length}`}
+            </Text>
+          </Pressable>
+        ) : null}
+      </View>
+
+      <SectionPanel title="Быстрый выбор">
         <View style={styles.actions}>
           {quickModes.map((mode) => (
             <Pressable
@@ -50,24 +98,16 @@ export function TodayTab({
               onPress={() => onApplyQuickMode(mode.taste)}
               style={({ pressed: isPressed }) => [
                 styles.actionCard,
-                mode.accent === "teal" && styles.actionCardTeal,
-                mode.accent === "berry" && styles.actionCardBerry,
+                getAccentStyle(mode.accent),
                 isPressed && { opacity: pressed.opacity },
               ]}
             >
-              <View
-                style={[
-                  styles.actionAccent,
-                  mode.accent === "teal" && styles.actionAccentTeal,
-                  mode.accent === "berry" && styles.actionAccentBerry,
-                ]}
-              />
               <View style={styles.actionCardTop}>
                 <Text style={styles.actionTitle}>{mode.title}</Text>
                 <Text style={styles.actionMeta}>{mode.matches.length}</Text>
               </View>
               <Text style={styles.actionSubtitle}>{mode.subtitle}</Text>
-              <Text style={styles.actionPreview}>
+              <Text style={styles.actionPreview} numberOfLines={1}>
                 {mode.matches.slice(0, 2).map((cocktail) => cocktail.name).join(", ")}
               </Text>
             </Pressable>
@@ -76,11 +116,11 @@ export function TodayTab({
       </SectionPanel>
 
       <CocktailResults
-        title="Готово сейчас"
+        title="Можно смешать сейчас"
         hint="Коктейли, для которых все уже есть дома."
         cocktails={perfectMatches.slice(0, 6)}
         ingredients={ingredients}
-        emptyText="Пока нет точных совпадений. Открой вкладку «Докупить» или добавь ингредиенты в «Мой бар»."
+        emptyText="Пока нет точных совпадений. Загляни в покупки или добавь ингредиенты в бар."
         onSelectCocktail={onSelectCocktail}
         isFavorite={isFavorite}
         onToggleFavorite={onToggleFavorite}
@@ -101,39 +141,83 @@ export function TodayTab({
 }
 
 const styles = StyleSheet.create({
+  hero: {
+    backgroundColor: colors.surfaceDark,
+    borderRadius: radii.md,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  heroLabel: {
+    color: "#b7d9d4",
+    fontSize: 12,
+    fontWeight: "900",
+    textTransform: "uppercase",
+  },
+  heroTitle: {
+    color: colors.textInverse,
+    fontSize: 31,
+    fontWeight: "900",
+    lineHeight: 36,
+  },
+  heroText: {
+    color: "#d7ded8",
+    fontSize: 15,
+    lineHeight: 22,
+    maxWidth: 720,
+  },
+  heroPick: {
+    marginTop: spacing.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing.md,
+    backgroundColor: "#252820",
+    borderWidth: 1,
+    borderColor: "#3f4437",
+    borderRadius: radii.md,
+    padding: spacing.md,
+  },
+  heroPickCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  heroPickLabel: {
+    color: "#c8d0c8",
+    fontSize: 11,
+    fontWeight: "900",
+    textTransform: "uppercase",
+  },
+  heroPickTitle: {
+    color: colors.textInverse,
+    fontSize: 18,
+    fontWeight: "900",
+    lineHeight: 23,
+  },
+  heroPickMeta: {
+    color: colors.accentSoft,
+    fontSize: 13,
+    fontWeight: "900",
+  },
   actions: {
-    gap: 8,
+    gap: spacing.sm,
   },
   actionCard: {
-    position: "relative",
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: colors.surface,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.borderMuted,
-    padding: 12,
-    paddingLeft: spacing.lg,
+    padding: spacing.md,
     gap: 6,
-    overflow: "hidden",
+  },
+  actionCardAmber: {
+    borderColor: "#e3c78d",
   },
   actionCardTeal: {
-    borderColor: colors.tealDark,
+    borderColor: "#a9d5cf",
+    backgroundColor: colors.tealSoft,
   },
   actionCardBerry: {
-    borderColor: colors.berryDark,
-  },
-  actionAccent: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    backgroundColor: colors.accent,
-  },
-  actionAccentTeal: {
-    backgroundColor: colors.teal,
-  },
-  actionAccentBerry: {
-    backgroundColor: colors.berry,
+    borderColor: "#e5b3c6",
+    backgroundColor: colors.berrySoft,
   },
   actionCardTop: {
     flexDirection: "row",
@@ -146,17 +230,17 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   actionMeta: {
-    color: colors.accent,
+    color: colors.text,
     fontSize: 16,
     fontWeight: "900",
   },
   actionSubtitle: {
-    color: "#9fb0c5",
+    color: colors.textMuted,
     fontSize: 13,
     lineHeight: 18,
   },
   actionPreview: {
-    color: "#e4ebf5",
+    color: colors.text,
     fontSize: 14,
     lineHeight: 20,
   },

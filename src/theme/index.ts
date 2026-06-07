@@ -1,35 +1,40 @@
-// Shared visual tokens. Use these instead of hardcoded values.
-
 export const colors = {
-  background: "#101318",
-  surface: "#1a1f27",
-  surfaceMuted: "#141a22",
-  surfaceLight: "#1b2029",
-  border: "#252d38",
-  borderMuted: "#303846",
-  borderStrong: "#39414f",
+  background: "#f4f5f2",
+  surface: "#ffffff",
+  surfaceMuted: "#edf1ee",
+  surfaceLight: "#f9faf7",
+  surfaceDark: "#171815",
+  border: "#d9ded7",
+  borderMuted: "#e5e9e3",
+  borderStrong: "#c3cbc2",
 
-  text: "#f8fafc",
-  textMuted: "#b7c2d3",
-  textSubtle: "#97a3b6",
-  textDim: "#7f8fa3",
+  text: "#181a16",
+  textMuted: "#59625b",
+  textSubtle: "#727c75",
+  textDim: "#8e9890",
+  textInverse: "#fbfcf8",
 
-  accent: "#f4b860",
-  accentText: "#151922",
-  teal: "#52c4c8",
-  tealDark: "#2a6864",
-  berry: "#d06b87",
-  berryDark: "#684052",
-  success: "#7ce0ab",
-  successBg: "#214b35",
-  warning: "#f0c985",
-  warningBg: "#5f4a1f",
+  accent: "#b7791f",
+  accentSoft: "#f4dfb8",
+  accentText: "#21170a",
+  teal: "#0f766e",
+  tealSoft: "#d8eeea",
+  tealDark: "#0d4f49",
+  berry: "#b4235a",
+  berrySoft: "#f4d9e3",
+  berryDark: "#7d163d",
+  success: "#147d50",
+  successBg: "#dcefe3",
+  warning: "#a16207",
+  warningBg: "#f6e6bf",
+  danger: "#b42318",
+  dangerBg: "#f7ddd9",
 } as const;
 
 export const radii = {
-  sm: 10,
-  md: 14, // default for cards/buttons (was 8 — feels too technical)
-  lg: 18,
+  sm: 6,
+  md: 8,
+  lg: 8,
   pill: 999,
 } as const;
 
@@ -42,5 +47,5 @@ export const spacing = {
 } as const;
 
 export const pressed = {
-  opacity: 0.78,
+  opacity: 0.72,
 } as const;

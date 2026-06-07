@@ -27,11 +27,8 @@ export function AppHeader({ title, subtitle, stats, rightPill }: AppHeaderProps)
 
       {stats.length > 0 ? (
         <View style={styles.summaryStrip}>
-          {stats.map((stat, index) => (
-            <View
-              key={stat.label}
-              style={[styles.summaryItem, index === stats.length - 1 && styles.summaryItemLast]}
-            >
+          {stats.map((stat) => (
+            <View key={stat.label} style={styles.summaryItem}>
               <Text style={styles.summaryValue}>{stat.value}</Text>
               <Text style={styles.summaryLabel}>{stat.label}</Text>
             </View>
@@ -44,12 +41,8 @@ export function AppHeader({ title, subtitle, stats, rightPill }: AppHeaderProps)
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
-    padding: 14,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingTop: 4,
+    gap: spacing.md,
   },
   headerTop: {
     flexDirection: "row",
@@ -59,65 +52,66 @@ const styles = StyleSheet.create({
   },
   headerTextBlock: {
     flex: 1,
-    gap: 2,
+    gap: 3,
   },
   eyebrow: {
-    color: colors.accent,
+    color: colors.teal,
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "900",
+    letterSpacing: 0,
     textTransform: "uppercase",
   },
   title: {
     color: colors.text,
-    fontSize: 28,
+    fontSize: 34,
     fontWeight: "900",
-    lineHeight: 32,
+    lineHeight: 38,
   },
   subtitle: {
     color: colors.textMuted,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 22,
+    maxWidth: 720,
   },
   savedPill: {
-    backgroundColor: "#142922",
-    borderColor: "#285840",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
     borderWidth: 1,
-    borderRadius: radii.sm,
-    paddingHorizontal: 10,
+    borderRadius: radii.pill,
+    paddingHorizontal: 12,
     paddingVertical: 7,
   },
   savedPillText: {
-    color: colors.success,
+    color: colors.text,
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "900",
   },
   summaryStrip: {
     flexDirection: "row",
-    backgroundColor: "#121821",
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: "#2b3441",
-    overflow: "hidden",
+    gap: spacing.sm,
   },
   summaryItem: {
     flex: 1,
+    minHeight: 72,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRightWidth: 1,
-    borderRightColor: "#2b3441",
-  },
-  summaryItemLast: {
-    borderRightWidth: 0,
+    justifyContent: "center",
   },
   summaryValue: {
     color: colors.text,
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: "900",
+    lineHeight: 29,
   },
   summaryLabel: {
-    color: "#91a0b4",
+    color: colors.textSubtle,
     fontSize: 11,
-    fontWeight: "800",
+    fontWeight: "900",
+    letterSpacing: 0,
     textTransform: "uppercase",
   },
 });

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { CocktailResults } from "../components/CocktailResults";
 import { SectionPanel } from "../components/SectionPanel";
 import { Ingredient } from "../data/cocktails";
-import { colors, radii } from "../theme";
+import { colors, radii, spacing } from "../theme";
 import { RankedCocktail } from "../utils/cocktailMatcher";
 
 type FavoritesTabProps = {
@@ -23,12 +23,12 @@ export function FavoritesTab({
 }: FavoritesTabProps) {
   if (favoriteCocktails.length === 0) {
     return (
-      <SectionPanel title="Избранное" hint="Здесь будут коктейли, которые ты отметил звездочкой.">
+      <SectionPanel title="Любимые коктейли" hint="Отмечай звёздочкой рецепты, к которым хочется вернуться.">
         <View style={styles.empty}>
           <Text style={styles.emptyEmoji}>☆</Text>
           <Text style={styles.emptyTitle}>Пока ничего не отмечено</Text>
           <Text style={styles.emptyText}>
-            Нажми на звездочку рядом с любым коктейлем, чтобы сохранить его сюда.
+            Любимые рецепты будут сохраняться локально, а после входа синхронизируются с аккаунтом.
           </Text>
         </View>
       </SectionPanel>
@@ -37,8 +37,8 @@ export function FavoritesTab({
 
   return (
     <CocktailResults
-      title="Избранное"
-      hint="Коктейли, отмеченные звездочкой."
+      title="Любимые коктейли"
+      hint="Рецепты, отмеченные звёздочкой."
       cocktails={favoriteCocktails}
       ingredients={ingredients}
       emptyText="Пока ничего не отмечено."
@@ -52,13 +52,13 @@ export function FavoritesTab({
 const styles = StyleSheet.create({
   empty: {
     alignItems: "center",
-    gap: 8,
-    paddingVertical: 24,
+    gap: spacing.sm,
+    paddingVertical: 28,
     paddingHorizontal: 16,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: colors.surface,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.borderMuted,
+    borderColor: colors.border,
   },
   emptyEmoji: {
     color: colors.accent,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     color: colors.text,
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "900",
   },
   emptyText: {
@@ -76,5 +76,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     textAlign: "center",
+    maxWidth: 520,
   },
 });
