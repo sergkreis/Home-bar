@@ -1,15 +1,22 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors, radii, spacing } from "../theme";
+import { colors, pressed, radii, spacing } from "../theme";
 
 type AppHeaderProps = {
   title: string;
   subtitle: string;
   stats: Array<{ value: number; label: string }>;
   rightPill?: string;
+  onPressRightPill?: () => void;
 };
 
-export function AppHeader({ title, subtitle, stats, rightPill }: AppHeaderProps) {
+export function AppHeader({
+  title,
+  subtitle,
+  stats,
+  rightPill,
+  onPressRightPill,
+}: AppHeaderProps) {
   return (
     <View style={styles.header}>
       <View style={styles.headerTop}>
@@ -18,9 +25,22 @@ export function AppHeader({ title, subtitle, stats, rightPill }: AppHeaderProps)
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.subtitle}>{subtitle}</Text>
         </View>
-        {rightPill ? (
+        {rightPill && onPressRightPill ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={rightPill === "Войти" ? "Открыть вход в аккаунт" : "Открыть настройки аккаунта"}
+            onPress={onPressRightPill}
+            style={({ pressed: isPressed }) => [
+              styles.savedPill,
+              styles.savedPillButton,
+              isPressed && { opacity: pressed.opacity },
+            ]}
+          >
+            <Text style={styles.savedPillText} numberOfLines={1}>{rightPill}</Text>
+          </Pressable>
+        ) : rightPill ? (
           <View style={styles.savedPill}>
-            <Text style={styles.savedPillText}>{rightPill}</Text>
+            <Text style={styles.savedPillText} numberOfLines={1}>{rightPill}</Text>
           </View>
         ) : null}
       </View>
@@ -80,6 +100,11 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     paddingHorizontal: 12,
     paddingVertical: 7,
+    maxWidth: 190,
+  },
+  savedPillButton: {
+    minHeight: 34,
+    justifyContent: "center",
   },
   savedPillText: {
     color: colors.text,

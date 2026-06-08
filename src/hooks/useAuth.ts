@@ -1,7 +1,14 @@
 import { AuthError, Session, User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { isSupabaseConfigured, supabase } from "../lib/supabase";
+import {
+  clearPersistedSupabaseSession,
+  clearSupabaseSessionTransientMarker,
+  clearTransientSupabaseSessionIfNeeded,
+  isSupabaseConfigured,
+  markSupabaseSessionTransient,
+  supabase,
+} from "../lib/supabase";
 
 export type AuthMode = "sign-in" | "sign-up" | "reset-password" | "update-password";
 
@@ -15,7 +22,7 @@ type UseAuthResult = {
   isSupabaseConfigured: boolean;
   resetPassword: (email: string) => Promise<void>;
   setAuthMode: (mode: AuthMode) => void;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, rememberSession?: boolean) => Promise<void>;
   signOut: () => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -58,6 +65,7 @@ export function useAuth(): UseAuthResult {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const shouldPersistSession = useRef(true);
 
   useEffect(() => {
     if (!supabase) {
@@ -65,8 +73,13 @@ export function useAuth(): UseAuthResult {
     }
 
     let isMounted = true;
+    const authClient = supabase;
 
-    supabase.auth.getSession().then(({ data, error }) => {
+    async function loadInitialSession() {
+      await clearTransientSupabaseSessionIfNeeded();
+
+      const { data, error } = await authClient.auth.getSession();
+
       if (!isMounted) {
         return;
       }
@@ -77,11 +90,25 @@ export function useAuth(): UseAuthResult {
 
       setAuthUser(getSessionUser(data.session));
       setIsAuthReady(true);
+    }
+
+    loadInitialSession().catch((error) => {
+      console.warn("Failed to load auth session.", error);
+      if (isMounted) {
+        setAuthError(error.message);
+        setIsAuthReady(true);
+      }
     });
 
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       setAuthUser(getSessionUser(session));
       setIsAuthReady(true);
+
+      if (session && !shouldPersistSession.current) {
+        markSupabaseSessionTransient().catch((error) => {
+          console.warn("Failed to mark transient auth session.", error);
+        });
+      }
 
       if (event === "PASSWORD_RECOVERY") {
         setAuthModeState("update-password");
@@ -101,11 +128,12 @@ export function useAuth(): UseAuthResult {
     setAuthMessage(null);
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberSession = true) => {
     if (!supabase) {
       return;
     }
 
+    shouldPersistSession.current = rememberSession;
     setIsAuthLoading(true);
     setAuthError(null);
     setAuthMessage(null);
@@ -114,6 +142,11 @@ export function useAuth(): UseAuthResult {
 
     if (error) {
       setAuthError(getAuthErrorMessage(error));
+      shouldPersistSession.current = true;
+    } else if (!rememberSession) {
+      await markSupabaseSessionTransient();
+    } else {
+      await clearSupabaseSessionTransientMarker();
     }
 
     setIsAuthLoading(false);
@@ -198,11 +231,14 @@ export function useAuth(): UseAuthResult {
     setIsAuthLoading(true);
     setAuthError(null);
     setAuthMessage(null);
+    shouldPersistSession.current = true;
 
     const { error } = await supabase.auth.signOut();
 
     if (error) {
       setAuthError(error.message);
+    } else {
+      await clearPersistedSupabaseSession();
     }
 
     setIsAuthLoading(false);

@@ -29,14 +29,6 @@ function uniqueKnownIds(values: unknown[], knownIds: Set<string>): string[] {
   );
 }
 
-function equalIds(left: string[], right: string[]) {
-  if (left.length !== right.length) {
-    return false;
-  }
-
-  return left.every((value, index) => value === right[index]);
-}
-
 function getStorageKey(userId?: string) {
   return userId ? `${STORAGE_KEY}:user:${userId}` : STORAGE_KEY;
 }
@@ -53,28 +45,7 @@ export function useFavorites(
   const [hasMergedRemoteFavorites, setHasMergedRemoteFavorites] = useState(false);
   const [isSyncingFavorites, setIsSyncingFavorites] = useState(false);
   const [favoritesSyncError, setFavoritesSyncError] = useState<string | null>(null);
-  const previousUserId = useRef<string | undefined>(userId);
   const loadedStorageKey = useRef<string | null>(null);
-  const pendingGuestFavorites = useRef<string[] | null>(null);
-
-  useEffect(() => {
-    if (!isAuthReady) {
-      return;
-    }
-
-    const previous = previousUserId.current;
-
-    if (
-      !previous &&
-      userId &&
-      loadedStorageKey.current === STORAGE_KEY &&
-      favorites.length > 0
-    ) {
-      pendingGuestFavorites.current = favorites;
-    }
-
-    previousUserId.current = userId;
-  }, [favorites, isAuthReady, userId]);
 
   useEffect(() => {
     if (!isAuthReady) {
@@ -148,29 +119,14 @@ export function useFavorites(
           return;
         }
 
-        const guestFavorites = pendingGuestFavorites.current
-          ? uniqueKnownIds(pendingGuestFavorites.current, knownIds)
-          : [];
-
         if (remoteFavorites && remoteFavorites.cocktailIds.length > 0) {
           const remoteIds = uniqueKnownIds(remoteFavorites.cocktailIds, knownIds);
-          const mergedIds = uniqueKnownIds([...remoteIds, ...favorites, ...guestFavorites], knownIds);
 
-          setFavorites(mergedIds);
-
-          if (!equalIds(remoteIds, mergedIds)) {
-            await saveRemoteUserFavorites(currentUserId, mergedIds);
-          }
+          setFavorites(remoteIds);
         } else {
-          const mergedIds = uniqueKnownIds([...favorites, ...guestFavorites], knownIds);
-
-          if (mergedIds.length > 0) {
-            setFavorites(mergedIds);
-            await saveRemoteUserFavorites(currentUserId, mergedIds);
-          }
+          setFavorites([]);
         }
 
-        pendingGuestFavorites.current = null;
         setHasMergedRemoteFavorites(true);
       } catch (error) {
         console.warn("Failed to sync favorites.", error);
@@ -189,7 +145,7 @@ export function useFavorites(
     return () => {
       isMounted = false;
     };
-  }, [favorites, hasLoadedFavorites, hasMergedRemoteFavorites, isAuthReady, knownIds, userId]);
+  }, [hasLoadedFavorites, hasMergedRemoteFavorites, isAuthReady, knownIds, userId]);
 
   useEffect(() => {
     if (!isAuthReady || !hasLoadedFavorites || !userId || !hasMergedRemoteFavorites) {

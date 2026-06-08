@@ -4,6 +4,7 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { AccountPanel } from "./src/components/AccountPanel";
 import { AppHeader } from "./src/components/AppHeader";
+import { AuthModal } from "./src/components/AuthModal";
 import { AppTab, BottomNav } from "./src/components/BottomNav";
 import { SectionPanel } from "./src/components/SectionPanel";
 import { cocktails, ingredients, TasteTag } from "./src/data/cocktails";
@@ -12,6 +13,7 @@ import { useAuth } from "./src/hooks/useAuth";
 import { useEnteredApp } from "./src/hooks/useEnteredApp";
 import { useFavorites } from "./src/hooks/useFavorites";
 import { useSavedBar } from "./src/hooks/useSavedBar";
+import { useUserProfile } from "./src/hooks/useUserProfile";
 import { BarTab } from "./src/screens/BarTab";
 import { BuyTab } from "./src/screens/BuyTab";
 import { CocktailDetailScreen } from "./src/screens/CocktailDetailScreen";
@@ -69,12 +71,16 @@ const tabLabels: Record<AppTab, string> = {
 
 function getSyncPillLabel({
   authUserEmail,
+  profileDisplayName,
+  isSupabaseConfigured,
   isSyncingBar,
   isSyncingFavorites,
   syncError,
   favoritesSyncError,
 }: {
   authUserEmail?: string;
+  profileDisplayName?: string;
+  isSupabaseConfigured: boolean;
   isSyncingBar: boolean;
   isSyncingFavorites: boolean;
   syncError: string | null;
@@ -88,7 +94,15 @@ function getSyncPillLabel({
     return "Синхронизация";
   }
 
-  return authUserEmail ? "Аккаунт" : "Локально";
+  if (authUserEmail) {
+    return profileDisplayName?.trim() || authUserEmail;
+  }
+
+  if (!isSupabaseConfigured) {
+    return "Локально";
+  }
+
+  return "Войти";
 }
 
 export default function App() {
@@ -126,9 +140,18 @@ export default function App() {
     favoritesSyncStatus,
     toggleFavorite,
   } = useFavorites(knownCocktailIds, authUser?.id, isAuthReady);
+  const {
+    hasLoadedProfile,
+    profile,
+    profileError,
+    profileMessage,
+    profileSyncStatus,
+    saveProfile,
+  } = useUserProfile(authUser?.id, isAuthReady);
 
   const [activeTaste, setActiveTaste] = useState<TasteTag | null>(null);
   const [activeTab, setActiveTab] = useState<AppTab>("today");
+  const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
   const [selectedCocktail, setSelectedCocktail] = useState<RankedCocktail | null>(null);
 
   useEffect(() => {
@@ -136,6 +159,18 @@ export default function App() {
       markEntered();
     }
   }, [hasLoadedSavedBar, hasLoadedEntered, hasSavedBar, hasEnteredApp, markEntered]);
+
+  useEffect(() => {
+    if (authUser && authMode !== "update-password") {
+      setIsAuthModalVisible(false);
+    }
+  }, [authMode, authUser]);
+
+  useEffect(() => {
+    if (authMode === "update-password") {
+      setIsAuthModalVisible(true);
+    }
+  }, [authMode]);
 
   const rankedCocktails = useMemo(
     () => rankCocktails(cocktails, selectedIngredients, activeTaste, ingredients),
@@ -175,11 +210,13 @@ export default function App() {
     [allRankedCocktails, isFavorite],
   );
 
+  const openAuthModal = () => {
+    setAuthMode("sign-in");
+    setIsAuthModalVisible(true);
+  };
+
   const accountPanel = (
     <AccountPanel
-      authError={authError}
-      authMessage={authMessage}
-      authMode={authMode}
       authUserEmail={authUser?.email}
       barSyncError={syncError}
       barSyncStatus={syncStatus}
@@ -187,12 +224,13 @@ export default function App() {
       favoritesSyncStatus={favoritesSyncStatus}
       isAuthLoading={isAuthLoading}
       isSupabaseConfigured={isSupabaseConfigured}
-      onResetPassword={resetPassword}
-      onSetAuthMode={setAuthMode}
-      onSignIn={signIn}
+      onOpenAuth={openAuthModal}
+      onSaveProfile={saveProfile}
       onSignOut={signOut}
-      onSignUp={signUp}
-      onUpdatePassword={updatePassword}
+      profile={profile}
+      profileError={profileError}
+      profileMessage={profileMessage}
+      profileSyncStatus={profileSyncStatus}
     />
   );
 
@@ -226,7 +264,23 @@ export default function App() {
     markEntered();
   };
 
-  if (!hasLoadedSavedBar || !hasLoadedEntered || !hasLoadedFavorites || !isAuthReady) {
+  const authModal = (
+    <AuthModal
+      authError={authError}
+      authMessage={authMessage}
+      authMode={authMode}
+      isAuthLoading={isAuthLoading}
+      onClose={() => setIsAuthModalVisible(false)}
+      onResetPassword={resetPassword}
+      onSetAuthMode={setAuthMode}
+      onSignIn={signIn}
+      onSignUp={signUp}
+      onUpdatePassword={updatePassword}
+      visible={isAuthModalVisible}
+    />
+  );
+
+  if (!hasLoadedSavedBar || !hasLoadedEntered || !hasLoadedFavorites || !hasLoadedProfile || !isAuthReady) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <StatusBar style="dark" />
@@ -235,6 +289,7 @@ export default function App() {
           <Text style={styles.loadingTitle}>Загружаем твой бар</Text>
           <Text style={styles.loadingText}>Проверяем локальные данные и сессию аккаунта.</Text>
         </View>
+        {authModal}
       </SafeAreaView>
     );
   }
@@ -252,6 +307,7 @@ export default function App() {
           onAddIngredientToBar={addIngredientToBar}
           onBack={() => setSelectedCocktail(null)}
         />
+        {authModal}
       </SafeAreaView>
     );
   }
@@ -270,6 +326,7 @@ export default function App() {
           onResetToStarter={() => setSelectedIngredients(starterIngredients)}
           onStartMatching={startMatching}
         />
+        {authModal}
       </SafeAreaView>
     );
   }
@@ -286,8 +343,17 @@ export default function App() {
           <AppHeader
             title={tabLabels[activeTab]}
             subtitle={tabSubtitles[activeTab]}
+            onPressRightPill={
+              authUser
+                ? () => setActiveTab("account")
+                : isSupabaseConfigured
+                  ? openAuthModal
+                  : undefined
+            }
             rightPill={getSyncPillLabel({
               authUserEmail: authUser?.email,
+              profileDisplayName: profile.displayName,
+              isSupabaseConfigured,
               isSyncingBar,
               isSyncingFavorites,
               syncError,
@@ -365,6 +431,7 @@ export default function App() {
           onChangeTab={setActiveTab}
           favoritesCount={favoriteCocktails.length}
         />
+        {authModal}
       </View>
     </SafeAreaView>
   );

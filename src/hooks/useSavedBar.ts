@@ -26,14 +26,6 @@ function uniqueKnownIds(values: unknown[], knownIds: Set<string>): string[] {
   );
 }
 
-function equalIds(left: string[], right: string[]) {
-  if (left.length !== right.length) {
-    return false;
-  }
-
-  return left.every((value, index) => value === right[index]);
-}
-
 function getStorageKey(userId?: string) {
   return userId ? `${SAVED_BAR_STORAGE_KEY}:user:${userId}` : SAVED_BAR_STORAGE_KEY;
 }
@@ -51,28 +43,7 @@ export function useSavedBar(
   const [isSyncingBar, setIsSyncingBar] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const previousUserId = useRef<string | undefined>(userId);
   const loadedStorageKey = useRef<string | null>(null);
-  const pendingGuestIngredients = useRef<string[] | null>(null);
-
-  useEffect(() => {
-    if (!isAuthReady) {
-      return;
-    }
-
-    const previous = previousUserId.current;
-
-    if (
-      !previous &&
-      userId &&
-      loadedStorageKey.current === SAVED_BAR_STORAGE_KEY &&
-      selectedIngredients.length > 0
-    ) {
-      pendingGuestIngredients.current = selectedIngredients;
-    }
-
-    previousUserId.current = userId;
-  }, [isAuthReady, selectedIngredients, userId]);
 
   useEffect(() => {
     if (!isAuthReady) {
@@ -172,37 +143,16 @@ export function useSavedBar(
 
         const knownIngredientIds = new Set(ingredients.map((ingredient) => ingredient.id));
 
-        const guestIngredientIds = pendingGuestIngredients.current
-          ? uniqueKnownIds(pendingGuestIngredients.current, knownIngredientIds)
-          : [];
-
         if (remoteBar && remoteBar.ingredientIds.length > 0) {
           const remoteIngredientIds = uniqueKnownIds(remoteBar.ingredientIds, knownIngredientIds);
-          const mergedIngredientIds = uniqueKnownIds(
-            [...remoteIngredientIds, ...selectedIngredients, ...guestIngredientIds],
-            knownIngredientIds,
-          );
 
-          setSelectedIngredients(mergedIngredientIds);
+          setSelectedIngredients(remoteIngredientIds);
           setHasSavedBar(true);
-
-          if (!equalIds(remoteIngredientIds, mergedIngredientIds)) {
-            await saveRemoteUserBar(currentUserId, mergedIngredientIds);
-          }
         } else {
-          const mergedIngredientIds = uniqueKnownIds(
-            [...selectedIngredients, ...guestIngredientIds],
-            knownIngredientIds,
-          );
-
-          if (mergedIngredientIds.length > 0) {
-            setSelectedIngredients(mergedIngredientIds);
-            setHasSavedBar(true);
-            await saveRemoteUserBar(currentUserId, mergedIngredientIds);
-          }
+          setSelectedIngredients([]);
+          setHasSavedBar(false);
         }
 
-        pendingGuestIngredients.current = null;
         setHasMergedRemoteBar(true);
       } catch (error) {
         console.warn("Failed to sync saved home bar.", error);
@@ -226,7 +176,6 @@ export function useSavedBar(
     hasMergedRemoteBar,
     ingredients,
     isAuthReady,
-    selectedIngredients,
     userId,
   ]);
 

@@ -50,7 +50,7 @@ npm / package-lock.json
 Static web export served by nginx
 Playwright UI tests
 GitHub Actions deploy
-Optional Supabase Auth/Postgres account sync for bar and favorites
+Optional Supabase Auth/Postgres account sync for bar, favorites, and profile
 ```
 
 ## Основные Файлы
@@ -61,10 +61,12 @@ src/components/                 - reusable UI components
 src/hooks/useAuth.ts            - Supabase auth session state, email/password actions, password reset/update
 src/hooks/useSavedBar.ts        - AsyncStorage persistence plus optional Supabase sync for selected home bar
 src/hooks/useFavorites.ts       - AsyncStorage persistence plus optional Supabase sync for favorite cocktails
+src/hooks/useUserProfile.ts     - optional Supabase profile load/save state
 src/lib/supabase.ts             - Supabase client using Expo public env vars
 src/services/userBarService.ts  - user_bars load/upsert helpers
 src/services/userFavoritesService.ts - user_favorites load/upsert helpers
-supabase/schema.sql             - user_bars/user_favorites tables and RLS policies
+src/services/userProfileService.ts - user_profiles load/upsert helpers
+supabase/schema.sql             - user_bars/user_favorites/user_profiles tables and RLS policies
 src/data/                       - generated cocktail/ingredient data
 src/utils/                      - matching and shopping suggestion logic
 tests/home-bar.spec.ts          - Playwright smoke test for core flow
@@ -98,8 +100,11 @@ Save selected home bar on device with AsyncStorage
 Optional account tab for Supabase email/password sign-in and cloud bar sync
 Production account flow with sign-up, sign-in, password reset, and password update after recovery link
 Favorite cocktails sync through Supabase user_favorites
+Account profile settings with display name and birth date through Supabase user_profiles
+Auth modal for sign-in/sign-up/reset/update-password, including a transient "do not stay signed in" option
 Light production UI pass with centered desktop layout, cleaner section structure, updated cards, and revised account screen
 Account-local AsyncStorage keys are separated by user id; guest data is imported only after a real guest-to-account sign-in
+Guest bar/favorites are no longer merged into an account after sign-in; the account remote state is authoritative
 ```
 
 ## Данные
@@ -286,6 +291,7 @@ Local branch after latest deploy: main...origin/main, clean.
 ```text
 Registration/account sync is implemented as an optional Supabase-backed flow for bar and favorites; it still needs real Supabase project credentials, schema execution, redirect URL configuration, and end-to-end QA against that project.
 GitHub Secrets include VPS_SSH_KEY, EXPO_PUBLIC_SUPABASE_URL, and EXPO_PUBLIC_SUPABASE_ANON_KEY for the Supabase project created on 2026-06-07.
+Supabase project currently has user_bars and user_favorites; run the updated supabase/schema.sql before deploy so user_profiles exists for account settings.
 AsyncStorage persistence plus optional remote sync lives in src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
 Generated data still contains a mix of translated Russian names and raw English ingredient names.
@@ -339,6 +345,13 @@ Supabase enablement on 2026-06-07:
   User created the Supabase project and ran supabase/schema.sql successfully in SQL Editor.
   GitHub Actions secrets EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY were added.
   Deployed commit b1ec616; live smoke confirmed account form is visible and local-only mode is gone.
+Account modal/profile pass on 2026-06-08:
+  Guest bar/favorites no longer merge into the account after sign-in; remote account data is authoritative.
+  Added AuthModal with sign-in/sign-up/reset/update-password and a transient session checkbox.
+  Added user_profiles SQL, profile service/hook, and account settings fields for display name and birth date.
+  Local browser QA with Supabase env verified: guest 18 ingredients -> sign-in to account -> account 7 ingredients, no guest merge.
+  Transient sign-in QA verified: with the checkbox off, reload signs out and returns to the guest bar.
+  Current Supabase project still needs the updated user_profiles table from supabase/schema.sql before profile saving works live.
 ```
 
 ## Следующие Шаги

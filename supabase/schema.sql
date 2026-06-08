@@ -63,3 +63,38 @@ with check ((select auth.uid()) = user_id);
 
 create index if not exists user_favorites_updated_at_idx
 on public.user_favorites (updated_at desc);
+
+create table if not exists public.user_profiles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  display_name text not null default '',
+  birth_date date,
+  updated_at timestamptz not null default now(),
+  constraint user_profiles_display_name_length check (char_length(display_name) <= 80)
+);
+
+alter table public.user_profiles enable row level security;
+
+drop policy if exists "Users can read their own profile" on public.user_profiles;
+create policy "Users can read their own profile"
+on public.user_profiles
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can insert their own profile" on public.user_profiles;
+create policy "Users can insert their own profile"
+on public.user_profiles
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "Users can update their own profile" on public.user_profiles;
+create policy "Users can update their own profile"
+on public.user_profiles
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+create index if not exists user_profiles_updated_at_idx
+on public.user_profiles (updated_at desc);
