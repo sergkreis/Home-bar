@@ -7,19 +7,19 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "alexander",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "alexander",
     "ingredientId": "creme-de-cacao",
     "sortOrder": 1,
-    "amount": "1/2 oz white"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "alexander",
     "ingredientId": "light-cream",
     "sortOrder": 2,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "alexander",
@@ -31,43 +31,43 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "americano",
     "ingredientId": "campari",
     "sortOrder": 0,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "americano",
     "ingredientId": "sweet-vermouth",
     "sortOrder": 1,
-    "amount": "1 oz red"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "americano",
     "ingredientId": "lemon-peel",
     "sortOrder": 2,
-    "amount": "Twist of"
+    "amount": "1 твист"
   },
   {
     "cocktailId": "americano",
     "ingredientId": "orange-peel",
     "sortOrder": 3,
-    "amount": "Twist of"
+    "amount": "1 твист"
   },
   {
     "cocktailId": "aviation",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "4.5 cl"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "aviation",
     "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "1.5 cl"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "aviation",
     "ingredientId": "maraschino-liqueur",
     "sortOrder": 2,
-    "amount": "1.5 cl"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "b-52",
@@ -91,133 +91,133 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "bellini",
     "ingredientId": "champagne",
     "sortOrder": 0,
-    "amount": "6 oz"
+    "amount": "180 мл"
   },
   {
     "cocktailId": "bellini",
     "ingredientId": "peach-schnapps",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "bramble",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "4 cl"
+    "amount": "40 мл"
   },
   {
     "cocktailId": "bramble",
     "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "1.5 cl"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "bramble",
     "ingredientId": "sugar-syrup",
     "sortOrder": 2,
-    "amount": "1 cl"
+    "amount": "10 мл"
   },
   {
     "cocktailId": "bramble",
     "ingredientId": "creme-de-mure",
     "sortOrder": 3,
-    "amount": "1.5 cl"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "brooklyn",
     "ingredientId": "rye-whiskey",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "brooklyn",
     "ingredientId": "dry-vermouth",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "brooklyn",
     "ingredientId": "maraschino-liqueur",
     "sortOrder": 2,
-    "amount": "1/4 oz"
+    "amount": "7,5 мл"
   },
   {
     "cocktailId": "brooklyn",
     "ingredientId": "angostura",
     "sortOrder": 3,
-    "amount": "3 dashes"
+    "amount": "3 дэша"
   },
   {
     "cocktailId": "brooklyn",
     "ingredientId": "maraschino-cherry",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "caipirinha",
     "ingredientId": "sugar",
     "sortOrder": 0,
-    "amount": "2 tsp"
+    "amount": "2 ч. л."
   },
   {
     "cocktailId": "caipirinha",
     "ingredientId": "lime",
     "sortOrder": 1,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "caipirinha",
     "ingredientId": "cachaca",
     "sortOrder": 2,
-    "amount": "2 1/2 oz"
+    "amount": "75 мл"
   },
   {
     "cocktailId": "casino",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "casino",
     "ingredientId": "maraschino-liqueur",
     "sortOrder": 1,
-    "amount": "1/4 tsp"
+    "amount": "0,25 ч. л."
   },
   {
     "cocktailId": "casino",
     "ingredientId": "lemon-juice",
     "sortOrder": 2,
-    "amount": "1/4 tsp"
+    "amount": "0,25 ч. л."
   },
   {
     "cocktailId": "casino",
     "ingredientId": "orange-bitters",
     "sortOrder": 3,
-    "amount": "2 dashes"
+    "amount": "2 дэша"
   },
   {
     "cocktailId": "casino",
     "ingredientId": "cherry",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "clover-club",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "clover-club",
     "ingredientId": "grenadine",
     "sortOrder": 1,
-    "amount": "2 tsp"
+    "amount": "2 ч. л."
   },
   {
     "cocktailId": "clover-club",
-    "ingredientId": "lemon",
+    "ingredientId": "lemon-juice",
     "sortOrder": 2,
-    "amount": "Juice of 1/2"
+    "amount": "сок 1/2 шт."
   },
   {
     "cocktailId": "clover-club",
@@ -229,67 +229,67 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "corpse-reviver",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "corpse-reviver",
     "ingredientId": "triple-sec",
     "sortOrder": 1,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "corpse-reviver",
     "ingredientId": "lillet-blanc",
     "sortOrder": 2,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "corpse-reviver",
     "ingredientId": "lemon-juice",
     "sortOrder": 3,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "corpse-reviver",
     "ingredientId": "absinthe",
     "sortOrder": 4,
-    "amount": "1 dash"
+    "amount": "1 дэш"
   },
   {
     "cocktailId": "cosmopolitan",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "1 1/4 oz"
+    "amount": "37,5 мл"
   },
   {
     "cocktailId": "cosmopolitan",
     "ingredientId": "lime-juice",
     "sortOrder": 1,
-    "amount": "1/4 oz"
+    "amount": "7,5 мл"
   },
   {
     "cocktailId": "cosmopolitan",
     "ingredientId": "cointreau",
     "sortOrder": 2,
-    "amount": "1/4 oz"
+    "amount": "7,5 мл"
   },
   {
     "cocktailId": "cosmopolitan",
     "ingredientId": "cranberry-juice",
     "sortOrder": 3,
-    "amount": "1/4 cup"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "cuba-libre",
     "ingredientId": "white-rum",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "cuba-libre",
-    "ingredientId": "lime",
+    "ingredientId": "lime-juice",
     "sortOrder": 1,
-    "amount": "Juice of 1/2"
+    "amount": "сок 1/2 шт."
   },
   {
     "cocktailId": "cuba-libre",
@@ -301,205 +301,205 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "daiquiri",
     "ingredientId": "white-rum",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "daiquiri",
-    "ingredientId": "lime",
+    "ingredientId": "lime-juice",
     "sortOrder": 1,
-    "amount": "Juice of 1/2"
+    "amount": "сок 1/2 шт."
   },
   {
     "cocktailId": "daiquiri",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "dark-and-stormy",
     "ingredientId": "dark-rum",
     "sortOrder": 0,
-    "amount": "5 cl"
+    "amount": "50 мл"
   },
   {
     "cocktailId": "dark-and-stormy",
     "ingredientId": "ginger-beer",
     "sortOrder": 1,
-    "amount": "10 cl"
+    "amount": "100 мл"
   },
   {
     "cocktailId": "dirty-martini",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "70ml/2fl oz"
+    "amount": "70 мл"
   },
   {
     "cocktailId": "dirty-martini",
     "ingredientId": "dry-vermouth",
     "sortOrder": 1,
-    "amount": "1 tbsp"
+    "amount": "1 ст. л."
   },
   {
     "cocktailId": "dirty-martini",
     "ingredientId": "olive-brine",
     "sortOrder": 2,
-    "amount": "2 tbsp"
+    "amount": "2 ст. л."
   },
   {
     "cocktailId": "dirty-martini",
     "ingredientId": "lemon",
     "sortOrder": 3,
-    "amount": "1 wedge"
+    "amount": "1 долька"
   },
   {
     "cocktailId": "dirty-martini",
     "ingredientId": "olive",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "dry-martini",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "1 2/3 oz"
+    "amount": "50 мл"
   },
   {
     "cocktailId": "dry-martini",
     "ingredientId": "dry-vermouth",
     "sortOrder": 1,
-    "amount": "1/3 oz"
+    "amount": "10 мл"
   },
   {
     "cocktailId": "dry-martini",
     "ingredientId": "olive",
     "sortOrder": 2,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "espresso-martini",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "5 cl"
+    "amount": "50 мл"
   },
   {
     "cocktailId": "espresso-martini",
     "ingredientId": "coffee-liqueur",
     "sortOrder": 1,
-    "amount": "1 cl"
+    "amount": "10 мл"
   },
   {
     "cocktailId": "espresso-martini",
     "ingredientId": "sugar-syrup",
     "sortOrder": 2,
-    "amount": "1 dash"
+    "amount": "1 дэш"
   },
   {
     "cocktailId": "french-75",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "french-75",
     "ingredientId": "sugar",
     "sortOrder": 1,
-    "amount": "2 tsp superfine"
+    "amount": "2 ч. л."
   },
   {
     "cocktailId": "french-75",
     "ingredientId": "lemon-juice",
     "sortOrder": 2,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "french-75",
     "ingredientId": "champagne",
     "sortOrder": 3,
-    "amount": "4 oz Chilled"
+    "amount": "120 мл"
   },
   {
     "cocktailId": "french-75",
     "ingredientId": "orange",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "french-75",
     "ingredientId": "maraschino-cherry",
     "sortOrder": 5,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "french-connection",
     "ingredientId": "cognac",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "french-connection",
     "ingredientId": "amaretto",
     "sortOrder": 1,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "french-martini",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "4.5 cl"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "french-martini",
     "ingredientId": "raspberry-liqueur",
     "sortOrder": 1,
-    "amount": "1.5 cl"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "french-martini",
     "ingredientId": "pineapple-juice",
     "sortOrder": 2,
-    "amount": "1.5 cl"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "gimlet",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "2 1/2 oz"
+    "amount": "75 мл"
   },
   {
     "cocktailId": "gimlet",
     "ingredientId": "lime-juice",
     "sortOrder": 1,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "gimlet",
     "ingredientId": "sugar-syrup",
     "sortOrder": 2,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "gimlet",
     "ingredientId": "lime",
     "sortOrder": 3,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "gin-fizz",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "gin-fizz",
-    "ingredientId": "lemon",
+    "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "Juice of 1/2"
+    "amount": "сок 1/2 шт."
   },
   {
     "cocktailId": "gin-fizz",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "gin-fizz",
@@ -511,403 +511,445 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "gin-rickey",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "gin-rickey",
     "ingredientId": "grenadine",
     "sortOrder": 1,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "gin-rickey",
-    "ingredientId": "lemon",
+    "ingredientId": "lemon-juice",
     "sortOrder": 2,
-    "amount": "Juice of 1/2"
+    "amount": "сок 1/2 шт."
   },
   {
     "cocktailId": "gin-rickey",
     "ingredientId": "soda-water",
     "sortOrder": 3,
-    "amount": "Top up with"
+    "amount": "долить"
   },
   {
     "cocktailId": "gin-rickey",
     "ingredientId": "lime",
     "sortOrder": 4,
-    "amount": "Garnish"
+    "amount": "для украшения"
   },
   {
     "cocktailId": "gin-tonic",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "4 cl"
+    "amount": "40 мл"
   },
   {
     "cocktailId": "gin-tonic",
     "ingredientId": "tonic",
     "sortOrder": 1,
-    "amount": "10 cl"
+    "amount": "100 мл"
   },
   {
     "cocktailId": "gin-tonic",
     "ingredientId": "lemon-peel",
     "sortOrder": 2,
-    "amount": "1 Slice"
+    "amount": "1 долька"
   },
   {
     "cocktailId": "gin-tonic",
     "ingredientId": "ice",
     "sortOrder": 3,
-    "amount": "cubes"
+    "amount": "кубики"
   },
   {
     "cocktailId": "godfather",
     "ingredientId": "scotch",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "godfather",
     "ingredientId": "amaretto",
     "sortOrder": 1,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
+  },
+  {
+    "cocktailId": "grasshopper",
+    "ingredientId": "green-creme-de-menthe",
+    "sortOrder": 0,
+    "amount": "22,5 мл"
+  },
+  {
+    "cocktailId": "grasshopper",
+    "ingredientId": "creme-de-cacao",
+    "sortOrder": 1,
+    "amount": "22,5 мл"
+  },
+  {
+    "cocktailId": "grasshopper",
+    "ingredientId": "light-cream",
+    "sortOrder": 2,
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "greyhound",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "greyhound",
     "ingredientId": "grapefruit-juice",
     "sortOrder": 1,
-    "amount": "3 oz"
+    "amount": "90 мл"
   },
   {
     "cocktailId": "harvey-wallbanger",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "harvey-wallbanger",
     "ingredientId": "galliano",
     "sortOrder": 1,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "harvey-wallbanger",
     "ingredientId": "orange-juice",
     "sortOrder": 2,
-    "amount": "4 oz"
+    "amount": "120 мл"
   },
   {
     "cocktailId": "hemingway-special",
     "ingredientId": "rum",
     "sortOrder": 0,
-    "amount": "12 parts"
+    "amount": "12 частей"
   },
   {
     "cocktailId": "hemingway-special",
     "ingredientId": "grapefruit-juice",
     "sortOrder": 1,
-    "amount": "8 parts"
+    "amount": "8 частей"
   },
   {
     "cocktailId": "hemingway-special",
     "ingredientId": "maraschino-liqueur",
     "sortOrder": 2,
-    "amount": "3 parts"
+    "amount": "3 части"
   },
   {
     "cocktailId": "hemingway-special",
     "ingredientId": "lime-juice",
     "sortOrder": 3,
-    "amount": "3 parts"
+    "amount": "3 части"
+  },
+  {
+    "cocktailId": "horse-s-neck",
+    "ingredientId": "lemon-peel",
+    "sortOrder": 0,
+    "amount": "1 длинная полоска"
+  },
+  {
+    "cocktailId": "horse-s-neck",
+    "ingredientId": "brandy",
+    "sortOrder": 1,
+    "amount": "60 мл"
+  },
+  {
+    "cocktailId": "horse-s-neck",
+    "ingredientId": "ginger-ale",
+    "sortOrder": 2,
+    "amount": "150 мл"
+  },
+  {
+    "cocktailId": "horse-s-neck",
+    "ingredientId": "bitters",
+    "sortOrder": 3,
+    "amount": "2 дэша"
   },
   {
     "cocktailId": "irish-coffee",
     "ingredientId": "irish-whiskey",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "irish-coffee",
     "ingredientId": "coffee",
     "sortOrder": 1,
-    "amount": "8 oz"
+    "amount": "240 мл"
   },
   {
     "cocktailId": "irish-coffee",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "irish-coffee",
     "ingredientId": "whipped-cream",
     "sortOrder": 3,
-    "amount": "1 tblsp"
+    "amount": "1 ст. л."
   },
   {
     "cocktailId": "jack-rose-cocktail",
     "ingredientId": "apple-brandy",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "jack-rose-cocktail",
     "ingredientId": "grenadine",
     "sortOrder": 1,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "jack-rose-cocktail",
-    "ingredientId": "lime",
+    "ingredientId": "lime-juice",
     "sortOrder": 2,
-    "amount": "Juice of 1/2"
+    "amount": "сок 1/2 шт."
   },
   {
     "cocktailId": "john-collins",
     "ingredientId": "bourbon",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "john-collins",
     "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "john-collins",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1 tsp superfine"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "john-collins",
     "ingredientId": "soda-water",
     "sortOrder": 3,
-    "amount": "3 oz"
+    "amount": "90 мл"
   },
   {
     "cocktailId": "john-collins",
     "ingredientId": "maraschino-cherry",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "john-collins",
     "ingredientId": "orange",
     "sortOrder": 5,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "kamikaze",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "kamikaze",
     "ingredientId": "triple-sec",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "kamikaze",
     "ingredientId": "lime-juice",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "kir",
     "ingredientId": "creme-de-cassis",
     "sortOrder": 0,
-    "amount": "1 part"
+    "amount": "1 часть"
   },
   {
     "cocktailId": "kir",
     "ingredientId": "champagne",
     "sortOrder": 1,
-    "amount": "5 parts"
+    "amount": "5 частей"
   },
   {
     "cocktailId": "kir-royale",
     "ingredientId": "creme-de-cassis",
     "sortOrder": 0,
-    "amount": "1 part"
+    "amount": "1 часть"
   },
   {
     "cocktailId": "kir-royale",
     "ingredientId": "champagne",
     "sortOrder": 1,
-    "amount": "5 parts"
+    "amount": "5 частей"
   },
   {
     "cocktailId": "the-last-word",
     "ingredientId": "green-chartreuse",
     "sortOrder": 0,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "the-last-word",
     "ingredientId": "maraschino-liqueur",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "the-last-word",
     "ingredientId": "lime-juice",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "the-last-word",
     "ingredientId": "gin",
     "sortOrder": 3,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "lemon-drop",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "1 1/2 shot"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "lemon-drop",
     "ingredientId": "cointreau",
     "sortOrder": 1,
-    "amount": "1 1/2 shot"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "lemon-drop",
-    "ingredientId": "lemon",
+    "ingredientId": "lemon-juice",
     "sortOrder": 2,
-    "amount": "Juice of 1 wedge"
+    "amount": "сок 1 дольки"
   },
   {
     "cocktailId": "long-island-iced-tea",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "long-island-iced-tea",
     "ingredientId": "tequila",
     "sortOrder": 1,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "long-island-iced-tea",
     "ingredientId": "white-rum",
     "sortOrder": 2,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "long-island-iced-tea",
     "ingredientId": "gin",
     "sortOrder": 3,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "long-island-iced-tea",
     "ingredientId": "cola",
     "sortOrder": 4,
-    "amount": "1 dash"
+    "amount": "1 дэш"
   },
   {
     "cocktailId": "long-island-iced-tea",
     "ingredientId": "lemon-peel",
     "sortOrder": 5,
-    "amount": "Twist of"
+    "amount": "1 твист"
   },
   {
     "cocktailId": "mai-tai",
     "ingredientId": "white-rum",
     "sortOrder": 0,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "mai-tai",
     "ingredientId": "orgeat-syrup",
     "sortOrder": 1,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "mai-tai",
     "ingredientId": "triple-sec",
     "sortOrder": 2,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "mai-tai",
     "ingredientId": "sweet-and-sour",
     "sortOrder": 3,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "mai-tai",
     "ingredientId": "cherry",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "manhattan",
     "ingredientId": "sweet-vermouth",
     "sortOrder": 0,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "manhattan",
     "ingredientId": "bourbon",
     "sortOrder": 1,
-    "amount": "2 1/2 oz Blended"
+    "amount": "75 мл"
   },
   {
     "cocktailId": "manhattan",
     "ingredientId": "angostura",
     "sortOrder": 2,
-    "amount": "dash"
+    "amount": "1 дэш"
   },
   {
     "cocktailId": "manhattan",
     "ingredientId": "ice",
     "sortOrder": 3,
-    "amount": "2 or 3"
+    "amount": "2-3 кубика"
   },
   {
     "cocktailId": "manhattan",
     "ingredientId": "maraschino-cherry",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "manhattan",
     "ingredientId": "orange-peel",
     "sortOrder": 5,
-    "amount": "1 twist of"
+    "amount": "1 твист"
   },
   {
     "cocktailId": "margarita",
     "ingredientId": "tequila",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "margarita",
     "ingredientId": "triple-sec",
     "sortOrder": 1,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "margarita",
     "ingredientId": "lime-juice",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "margarita",
@@ -919,109 +961,109 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "martinez-2",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "martinez-2",
     "ingredientId": "sweet-vermouth",
     "sortOrder": 1,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "martinez-2",
     "ingredientId": "maraschino-liqueur",
     "sortOrder": 2,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "martinez-2",
     "ingredientId": "angostura",
     "sortOrder": 3,
-    "amount": "2 dashes"
+    "amount": "2 дэша"
   },
   {
     "cocktailId": "mary-pickford",
     "ingredientId": "white-rum",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "mary-pickford",
     "ingredientId": "pineapple-juice",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "mary-pickford",
     "ingredientId": "maraschino-liqueur",
     "sortOrder": 2,
-    "amount": "1/2 tsp"
+    "amount": "0,5 ч. л."
   },
   {
     "cocktailId": "mary-pickford",
     "ingredientId": "grenadine",
     "sortOrder": 3,
-    "amount": "1/2 tsp"
+    "amount": "0,5 ч. л."
   },
   {
     "cocktailId": "mary-pickford",
     "ingredientId": "maraschino-cherry",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "mimosa",
     "ingredientId": "champagne",
     "sortOrder": 0,
-    "amount": "Chilled"
+    "amount": "охлажденное"
   },
   {
     "cocktailId": "mimosa",
     "ingredientId": "orange-juice",
     "sortOrder": 1,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "mint-julep",
     "ingredientId": "mint",
     "sortOrder": 0,
-    "amount": "4 fresh"
+    "amount": "4 свежих"
   },
   {
     "cocktailId": "mint-julep",
     "ingredientId": "bourbon",
     "sortOrder": 1,
-    "amount": "2 1/2 oz"
+    "amount": "75 мл"
   },
   {
     "cocktailId": "mint-julep",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "mint-julep",
     "ingredientId": "water",
     "sortOrder": 3,
-    "amount": "2 tsp"
+    "amount": "2 ч. л."
   },
   {
     "cocktailId": "mojito",
     "ingredientId": "white-rum",
     "sortOrder": 0,
-    "amount": "2-3 oz"
+    "amount": "60-90 мл"
   },
   {
     "cocktailId": "mojito",
-    "ingredientId": "lime",
+    "ingredientId": "lime-juice",
     "sortOrder": 1,
-    "amount": "Juice of 1"
+    "amount": "сок 1 шт."
   },
   {
     "cocktailId": "mojito",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "2 tsp"
+    "amount": "2 ч. л."
   },
   {
     "cocktailId": "mojito",
@@ -1036,64 +1078,88 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "amount": "по вкусу"
   },
   {
+    "cocktailId": "monkey-gland",
+    "ingredientId": "gin",
+    "sortOrder": 0,
+    "amount": "60 мл"
+  },
+  {
+    "cocktailId": "monkey-gland",
+    "ingredientId": "benedictine",
+    "sortOrder": 1,
+    "amount": "1 ч. л."
+  },
+  {
+    "cocktailId": "monkey-gland",
+    "ingredientId": "orange-juice",
+    "sortOrder": 2,
+    "amount": "15 мл"
+  },
+  {
+    "cocktailId": "monkey-gland",
+    "ingredientId": "grenadine",
+    "sortOrder": 3,
+    "amount": "1 ч. л."
+  },
+  {
     "cocktailId": "moscow-mule",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "moscow-mule",
     "ingredientId": "lime-juice",
     "sortOrder": 1,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "moscow-mule",
     "ingredientId": "ginger-ale",
     "sortOrder": 2,
-    "amount": "8 oz"
+    "amount": "240 мл"
   },
   {
     "cocktailId": "negroni",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "negroni",
     "ingredientId": "campari",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "negroni",
     "ingredientId": "sweet-vermouth",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "new-york-sour",
     "ingredientId": "blended-whiskey",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "new-york-sour",
-    "ingredientId": "lemon",
+    "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "Juice of 1/2"
+    "amount": "сок 1/2 шт."
   },
   {
     "cocktailId": "new-york-sour",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "new-york-sour",
     "ingredientId": "red-wine",
     "sortOrder": 3,
-    "amount": "(Claret)"
+    "amount": "немного"
   },
   {
     "cocktailId": "new-york-sour",
@@ -1111,193 +1177,211 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "old-cuban",
     "ingredientId": "white-rum",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "old-cuban",
     "ingredientId": "sugar-syrup",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "old-cuban",
     "ingredientId": "lime-juice",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "old-cuban",
     "ingredientId": "angostura",
     "sortOrder": 3,
-    "amount": "2 dashes"
+    "amount": "2 дэша"
   },
   {
     "cocktailId": "old-cuban",
     "ingredientId": "prosecco",
     "sortOrder": 4,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "old-fashioned",
     "ingredientId": "bourbon",
     "sortOrder": 0,
-    "amount": "4.5 cL"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "old-fashioned",
     "ingredientId": "angostura",
     "sortOrder": 1,
-    "amount": "2 dashes"
+    "amount": "2 дэша"
   },
   {
     "cocktailId": "old-fashioned",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1 cube"
+    "amount": "1 кубик"
   },
   {
     "cocktailId": "old-fashioned",
     "ingredientId": "water",
     "sortOrder": 3,
-    "amount": "dash"
+    "amount": "1 дэш"
   },
   {
     "cocktailId": "old-pal",
     "ingredientId": "rye-whiskey",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "old-pal",
     "ingredientId": "campari",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "old-pal",
     "ingredientId": "dry-vermouth",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "paloma",
     "ingredientId": "grape-soda",
     "sortOrder": 0,
-    "amount": "3 oz"
+    "amount": "90 мл"
   },
   {
     "cocktailId": "paloma",
     "ingredientId": "tequila",
     "sortOrder": 1,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
+  },
+  {
+    "cocktailId": "paradise",
+    "ingredientId": "gin",
+    "sortOrder": 0,
+    "amount": "7 частей"
+  },
+  {
+    "cocktailId": "paradise",
+    "ingredientId": "apricot-brandy",
+    "sortOrder": 1,
+    "amount": "4 части"
+  },
+  {
+    "cocktailId": "paradise",
+    "ingredientId": "orange-juice",
+    "sortOrder": 2,
+    "amount": "3 части"
   },
   {
     "cocktailId": "pegu-club",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "pegu-club",
     "ingredientId": "orange-curacao",
     "sortOrder": 1,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "pegu-club",
     "ingredientId": "lime-juice",
     "sortOrder": 2,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "pegu-club",
     "ingredientId": "angostura",
     "sortOrder": 3,
-    "amount": "1 dash"
+    "amount": "1 дэш"
   },
   {
     "cocktailId": "pegu-club",
     "ingredientId": "orange-bitters",
     "sortOrder": 4,
-    "amount": "1 dash"
+    "amount": "1 дэш"
   },
   {
     "cocktailId": "penicillin",
     "ingredientId": "blended-scotch",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "penicillin",
     "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "3/4 oz"
+    "amount": "22,5 мл"
   },
   {
     "cocktailId": "penicillin",
     "ingredientId": "honey-syrup",
     "sortOrder": 2,
-    "amount": "2 tsp"
+    "amount": "2 ч. л."
   },
   {
     "cocktailId": "penicillin",
     "ingredientId": "ginger-syrup",
     "sortOrder": 3,
-    "amount": "2 tsp"
+    "amount": "2 ч. л."
   },
   {
     "cocktailId": "penicillin",
     "ingredientId": "islay-single-malt-scotch",
     "sortOrder": 4,
-    "amount": "1/4 oz"
+    "amount": "7,5 мл"
   },
   {
     "cocktailId": "pina-colada",
     "ingredientId": "white-rum",
     "sortOrder": 0,
-    "amount": "3 oz"
+    "amount": "90 мл"
   },
   {
     "cocktailId": "pina-colada",
     "ingredientId": "coconut-milk",
     "sortOrder": 1,
-    "amount": "3 tblsp"
+    "amount": "3 ст. л."
   },
   {
     "cocktailId": "pina-colada",
     "ingredientId": "pineapple",
     "sortOrder": 2,
-    "amount": "3 tblsp"
+    "amount": "3 ст. л."
   },
   {
     "cocktailId": "pink-gin",
     "ingredientId": "bitters",
     "sortOrder": 0,
-    "amount": "3 dashes"
+    "amount": "3 дэша"
   },
   {
     "cocktailId": "pink-gin",
     "ingredientId": "gin",
     "sortOrder": 1,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "pisco-sour",
     "ingredientId": "pisco",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "pisco-sour",
     "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "pisco-sour",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1-2 tblsp"
+    "amount": "1-2 ст. л."
   },
   {
     "cocktailId": "pisco-sour",
@@ -1315,61 +1399,109 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "planter-s-punch",
     "ingredientId": "dark-rum",
     "sortOrder": 0,
-    "amount": "4.5 cL"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "planter-s-punch",
     "ingredientId": "orange-juice",
     "sortOrder": 1,
-    "amount": "3 cl"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "planter-s-punch",
     "ingredientId": "pineapple-juice",
     "sortOrder": 2,
-    "amount": "3.5 cl"
+    "amount": "35 мл"
   },
   {
     "cocktailId": "planter-s-punch",
     "ingredientId": "grenadine",
     "sortOrder": 3,
-    "amount": "1 cl"
+    "amount": "10 мл"
   },
   {
     "cocktailId": "planter-s-punch",
     "ingredientId": "sugar-syrup",
     "sortOrder": 4,
-    "amount": "1 cl"
+    "amount": "10 мл"
   },
   {
     "cocktailId": "planter-s-punch",
     "ingredientId": "angostura",
     "sortOrder": 5,
-    "amount": "4 drops"
+    "amount": "4 капли"
+  },
+  {
+    "cocktailId": "pornstar-martini",
+    "ingredientId": "vodka",
+    "sortOrder": 0,
+    "amount": "30 мл"
+  },
+  {
+    "cocktailId": "pornstar-martini",
+    "ingredientId": "passoa",
+    "sortOrder": 1,
+    "amount": "30 мл"
+  },
+  {
+    "cocktailId": "pornstar-martini",
+    "ingredientId": "passion-fruit-juice",
+    "sortOrder": 2,
+    "amount": "10 мл"
+  },
+  {
+    "cocktailId": "pornstar-martini",
+    "ingredientId": "lime",
+    "sortOrder": 3,
+    "amount": "10 мл"
+  },
+  {
+    "cocktailId": "pornstar-martini",
+    "ingredientId": "prosecco",
+    "sortOrder": 4,
+    "amount": "30 мл"
+  },
+  {
+    "cocktailId": "porto-flip",
+    "ingredientId": "brandy",
+    "sortOrder": 0,
+    "amount": "3 части"
+  },
+  {
+    "cocktailId": "porto-flip",
+    "ingredientId": "port",
+    "sortOrder": 1,
+    "amount": "9 частей"
+  },
+  {
+    "cocktailId": "porto-flip",
+    "ingredientId": "egg-yolk",
+    "sortOrder": 2,
+    "amount": "2 части"
   },
   {
     "cocktailId": "ramos-gin-fizz",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "4.5 cL"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "ramos-gin-fizz",
     "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "3 cl"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "ramos-gin-fizz",
     "ingredientId": "sugar-syrup",
     "sortOrder": 2,
-    "amount": "3 cl"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "ramos-gin-fizz",
     "ingredientId": "cream",
     "sortOrder": 3,
-    "amount": "6 cl"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "ramos-gin-fizz",
@@ -1381,127 +1513,163 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "ramos-gin-fizz",
     "ingredientId": "vanilla-extract",
     "sortOrder": 5,
-    "amount": "2 drop"
+    "amount": "2 капли"
   },
   {
     "cocktailId": "ramos-gin-fizz",
     "ingredientId": "soda-water",
     "sortOrder": 6,
-    "amount": "2 cl"
+    "amount": "20 мл"
+  },
+  {
+    "cocktailId": "russian-spring-punch",
+    "ingredientId": "vodka",
+    "sortOrder": 0,
+    "amount": "25 мл"
+  },
+  {
+    "cocktailId": "russian-spring-punch",
+    "ingredientId": "creme-de-cassis",
+    "sortOrder": 1,
+    "amount": "15 мл"
+  },
+  {
+    "cocktailId": "russian-spring-punch",
+    "ingredientId": "sugar-syrup",
+    "sortOrder": 2,
+    "amount": "10 мл"
+  },
+  {
+    "cocktailId": "russian-spring-punch",
+    "ingredientId": "lemon-juice",
+    "sortOrder": 3,
+    "amount": "25 мл"
   },
   {
     "cocktailId": "rusty-nail",
     "ingredientId": "scotch",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "rusty-nail",
     "ingredientId": "drambuie",
     "sortOrder": 1,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "rusty-nail",
     "ingredientId": "lemon-peel",
     "sortOrder": 2,
-    "amount": "1 twist of"
+    "amount": "1 твист"
   },
   {
     "cocktailId": "sazerac",
     "ingredientId": "ricard",
     "sortOrder": 0,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "sazerac",
     "ingredientId": "sugar",
     "sortOrder": 1,
-    "amount": "1/2 tsp superfine"
+    "amount": "0,5 ч. л."
   },
   {
     "cocktailId": "sazerac",
     "ingredientId": "peychaud-bitters",
     "sortOrder": 2,
-    "amount": "2 dashes"
+    "amount": "2 дэша"
   },
   {
     "cocktailId": "sazerac",
     "ingredientId": "water",
     "sortOrder": 3,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "sazerac",
     "ingredientId": "bourbon",
     "sortOrder": 4,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "sazerac",
     "ingredientId": "lemon-peel",
     "sortOrder": 5,
-    "amount": "1 twist of"
+    "amount": "1 твист"
   },
   {
     "cocktailId": "sea-breeze",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "sea-breeze",
     "ingredientId": "cranberry-juice",
     "sortOrder": 1,
-    "amount": "4 oz"
+    "amount": "120 мл"
   },
   {
     "cocktailId": "sea-breeze",
     "ingredientId": "grapefruit-juice",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "sidecar",
     "ingredientId": "cognac",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "sidecar",
     "ingredientId": "cointreau",
     "sortOrder": 1,
-    "amount": "1/2 oz"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "sidecar",
     "ingredientId": "lemon-juice",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "spritz",
     "ingredientId": "prosecco",
     "sortOrder": 0,
-    "amount": "6 cl"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "spritz",
     "ingredientId": "campari",
     "sortOrder": 1,
-    "amount": "4 cl"
+    "amount": "40 мл"
   },
   {
     "cocktailId": "spritz",
     "ingredientId": "soda-water",
     "sortOrder": 2,
-    "amount": "splash"
+    "amount": "немного"
+  },
+  {
+    "cocktailId": "stinger",
+    "ingredientId": "brandy",
+    "sortOrder": 0,
+    "amount": "45 мл"
+  },
+  {
+    "cocktailId": "stinger",
+    "ingredientId": "white-creme-de-menthe",
+    "sortOrder": 1,
+    "amount": "15 мл"
   },
   {
     "cocktailId": "tequila-sunrise",
     "ingredientId": "tequila",
     "sortOrder": 0,
-    "amount": "2 measures"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "tequila-sunrise",
@@ -1516,118 +1684,136 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "amount": "по вкусу"
   },
   {
+    "cocktailId": "tipperary",
+    "ingredientId": "irish-whiskey",
+    "sortOrder": 0,
+    "amount": "60 мл"
+  },
+  {
+    "cocktailId": "tipperary",
+    "ingredientId": "sweet-vermouth",
+    "sortOrder": 1,
+    "amount": "30 мл"
+  },
+  {
+    "cocktailId": "tipperary",
+    "ingredientId": "green-chartreuse",
+    "sortOrder": 2,
+    "amount": "15 мл"
+  },
+  {
     "cocktailId": "tom-collins",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "tom-collins",
     "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "tom-collins",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1 tsp superfine"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "tom-collins",
     "ingredientId": "soda-water",
     "sortOrder": 3,
-    "amount": "3 oz"
+    "amount": "90 мл"
   },
   {
     "cocktailId": "tom-collins",
     "ingredientId": "maraschino-cherry",
     "sortOrder": 4,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "tom-collins",
     "ingredientId": "orange",
     "sortOrder": 5,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "vesper",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "6 cl"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "vesper",
     "ingredientId": "vodka",
     "sortOrder": 1,
-    "amount": "1.5 cl"
+    "amount": "15 мл"
   },
   {
     "cocktailId": "vesper",
     "ingredientId": "lillet-blanc",
     "sortOrder": 2,
-    "amount": "0.75 cl"
+    "amount": "7,5 мл"
   },
   {
     "cocktailId": "whiskey-sour",
     "ingredientId": "blended-whiskey",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "whiskey-sour",
-    "ingredientId": "lemon",
+    "ingredientId": "lemon-juice",
     "sortOrder": 1,
-    "amount": "Juice of 1/2"
+    "amount": "сок 1/2 шт."
   },
   {
     "cocktailId": "whiskey-sour",
     "ingredientId": "sugar",
     "sortOrder": 2,
-    "amount": "1/2 tsp"
+    "amount": "0,5 ч. л."
   },
   {
     "cocktailId": "whiskey-sour",
     "ingredientId": "cherry",
     "sortOrder": 3,
-    "amount": "1"
+    "amount": "1 шт."
   },
   {
     "cocktailId": "whiskey-sour",
     "ingredientId": "lemon",
     "sortOrder": 4,
-    "amount": "1/2 slice"
+    "amount": "1/2 дольки"
   },
   {
     "cocktailId": "white-lady",
     "ingredientId": "gin",
     "sortOrder": 0,
-    "amount": "4cl"
+    "amount": "40 мл"
   },
   {
     "cocktailId": "white-lady",
     "ingredientId": "triple-sec",
     "sortOrder": 1,
-    "amount": "3cl"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "white-lady",
     "ingredientId": "lemon-juice",
     "sortOrder": 2,
-    "amount": "2cl"
+    "amount": "20 мл"
   },
   {
     "cocktailId": "white-russian",
     "ingredientId": "vodka",
     "sortOrder": 0,
-    "amount": "2 oz"
+    "amount": "60 мл"
   },
   {
     "cocktailId": "white-russian",
     "ingredientId": "coffee-liqueur",
     "sortOrder": 1,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "white-russian",
@@ -1639,42 +1825,42 @@ export const cocktailIngredientLinks: CocktailIngredientLink[] = [
     "cocktailId": "zombie",
     "ingredientId": "rum",
     "sortOrder": 0,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "zombie",
     "ingredientId": "gold-rum",
     "sortOrder": 1,
-    "amount": "1 1/2 oz"
+    "amount": "45 мл"
   },
   {
     "cocktailId": "zombie",
     "ingredientId": "151-proof-rum",
     "sortOrder": 2,
-    "amount": "1 oz"
+    "amount": "30 мл"
   },
   {
     "cocktailId": "zombie",
     "ingredientId": "pernod",
     "sortOrder": 3,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "zombie",
     "ingredientId": "grenadine",
     "sortOrder": 4,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "zombie",
     "ingredientId": "lime-juice",
     "sortOrder": 5,
-    "amount": "1 tsp"
+    "amount": "1 ч. л."
   },
   {
     "cocktailId": "zombie",
     "ingredientId": "angostura",
     "sortOrder": 6,
-    "amount": "1 drop"
+    "amount": "1 капля"
   }
 ];

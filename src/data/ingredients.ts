@@ -79,6 +79,15 @@ export const ingredients: Ingredient[] = [
     "family": "whiskey"
   },
   {
+    "id": "brandy",
+    "name": "Бренди",
+    "category": "spirit",
+    "aliases": [
+      "brandy"
+    ],
+    "family": "brandy"
+  },
+  {
     "id": "gold-rum",
     "name": "Золотой ром",
     "category": "spirit",
@@ -241,6 +250,15 @@ export const ingredients: Ingredient[] = [
     "isCommon": true
   },
   {
+    "id": "apricot-brandy",
+    "name": "Абрикосовый бренди",
+    "category": "liqueur",
+    "aliases": [
+      "apricot brandy"
+    ],
+    "family": "fruit-liqueur"
+  },
+  {
     "id": "irish-cream",
     "name": "Айриш крим",
     "category": "liqueur",
@@ -259,6 +277,25 @@ export const ingredients: Ingredient[] = [
       "amaretto"
     ],
     "family": "almond-liqueur"
+  },
+  {
+    "id": "white-creme-de-menthe",
+    "name": "Белый крем де мент",
+    "category": "liqueur",
+    "aliases": [
+      "white creme de menthe",
+      "creme de menthe"
+    ],
+    "family": "mint-liqueur"
+  },
+  {
+    "id": "benedictine",
+    "name": "Бенедиктин",
+    "category": "liqueur",
+    "aliases": [
+      "benedictine"
+    ],
+    "family": "herbal-liqueur"
   },
   {
     "id": "galliano",
@@ -287,6 +324,16 @@ export const ingredients: Ingredient[] = [
       "drambuie"
     ],
     "family": "whiskey-liqueur"
+  },
+  {
+    "id": "green-creme-de-menthe",
+    "name": "Зеленый крем де мент",
+    "category": "liqueur",
+    "aliases": [
+      "green creme de menthe",
+      "green crème de menthe"
+    ],
+    "family": "mint-liqueur"
   },
   {
     "id": "green-chartreuse",
@@ -380,6 +427,16 @@ export const ingredients: Ingredient[] = [
     "family": "orange-liqueur"
   },
   {
+    "id": "passoa",
+    "name": "Пассоа",
+    "category": "liqueur",
+    "aliases": [
+      "passoa",
+      "passion fruit liqueur"
+    ],
+    "family": "fruit-liqueur"
+  },
+  {
     "id": "pernod",
     "name": "Перно",
     "category": "liqueur",
@@ -434,6 +491,16 @@ export const ingredients: Ingredient[] = [
       "lillet"
     ],
     "family": "aromatized-wine"
+  },
+  {
+    "id": "port",
+    "name": "Портвейн",
+    "category": "wine",
+    "aliases": [
+      "port",
+      "porto"
+    ],
+    "family": "fortified-wine"
   },
   {
     "id": "prosecco",
@@ -604,6 +671,15 @@ export const ingredients: Ingredient[] = [
       "сливки"
     ],
     "family": "cream"
+  },
+  {
+    "id": "passion-fruit-juice",
+    "name": "Сок маракуйи",
+    "category": "mixer",
+    "aliases": [
+      "passion fruit juice"
+    ],
+    "family": "juice"
   },
   {
     "id": "lemon-juice",
@@ -917,6 +993,16 @@ export const ingredients: Ingredient[] = [
     "aliases": [
       "egg white",
       "белок"
+    ],
+    "family": "egg"
+  },
+  {
+    "id": "egg-yolk",
+    "name": "Яичный желток",
+    "category": "pantry",
+    "aliases": [
+      "egg yolk",
+      "желток"
     ],
     "family": "egg"
   }

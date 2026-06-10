@@ -35,9 +35,11 @@ const curatedCocktailNames = [
   "Gin Rickey",
   "Gin Tonic",
   "Godfather",
+  "Grasshopper",
   "Greyhound",
   "Harvey Wallbanger",
   "Hemingway Special",
+  "Horse's Neck",
   "Irish Coffee",
   "Jack Rose Cocktail",
   "John Collins",
@@ -55,6 +57,7 @@ const curatedCocktailNames = [
   "Mimosa",
   "Mint Julep",
   "Mojito",
+  "Monkey Gland",
   "Moscow Mule",
   "Negroni",
   "New York Sour",
@@ -62,19 +65,25 @@ const curatedCocktailNames = [
   "Old Fashioned",
   "Old Pal",
   "Paloma",
+  "Paradise",
   "Pegu Club",
   "Penicillin",
   "Pina Colada",
   "Pink Gin",
   "Pisco Sour",
   "Planter's Punch",
+  "Pornstar Martini",
+  "Porto flip",
   "Ramos Gin Fizz",
+  "Russian Spring Punch",
   "Rusty Nail",
   "Sazerac",
   "Sea breeze",
   "Sidecar",
   "Spritz",
+  "Stinger",
   "Tequila Sunrise",
+  "Tipperary",
   "Tom Collins",
   "Vesper",
   "Whiskey Sour",
@@ -110,9 +119,11 @@ const cocktailNameTranslations = {
   "Gin Rickey": "Джин рики",
   "Gin Tonic": "Джин-тоник",
   Godfather: "Крестный отец",
+  Grasshopper: "Грассхоппер",
   Greyhound: "Грейхаунд",
   "Harvey Wallbanger": "Харви Воллбангер",
   "Hemingway Special": "Хемингуэй спешл",
+  "Horse's Neck": "Хорс Нек",
   "Irish Coffee": "Айриш кофе",
   "Jack Rose Cocktail": "Джек Роуз",
   "John Collins": "Джон Коллинз",
@@ -130,6 +141,7 @@ const cocktailNameTranslations = {
   Mimosa: "Мимоза",
   "Mint Julep": "Мятный джулеп",
   Mojito: "Мохито",
+  "Monkey Gland": "Манки Гланд",
   "Moscow Mule": "Московский мул",
   Negroni: "Негрони",
   "New York Sour": "Нью-Йорк сауэр",
@@ -137,19 +149,25 @@ const cocktailNameTranslations = {
   "Old Fashioned": "Олд фэшнд",
   "Old Pal": "Олд Пал",
   Paloma: "Палома",
+  Paradise: "Парадайз",
   "Pegu Club": "Пегу Клаб",
   Penicillin: "Пенициллин",
   "Pina Colada": "Пина колада",
   "Pink Gin": "Пинк джин",
   "Pisco Sour": "Писко сауэр",
   "Planter’s Punch": "Плантерс панч",
+  "Pornstar Martini": "Порнстар мартини",
+  "Porto flip": "Порто флип",
   "Ramos Gin Fizz": "Рамос джин физз",
+  "Russian Spring Punch": "Рашен спринг панч",
   "Rusty Nail": "Ржавый гвоздь",
   Sazerac: "Сазерак",
   "Sea breeze": "Морской бриз",
   Sidecar: "Сайдкар",
   Spritz: "Спритц",
+  Stinger: "Стингер",
   "Tequila Sunrise": "Текила санрайз",
+  Tipperary: "Типперэри",
   "Tom Collins": "Том Коллинз",
   Vesper: "Веспер",
   "Whiskey Sour": "Виски сауэр",
@@ -569,6 +587,23 @@ function getIngredientId(name) {
   return normalizedIngredientIdOverrides.get(name.toLowerCase()) ?? slugify(name);
 }
 
+const citrusJuiceIngredientIds = new Map([
+  ["lemon", "lemon-juice"],
+  ["lime", "lime-juice"],
+  ["orange", "orange-juice"],
+  ["grapefruit", "grapefruit-juice"],
+]);
+
+function getRecipeIngredientId(name, measure) {
+  const ingredientId = getIngredientId(name);
+
+  if (/^\s*juice\s+of\b/i.test(measure) && citrusJuiceIngredientIds.has(ingredientId)) {
+    return citrusJuiceIngredientIds.get(ingredientId);
+  }
+
+  return ingredientId;
+}
+
 function getIngredientLabel(name) {
   return normalizedIngredientNameOverrides.get(name.toLowerCase()) ?? name.trim();
 }
@@ -579,6 +614,259 @@ function translateIngredientName(name) {
 
 function getIngredientMetadata(id) {
   return ingredientMetadata[id] ?? {};
+}
+
+function formatDecimal(value) {
+  return Number.isInteger(value) ? String(value) : String(value).replace(".", ",");
+}
+
+function parseRecipeNumber(value) {
+  const normalized = value.trim();
+  const mixedMatch = normalized.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+
+  if (mixedMatch) {
+    return Number(mixedMatch[1]) + Number(mixedMatch[2]) / Number(mixedMatch[3]);
+  }
+
+  const fractionMatch = normalized.match(/^(\d+)\/(\d+)$/);
+
+  if (fractionMatch) {
+    return Number(fractionMatch[1]) / Number(fractionMatch[2]);
+  }
+
+  const decimalMatch = normalized.match(/^\d+(?:\.\d+)?$/);
+
+  return decimalMatch ? Number(normalized) : null;
+}
+
+function formatMilliliters(value) {
+  const rounded = Math.round(value * 10) / 10;
+  return `${formatDecimal(rounded)} мл`;
+}
+
+function formatSpoons(quantity, unit) {
+  return `${formatDecimal(quantity)} ${unit === "tbsp" || unit === "tblsp" ? "ст. л." : "ч. л."}`;
+}
+
+function getRussianPlural(quantity, one, few, many) {
+  if (!Number.isInteger(quantity)) {
+    return many;
+  }
+
+  const normalized = Math.abs(quantity);
+  const lastTwo = normalized % 100;
+  const last = normalized % 10;
+
+  if (lastTwo >= 11 && lastTwo <= 14) {
+    return many;
+  }
+
+  if (last === 1) {
+    return one;
+  }
+
+  if (last >= 2 && last <= 4) {
+    return few;
+  }
+
+  return many;
+}
+
+function formatCountedUnit(quantityText, one, few, many) {
+  const quantity = parseRecipeNumber(quantityText);
+  const unit = quantity === null ? many : getRussianPlural(quantity, one, few, many);
+
+  return `${quantityText} ${unit}`;
+}
+
+function formatDash(quantity) {
+  return `${formatDecimal(quantity)} ${getRussianPlural(quantity, "дэш", "дэша", "дэшей")}`;
+}
+
+function formatDrops(quantity) {
+  return `${formatDecimal(quantity)} ${getRussianPlural(quantity, "капля", "капли", "капель")}`;
+}
+
+function formatParts(quantity) {
+  return `${formatDecimal(quantity)} ${getRussianPlural(quantity, "часть", "части", "частей")}`;
+}
+
+function normalizeRecipeAmount(measure, ingredientId) {
+  const raw = measure.trim();
+
+  if (!raw) {
+    return "по вкусу";
+  }
+
+  if (/^to taste$/i.test(raw)) {
+    return "по вкусу";
+  }
+
+  if (/^\([^)]*\)$/.test(raw)) {
+    return "немного";
+  }
+
+  if (/^top up with$/i.test(raw)) {
+    return "долить";
+  }
+
+  if (/^garnish$/i.test(raw)) {
+    return "для украшения";
+  }
+
+  if (/^chilled$/i.test(raw)) {
+    return "охлажденное";
+  }
+
+  if (/^splash$/i.test(raw)) {
+    return "немного";
+  }
+
+  if (/^cubes$/i.test(raw) && ingredientId === "ice") {
+    return "кубики";
+  }
+
+  const orMatch = raw.match(/^(\d+)\s+or\s+(\d+)$/i);
+
+  if (orMatch) {
+    return ingredientId === "ice"
+      ? `${orMatch[1]}-${orMatch[2]} кубика`
+      : `${orMatch[1]}-${orMatch[2]} шт.`;
+  }
+
+  const metricMatch = raw.match(/(\d+(?:\.\d+)?)\s*ml\b/i);
+
+  if (metricMatch) {
+    return formatMilliliters(Number(metricMatch[1]));
+  }
+
+  const juiceMatch = raw.match(/^juice\s+of\s+(.+)$/i);
+
+  if (juiceMatch) {
+    const amount = juiceMatch[1].trim().toLowerCase();
+
+    if (amount === "1 wedge") {
+      return "сок 1 дольки";
+    }
+
+    return `сок ${amount} шт.`;
+  }
+
+  const twistMatch = raw.match(/^(?:(.+?)\s+)?twist\s+of$/i);
+
+  if (twistMatch) {
+    const quantity = twistMatch[1]?.trim() || "1";
+    return `${quantity} твист`;
+  }
+
+  const wedgeMatch = raw.match(/^(.+?)\s+wedge$/i);
+
+  if (wedgeMatch) {
+    return formatCountedUnit(wedgeMatch[1].trim(), "долька", "дольки", "дольки");
+  }
+
+  const freshMatch = raw.match(/^(.+?)\s+fresh$/i);
+
+  if (freshMatch) {
+    return `${freshMatch[1].trim()} свежих`;
+  }
+
+  const cubeMatch = raw.match(/^(.+?)\s+cubes?$/i);
+
+  if (cubeMatch) {
+    return formatCountedUnit(cubeMatch[1].trim(), "кубик", "кубика", "кубиков");
+  }
+
+  const partsMatch = raw.match(/^(.+?)\s+parts?$/i);
+
+  if (partsMatch) {
+    const quantity = parseRecipeNumber(partsMatch[1]);
+    return quantity !== null ? formatParts(quantity) : raw;
+  }
+
+  const dropsMatch = raw.match(/^(.+?)\s+drops?$/i);
+
+  if (dropsMatch) {
+    const quantity = parseRecipeNumber(dropsMatch[1]);
+    return quantity !== null ? formatDrops(quantity) : raw;
+  }
+
+  const sliceMatch = raw.match(/^(.+?)\s+slice$/i);
+
+  if (sliceMatch) {
+    return formatCountedUnit(sliceMatch[1].trim(), "долька", "дольки", "дольки");
+  }
+
+  const stripMatch = raw.match(/^(.+?)\s+strip$/i);
+
+  if (stripMatch) {
+    const quantity = stripMatch[1].trim().toLowerCase();
+    return quantity === "1 long" ? "1 длинная полоска" : `${quantity} полоска`;
+  }
+
+  const rangeMatch = raw.match(/^(.+?)\s*-\s*(.+?)\s*(oz|cl|tsp|tbsp|tblsp|shot|measures?)\b/i);
+
+  if (rangeMatch) {
+    const left = parseRecipeNumber(rangeMatch[1]);
+    const right = parseRecipeNumber(rangeMatch[2]);
+    const unit = rangeMatch[3].toLowerCase();
+
+    if (left !== null && right !== null) {
+      if (unit === "oz") {
+        return `${formatDecimal(Math.round(left * 30 * 10) / 10)}-${formatMilliliters(right * 30)}`;
+      }
+
+      if (unit === "cl") {
+        return `${formatDecimal(Math.round(left * 10 * 10) / 10)}-${formatMilliliters(right * 10)}`;
+      }
+
+      if (unit === "shot" || unit.startsWith("measure")) {
+        return `${formatDecimal(Math.round(left * 30 * 10) / 10)}-${formatMilliliters(right * 30)}`;
+      }
+
+      return `${formatDecimal(left)}-${formatSpoons(right, unit)}`;
+    }
+  }
+
+  const unitMatch = raw.match(/^(.+?)\s*(oz|cl|tsp|tbsp|tblsp|cup|shot|measures?)\b/i);
+
+  if (unitMatch) {
+    const quantity = parseRecipeNumber(unitMatch[1]);
+    const unit = unitMatch[2].toLowerCase();
+
+    if (quantity !== null) {
+      if (unit === "oz") {
+        return formatMilliliters(quantity * 30);
+      }
+
+      if (unit === "cl") {
+        return formatMilliliters(quantity * 10);
+      }
+
+      if (unit === "cup") {
+        return formatMilliliters(quantity * 240);
+      }
+
+      if (unit === "shot" || unit.startsWith("measure")) {
+        return formatMilliliters(quantity * 30);
+      }
+
+      return formatSpoons(quantity, unit);
+    }
+  }
+
+  const dashMatch = raw.match(/^(?:(.+?)\s+)?dash(?:es)?$/i);
+
+  if (dashMatch) {
+    const quantity = dashMatch[1] ? parseRecipeNumber(dashMatch[1]) : 1;
+    return formatDash(quantity ?? 1);
+  }
+
+  if (/^\d+(?:\/\d+)?(?:\s+\d+\/\d+)?$/.test(raw) && getIngredientMetadata(ingredientId).isGarnish) {
+    return `${raw} шт.`;
+  }
+
+  return raw;
 }
 
 function escapeRegex(value) {
@@ -758,9 +1046,13 @@ function splitInstructions(value) {
 }
 
 function buildLocalizedRecipeSteps(recipeIngredients, glassName) {
-  const garnishNames = recipeIngredients
-    .filter((ingredient) => getIngredientMetadata(ingredient.id).isGarnish)
-    .map((ingredient) => ingredient.name);
+  const garnishNames = Array.from(
+    new Set(
+      recipeIngredients
+        .filter((ingredient) => getIngredientMetadata(ingredient.id).isGarnish)
+        .map((ingredient) => ingredient.name),
+    ),
+  );
   const coreIngredients = recipeIngredients.filter(
     (ingredient) => !getIngredientMetadata(ingredient.id).isGarnish,
   );
@@ -790,13 +1082,16 @@ function extractRecipeIngredients(drink) {
       continue;
     }
 
+    const rawAmount = drink[`strMeasure${index}`]?.trim() || "по вкусу";
+    const ingredientId = getRecipeIngredientId(rawIngredient, rawAmount);
+
     recipeIngredients.push({
-      id: getIngredientId(rawIngredient),
+      id: ingredientId,
       name:
-        getIngredientMetadata(getIngredientId(rawIngredient)).name ??
+        getIngredientMetadata(ingredientId).name ??
         translateIngredientName(getIngredientLabel(rawIngredient)),
       sourceName: getIngredientLabel(rawIngredient),
-      amount: drink[`strMeasure${index}`]?.trim() || "по вкусу",
+      amount: normalizeRecipeAmount(rawAmount, ingredientId),
     });
   }
 
