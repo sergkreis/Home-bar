@@ -1,15 +1,25 @@
 import { Image, ImageSourcePropType, StyleSheet, View, ViewStyle } from "react-native";
 
 type DrinkArtKey =
+  | "americano"
+  | "aviation"
+  | "bellini"
+  | "bramble"
+  | "caipirinha"
   | "cosmopolitan"
+  | "cubaLibre"
   | "daiquiri"
+  | "darkAndStormy"
   | "dryMartini"
   | "espressoMartini"
   | "french75"
+  | "gimlet"
   | "ginTonic"
   | "longIslandIcedTea"
+  | "maiTai"
   | "manhattan"
   | "margarita"
+  | "mintJulep"
   | "moscowMule"
   | "mojito"
   | "negroni"
@@ -37,15 +47,25 @@ type DrinkArtProps = {
 };
 
 const sources: Record<DrinkArtKey, ImageSourcePropType> = {
+  americano: require("../../assets/drinks/americano-art.png"),
+  aviation: require("../../assets/drinks/aviation-art.png"),
+  bellini: require("../../assets/drinks/bellini-art.png"),
+  bramble: require("../../assets/drinks/bramble-art.png"),
+  caipirinha: require("../../assets/drinks/caipirinha-art.png"),
   cosmopolitan: require("../../assets/drinks/cosmopolitan-art.png"),
+  cubaLibre: require("../../assets/drinks/cuba-libre-art.png"),
   daiquiri: require("../../assets/drinks/daiquiri-art.png"),
+  darkAndStormy: require("../../assets/drinks/dark-and-stormy-art.png"),
   dryMartini: require("../../assets/drinks/dry-martini-art.png"),
   espressoMartini: require("../../assets/drinks/espresso-martini-art.png"),
   french75: require("../../assets/drinks/french-75-art.png"),
+  gimlet: require("../../assets/drinks/gimlet-art.png"),
   ginTonic: require("../../assets/drinks/gin-tonic-art.png"),
   longIslandIcedTea: require("../../assets/drinks/long-island-iced-tea-art.png"),
+  maiTai: require("../../assets/drinks/mai-tai-art.png"),
   manhattan: require("../../assets/drinks/manhattan-art.png"),
   margarita: require("../../assets/drinks/margarita-art.png"),
+  mintJulep: require("../../assets/drinks/mint-julep-art.png"),
   moscowMule: require("../../assets/drinks/moscow-mule-art.png"),
   mojito: require("../../assets/drinks/mojito-art.png"),
   negroni: require("../../assets/drinks/negroni-art.png"),
@@ -81,15 +101,25 @@ export function getDrinkArtKey(cocktail: DrinkArtCocktail | null): DrinkArtKey {
   }
 
   const exactKeyById: Record<string, DrinkArtKey> = {
+    americano: "americano",
+    aviation: "aviation",
+    bellini: "bellini",
+    bramble: "bramble",
+    caipirinha: "caipirinha",
     cosmopolitan: "cosmopolitan",
+    "cuba-libre": "cubaLibre",
     daiquiri: "daiquiri",
+    "dark-and-stormy": "darkAndStormy",
     "dry-martini": "dryMartini",
     "espresso-martini": "espressoMartini",
     "french-75": "french75",
+    gimlet: "gimlet",
     "gin-tonic": "ginTonic",
     "long-island-iced-tea": "longIslandIcedTea",
+    "mai-tai": "maiTai",
     manhattan: "manhattan",
     margarita: "margarita",
+    "mint-julep": "mintJulep",
     "moscow-mule": "moscowMule",
     mojito: "mojito",
     negroni: "negroni",
