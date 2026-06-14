@@ -1,6 +1,6 @@
 # Domashniy Bar - Handover
 
-Последнее обновление: 2026-06-07
+Последнее обновление: 2026-06-15
 
 ## Быстрый Контекст
 
@@ -18,6 +18,7 @@ C:\Users\Sergej\Documents\Codex\PROJECTS.md
 
 ```text
 C:\Users\Sergej\Projects\apps\domashniy-bar
+/Users/sergejkreis/Projects/apps/domashniy-bar
 ```
 
 GitHub:
@@ -163,16 +164,16 @@ Recent deployment state:
 ```text
 VPS was cleaned on 2026-05-01.
 Old KIKU files and services were backed up to /root/home-bar-cleanup-backups/20260501-131803 before removal.
-Production UI/auth pass was deployed to https://kreisphoto.de/ through GitHub Actions on 2026-06-07.
+Latest checked deploy was pushed to https://kreisphoto.de/ through GitHub Actions on 2026-06-14.
 App change commit:
-  e940a7c Polish production UI and account sync
+  59873e3 Complete cocktail art set
 GitHub Actions deploy succeeded:
-  https://github.com/sergkreis/Home-bar/actions/runs/27084502544
-Production check after deploy:
+  https://github.com/sergkreis/Home-bar/actions/runs/27512894755
+Production check from macOS on 2026-06-15:
   https://kreisphoto.de/ returned 200 OK.
-  Current deployed JS bundle: /_expo/static/js/web/index-44caf7dbdce743e29aaceb4374f08f17.js
+  Current deployed JS bundle: /_expo/static/js/web/index-3ceb18d6d67c6bd5bd53e68c295291bd.js
   Production Playwright smoke suite passed: 6 passed.
-  Supabase env is not configured on production as of this check; account tab shows local-only mode.
+  Supabase env is configured on production; account tab shows the sign-in flow.
 ```
 
 ## Проверка И Команды
@@ -258,23 +259,29 @@ Use Playwright as fallback or for the existing tests/home-bar.spec.ts workflow.
 shadcn, Stripe, and Supabase skills are not currently relevant unless the project adopts those stacks.
 ```
 
-Last local verification on 2026-05-16:
+Last local verification on macOS on 2026-06-15:
 
 ```text
+npm ci
+npm test
 npx tsc --noEmit
 npm run build:web
 npm run test:ui
+PLAYWRIGHT_BASE_URL=https://kreisphoto.de npm run test:ui
+npx expo-doctor
 ```
 
 Result:
 
 ```text
 Type-check passed.
+Vitest passed: 30 passed.
 Static web build passed and postprocessed PWA metadata into dist/.
-Playwright smoke test passed: 4 passed.
-Browser QA against http://127.0.0.1:8091/ passed for page identity, lang=ru, manifest link, viewport-fit=cover, and console health.
-Isolated Playwright mobile QA passed: onboarding -> starter bar -> main app opens at scrollTop 0.
-Expo still warns that expo and @react-native-async-storage/async-storage should be aligned to expected SDK 54 versions.
+Local Playwright smoke test passed: 6 passed.
+Production Playwright smoke test passed: 6 passed.
+Expo Doctor passed: 18/18 checks.
+npm audit still reports 17 vulnerabilities; fixes require major upgrades for vitest and Expo.
+Metro still warns about private lucide-react-native deep icon imports, but build succeeds.
 ```
 
 ## Git/GitHub Notes
@@ -282,16 +289,20 @@ Expo still warns that expo and @react-native-async-storage/async-storage should 
 ```text
 GitHub remote: https://github.com/sergkreis/Home-bar.git
 Current deploy path is GitHub Actions, not manual server copy.
-gh CLI was not available in PATH during previous work.
-Local branch after latest deploy: main...origin/main, clean.
+gh CLI is available and authenticated as sergkreis on macOS.
+At the start of the macOS continuity check, local branch matched main...origin/main and the worktree was clean.
+Repository is public; current user has ADMIN permission.
+No open GitHub PRs or issues were found on 2026-06-15.
+GitHub Actions workflow "Deploy Home Bar" is active and the latest 10 runs checked were successful.
 ```
 
 ## Текущая Незавершенная Работа
 
 ```text
-Registration/account sync is implemented as an optional Supabase-backed flow for bar and favorites; it still needs real Supabase project credentials, schema execution, redirect URL configuration, and end-to-end QA against that project.
-GitHub Secrets include VPS_SSH_KEY, EXPO_PUBLIC_SUPABASE_URL, and EXPO_PUBLIC_SUPABASE_ANON_KEY for the Supabase project created on 2026-06-07.
-Supabase project currently has user_bars and user_favorites; run the updated supabase/schema.sql before deploy so user_profiles exists for account settings.
+Registration/account sync is implemented as an optional Supabase-backed flow for bar, favorites, and profile.
+GitHub Secrets include VPS_SSH_KEY, EXPO_PUBLIC_SUPABASE_URL, and EXPO_PUBLIC_SUPABASE_ANON_KEY.
+Production is built with Supabase env and shows the account sign-in flow.
+Local macOS development has no .env by default, so account tab stays in local-only mode unless .env is created from .env.example.
 AsyncStorage persistence plus optional remote sync lives in src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
 Generated data still contains a mix of translated Russian names and raw English ingredient names.
@@ -352,6 +363,12 @@ Account modal/profile pass on 2026-06-08:
   Local browser QA with Supabase env verified: guest 18 ingredients -> sign-in to account -> account 7 ingredients, no guest merge.
   Transient sign-in QA verified: with the checkbox off, reload signs out and returns to the guest bar.
   Current Supabase project still needs the updated user_profiles table from supabase/schema.sql before profile saving works live.
+macOS/GitHub continuity check on 2026-06-15:
+  Local checkout at /Users/sergejkreis/Projects/apps/domashniy-bar matches origin/main on 59873e3.
+  git fetch --prune found only origin/main and no tags.
+  No case-only filename conflicts were found for Windows/macOS portability.
+  git diff --check passed.
+  Playwright account smoke test now accepts both local-only and Supabase-configured account modes.
 ```
 
 ## Следующие Шаги

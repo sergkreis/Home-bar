@@ -35,7 +35,7 @@ test("saved starter bar opens the main app after reload", async ({ page }) => {
   await expect(page.getByText("Что можно смешать из того, что есть дома?")).toBeHidden();
 });
 
-test("account tab explains local-only sync when Supabase is not configured", async ({ page }) => {
+test("account tab explains the current account sync mode", async ({ page }) => {
   await page.goto("/");
 
   await page.getByRole("button", { name: "Стартовый" }).click();
@@ -43,6 +43,14 @@ test("account tab explains local-only sync when Supabase is not configured", asy
   await page.getByRole("button", { name: "Перейти на вкладку Аккаунт" }).click();
 
   await expect(page.getByText("Регистрация, вход и синхронизация бара с избранным.")).toBeVisible();
-  await expect(page.getByText("Аккаунты не включены")).toBeVisible();
-  await expect(page.getByText("Бар и избранное сохраняются на устройстве.")).toBeVisible();
+
+  const localOnlyStatus = page.getByText("Аккаунты не включены");
+
+  if (await localOnlyStatus.isVisible()) {
+    await expect(page.getByText("Бар и избранное сохраняются на устройстве.")).toBeVisible();
+    return;
+  }
+
+  await expect(page.getByText("Войти в аккаунт")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Войти или создать аккаунт" })).toBeVisible();
 });
