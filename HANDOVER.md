@@ -6,6 +6,36 @@
 
 Domashniy Bar - phone-oriented Expo / React Native Web / TypeScript приложение для подбора коктейлей из ингредиентов, которые уже есть дома.
 
+Живой сайт:
+
+```text
+https://kreisphoto.de/
+```
+
+Последний app-content commit с полным набором иллюстраций:
+
+```text
+59873e3 Complete cocktail art set
+```
+
+Последний проверенный remote commit перед этим docs-merge:
+
+```text
+1afe0d2 Update Mac handover and smoke test
+```
+
+Последний проверенный GitHub Actions deploy перед этим docs-merge:
+
+```text
+https://github.com/sergkreis/Home-bar/actions/runs/27514689629
+```
+
+Текущий production bundle на момент проверки:
+
+```text
+/_expo/static/js/web/index-3ceb18d6d67c6bd5bd53e68c295291bd.js
+```
+
 Глобальный индекс проектов:
 
 ```text
@@ -14,10 +44,15 @@ C:\Users\Sergej\Documents\Codex\PROJECTS.md
 
 ## Пути И Репозиторий
 
-Локальный путь:
+Windows checkout:
 
 ```text
 C:\Users\Sergej\Projects\apps\domashniy-bar
+```
+
+macOS checkout:
+
+```text
 /Users/sergejkreis/Projects/apps/domashniy-bar
 ```
 
@@ -27,16 +62,10 @@ GitHub:
 https://github.com/sergkreis/Home-bar.git
 ```
 
-Ветка:
+Основная ветка:
 
 ```text
 main
-```
-
-Живой сайт:
-
-```text
-https://kreisphoto.de/
 ```
 
 ## Технологии
@@ -51,83 +80,98 @@ npm / package-lock.json
 Static web export served by nginx
 Playwright UI tests
 GitHub Actions deploy
-Optional Supabase Auth/Postgres account sync for bar, favorites, and profile
+Supabase Auth/Postgres account sync
+Resend/custom SMTP configured through Supabase Dashboard for auth emails
 ```
 
 ## Основные Файлы
 
 ```text
-App.tsx                         - главный экран, screen switching, layout and tab rendering
-src/components/                 - reusable UI components
-src/hooks/useAuth.ts            - Supabase auth session state, email/password actions, password reset/update
-src/hooks/useSavedBar.ts        - AsyncStorage persistence plus optional Supabase sync for selected home bar
-src/hooks/useFavorites.ts       - AsyncStorage persistence plus optional Supabase sync for favorite cocktails
-src/hooks/useUserProfile.ts     - optional Supabase profile load/save state
-src/lib/supabase.ts             - Supabase client using Expo public env vars
-src/services/userBarService.ts  - user_bars load/upsert helpers
-src/services/userFavoritesService.ts - user_favorites load/upsert helpers
-src/services/userProfileService.ts - user_profiles load/upsert helpers
-supabase/schema.sql             - user_bars/user_favorites/user_profiles tables and RLS policies
-src/data/                       - generated cocktail/ingredient data
-src/utils/                      - matching and shopping suggestion logic
-tests/home-bar.spec.ts          - Playwright smoke test for core flow
-scripts/import-cocktails.mjs    - импорт/генерация данных из TheCocktailDB
-deploy/                         - VPS/nginx deployment scripts and config
-.github/workflows/deploy.yml    - GitHub Actions deploy workflow
+App.tsx                              main app shell, screen switching, layout and tab rendering
+assets/drinks/                       81 generated PNG cocktail illustrations
+src/components/DrinkArt.tsx          cocktail id -> illustration mapping
+src/components/                      reusable UI components
+src/hooks/useAuth.ts                 Supabase auth session state and email/password actions
+src/hooks/useSavedBar.ts             AsyncStorage persistence plus optional Supabase sync for selected home bar
+src/hooks/useFavorites.ts            AsyncStorage persistence plus optional Supabase sync for favorite cocktails
+src/hooks/useUserProfile.ts          optional Supabase profile load/save state
+src/lib/supabase.ts                  Supabase client using Expo public env vars
+src/services/userBarService.ts       user_bars load/upsert helpers
+src/services/userFavoritesService.ts user_favorites load/upsert helpers
+src/services/userProfileService.ts   user_profiles load/upsert helpers
+supabase/schema.sql                  user_bars/user_favorites/user_profiles tables and RLS policies
+src/data/                            generated cocktail/ingredient data
+src/utils/                           matching and shopping suggestion logic
+tests/home-bar.spec.ts               Playwright smoke tests for core flow
+scripts/import-cocktails.mjs         import/generation from TheCocktailDB plus curated data
+scripts/postprocess-web-export.mjs   PWA metadata patch after Expo export
+deploy/                              VPS/nginx deployment scripts and config
+.github/workflows/deploy.yml         GitHub Actions deploy workflow
 ```
 
 ## Реализованные Возможности
 
 ```text
-First-run ingredient selection screen for unregistered users
-Muted "Account later" placeholder instead of a disabled registration CTA
+First-run ingredient selection for guests
+Saved selected home bar on device with AsyncStorage
+Account modal for sign-in/sign-up/reset/update-password
+Optional transient session checkbox in auth modal
+Supabase-backed bar sync through user_bars
+Supabase-backed favorite cocktail sync through user_favorites
+Supabase-backed account profile settings through user_profiles
+Account-local AsyncStorage keys are separated by user id
+Guest bar/favorites are not merged into an account after sign-in; account remote state is authoritative
 Home screen with summary counters
-Ingredient picker grouped by category
-Collapsible ingredient categories
-Featured "Часто бывает дома" ingredient block
-Ingredient search inside picker
-"What to drink tonight" quick modes
-Accent styling for quick modes
-Taste filters: refreshing, sweet, sour, strong, bitter
-Ranked cocktail list by ingredient match
-Expanded recipe detail with glass, ingredients, steps, garnish
-Shopping suggestions for 1-2 missing ingredients
-Generated cocktail database from TheCocktailDB plus curated cocktail names
-Bottom navigation with compact icon markers and larger tap zones
-Compact cocktail cards
 Dedicated bar screen
 Dedicated recipe detail screen
-Save selected home bar on device with AsyncStorage
-Optional account tab for Supabase email/password sign-in and cloud bar sync
-Production account flow with sign-up, sign-in, password reset, and password update after recovery link
-Favorite cocktails sync through Supabase user_favorites
-Account profile settings with display name and birth date through Supabase user_profiles
-Auth modal for sign-in/sign-up/reset/update-password, including a transient "do not stay signed in" option
-Light production UI pass with centered desktop layout, cleaner section structure, updated cards, and revised account screen
-Account-local AsyncStorage keys are separated by user id; guest data is imported only after a real guest-to-account sign-in
-Guest bar/favorites are no longer merged into an account after sign-in; the account remote state is authoritative
+Ingredient picker grouped by category
+Collapsible ingredient categories
+Featured common ingredient block
+Ingredient search inside picker
+Quick modes for evening scenarios
+Taste filters: refreshing, sweet, sour, strong, bitter
+Ranked cocktail list by ingredient match
+Recipe detail with glass, ingredients, steps, garnish
+Shopping suggestions for 1-2 missing ingredients
+Bottom navigation with lucide/react-native-svg icons
+Production dark emerald/gold visual direction
+Generated cocktail database from TheCocktailDB plus curated classics
+Generated cocktail illustrations for every cocktail in the current database
+PWA metadata post-processing after web export
 ```
 
 ## Данные
 
-Snapshot на 2026-05-16:
+Snapshot на 2026-06-15:
 
 ```text
-Cocktails: 72
-Ingredients: 90
-Recipe ingredient links: 279
+Cocktails: 81
+Ingredients: 99
+Recipe ingredient links: 310
 Starter ingredients: 18
+Drink illustration assets: 81 / 81
 ```
 
 Ingredient categories:
 
 ```text
-spirit: 20
-liqueur: 22
-mixer: 18
-other: 19
-citrus: 7
-sweetener: 7
+spirit: 21
+liqueur: 26
+wine: 5
+mixer: 16
+citrus: 2
+sweetener: 5
+garnish: 11
+pantry: 13
+```
+
+Illustration state:
+
+```text
+All current cocktails have PNG assets in assets/drinks/.
+DrinkArt.tsx maps every current cocktail id to a generated asset.
+Latest completed asset batch commit: 59873e3 Complete cocktail art set.
+Images were generated as chroma-key sources, converted to transparent PNG locally, and committed as project assets.
 ```
 
 ## Деплой
@@ -144,7 +188,7 @@ Production:
 Domain/live URL: https://kreisphoto.de/
 Static web export served by nginx
 Web root: /var/www/home-bar
-Existing Let's Encrypt certificate
+Existing Let's Encrypt certificate on server; re-check expiry before certificate-sensitive work
 ```
 
 Current deployment workflow:
@@ -154,7 +198,7 @@ Local edit -> type-check/build/test -> commit -> push to GitHub main.
 GitHub Actions builds Expo web export and deploys dist/ to VPS over SSH.
 Workflow file: .github/workflows/deploy.yml
 Required GitHub secret: VPS_SSH_KEY
-Optional GitHub secrets for cloud sync build: EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY
+Required public build secrets for cloud sync: EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY
 Server deploy key comment: github-actions-home-bar
 Password SSH was left enabled on the VPS.
 ```
@@ -164,16 +208,15 @@ Recent deployment state:
 ```text
 VPS was cleaned on 2026-05-01.
 Old KIKU files and services were backed up to /root/home-bar-cleanup-backups/20260501-131803 before removal.
-Latest checked deploy was pushed to https://kreisphoto.de/ through GitHub Actions on 2026-06-14.
-App change commit:
-  59873e3 Complete cocktail art set
+Full cocktail art set was deployed on 2026-06-14 through GitHub Actions.
+macOS continuity/smoke-test commit was deployed on 2026-06-15 through GitHub Actions.
 GitHub Actions deploy succeeded:
-  https://github.com/sergkreis/Home-bar/actions/runs/27512894755
-Production check from macOS on 2026-06-15:
+  https://github.com/sergkreis/Home-bar/actions/runs/27514689629
+Production check on 2026-06-15:
   https://kreisphoto.de/ returned 200 OK.
-  Current deployed JS bundle: /_expo/static/js/web/index-3ceb18d6d67c6bd5bd53e68c295291bd.js
-  Production Playwright smoke suite passed: 6 passed.
-  Supabase env is configured on production; account tab shows the sign-in flow.
+  https://www.kreisphoto.de/ returned the same current bundle.
+  Current deployed JS bundle contains AuthModal, supabase, old-cuban-art, and zombie-art.
+  Service worker files /sw.js and /service-worker.js returned 404, so browser/PWA cache is not app-managed.
 ```
 
 ## Проверка И Команды
@@ -208,6 +251,12 @@ Type-check:
 npx tsc --noEmit
 ```
 
+Unit tests:
+
+```bash
+npm test
+```
+
 Playwright UI tests:
 
 ```bash
@@ -221,6 +270,12 @@ Run UI tests against production:
 $env:PLAYWRIGHT_BASE_URL='https://kreisphoto.de'; npm run test:ui
 ```
 
+On macOS/Linux:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://kreisphoto.de npm run test:ui
+```
+
 Regenerate cocktail data:
 
 ```bash
@@ -230,36 +285,39 @@ npm run import:cocktails
 Supabase setup:
 
 ```text
-1. Create Supabase project.
+1. Create/open Supabase project.
 2. Run supabase/schema.sql in Supabase SQL Editor.
-3. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY locally or as GitHub Actions secrets.
-4. Without these env vars the app stays in local-only mode.
-5. Configure Auth site URL/redirect URLs so sign-up confirmation and password recovery return to the deployed domain.
+3. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY locally and as GitHub Actions secrets.
+4. Configure Auth site URL and redirect URLs for https://kreisphoto.de/.
+5. Configure custom SMTP/Resend in Supabase Dashboard for production auth emails.
+6. Without env vars the app stays in local-only mode.
 ```
 
-Frontend skill bundle to use for future web app work:
+## Last Verification
+
+Last full local verification on Windows on 2026-06-14:
 
 ```text
-C:\Users\Sergej\.codex\plugins\cache\openai-curated\build-web-apps\dc902811\skills\
+npx tsc --noEmit
+npm test
+npm run build:web
+npm run test:ui
+Browser plugin check against http://localhost:8081/
+Production HTTP check against https://kreisphoto.de/
 ```
 
-Relevant skills for this project:
+Result:
 
 ```text
-frontend-app-builder        - redesign/restyle/modernization and visual concept fidelity work
-frontend-testing-debugging  - rendered UI testing, responsive checks, console/layout/debugging loops
-react-best-practices        - React performance/refactor guidance for component changes
+Type-check passed.
+Unit tests passed: 4 files, 30 tests.
+Static web build passed and included 81 drink assets.
+Playwright UI tests passed: 6 passed.
+Browser check found no broken visible images and no console errors.
+Production returned 200 OK.
 ```
 
-Notes:
-
-```text
-Prefer the Browser plugin / in-app browser for rendered frontend QA when available.
-Use Playwright as fallback or for the existing tests/home-bar.spec.ts workflow.
-shadcn, Stripe, and Supabase skills are not currently relevant unless the project adopts those stacks.
-```
-
-Last local verification on macOS on 2026-06-15:
+Last macOS continuity verification on 2026-06-15:
 
 ```text
 npm ci
@@ -274,9 +332,9 @@ npx expo-doctor
 Result:
 
 ```text
-Type-check passed.
 Vitest passed: 30 passed.
-Static web build passed and postprocessed PWA metadata into dist/.
+Type-check passed.
+Static web build passed.
 Local Playwright smoke test passed: 6 passed.
 Production Playwright smoke test passed: 6 passed.
 Expo Doctor passed: 18/18 checks.
@@ -284,101 +342,116 @@ npm audit still reports 17 vulnerabilities; fixes require major upgrades for vit
 Metro still warns about private lucide-react-native deep icon imports, but build succeeds.
 ```
 
+Known build warnings:
+
+```text
+Metro warns that individual lucide-react-native CJS icon files are not exported by package exports.
+This is intentional for now because root lucide imports previously inflated the web bundle.
+GitHub Actions warns that Node.js 20 actions are deprecated; update workflow to Node 24 after compatibility is confirmed.
+```
+
+## Supabase/Auth State
+
+```text
+Supabase project was created by the user.
+supabase/schema.sql was run in SQL Editor during previous work.
+GitHub Actions secrets for Supabase URL and anon key were added.
+Production is built with Supabase env and shows the account sign-in flow.
+Local development has no .env by default, so account tab stays in local-only mode unless .env is created from .env.example.
+Custom SMTP/Resend setup was configured through dashboards by the user; verify templates and delivery when changing auth.
+User profile fields exist in app and schema: display_name, birth_date.
+```
+
+Important auth behavior:
+
+```text
+Guest state is separate from account state.
+When a user signs in, the account's remote bar/favorites are authoritative.
+Guest-selected ingredients are not merged into an existing account after sign-in.
+Authenticated AsyncStorage keys are scoped by Supabase user id.
+```
+
 ## Git/GitHub Notes
 
 ```text
 GitHub remote: https://github.com/sergkreis/Home-bar.git
 Current deploy path is GitHub Actions, not manual server copy.
-gh CLI is available and authenticated as sergkreis on macOS.
-At the start of the macOS continuity check, local branch matched main...origin/main and the worktree was clean.
+gh CLI is available and authenticated on the checked machines used recently.
 Repository is public; current user has ADMIN permission.
 No open GitHub PRs or issues were found on 2026-06-15.
-GitHub Actions workflow "Deploy Home Bar" is active and the latest 10 runs checked were successful.
+GitHub Actions workflow "Deploy Home Bar" is active and the latest checked runs were successful.
+```
+
+## Frontend/Design Notes
+
+Current visual direction:
+
+```text
+Dark emerald/gold home-bar style inspired by a premium cocktail menu.
+Cocktail art uses vintage engraved illustrations with transparent PNG cutouts.
+Cards and bottom navigation are optimized for phone-first usage.
+```
+
+Frontend skill bundle to use for future web app work:
+
+```text
+C:\Users\Sergej\.codex\plugins\cache\openai-curated\build-web-apps\c6ea566d\skills\
+```
+
+Relevant skills:
+
+```text
+frontend-app-builder        - redesign/restyle/modernization and visual concept fidelity work
+frontend-testing-debugging  - rendered UI testing, responsive checks, console/layout/debugging loops
+react-best-practices        - React performance/refactor guidance for component changes
+supabase-postgres-best-practices - schema/query review when changing Supabase
+```
+
+QA preference:
+
+```text
+Prefer the Browser plugin / in-app browser for rendered frontend QA when available.
+Use Playwright for existing tests/home-bar.spec.ts and regression checks.
 ```
 
 ## Текущая Незавершенная Работа
 
 ```text
-Registration/account sync is implemented as an optional Supabase-backed flow for bar, favorites, and profile.
-GitHub Secrets include VPS_SSH_KEY, EXPO_PUBLIC_SUPABASE_URL, and EXPO_PUBLIC_SUPABASE_ANON_KEY.
-Production is built with Supabase env and shows the account sign-in flow.
-Local macOS development has no .env by default, so account tab stays in local-only mode unless .env is created from .env.example.
-AsyncStorage persistence plus optional remote sync lives in src/hooks/useSavedBar.ts and is covered by UI reload tests, but should still be checked on actual phones after UX changes.
+Recipe database still needs editorial review: ingredient names, units, serving text, and Russian wording.
+Admin/editor surface for cocktail database exists in planning but should be improved before heavy database editing.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
-Generated data still contains a mix of translated Russian names and raw English ingredient names.
-PWA build pass now adds /manifest.json, lang=ru, viewport-fit=cover, apple mobile metadata, and install icons during npm run build:web.
-UI tests default to local Expo web server unless PLAYWRIGHT_BASE_URL is set.
+Account sync should still be checked on actual phones after UX/auth changes.
+Add unit tests around account-local isolation, no guest merge after sign-in, and remote sync edge cases.
+Add more tests around matching/shopping logic before another database expansion.
+Optimize PNG asset size if mobile loading becomes heavy.
 Deployment still uses root over SSH in GitHub Actions; consider a restricted deploy user later.
-Bundle size increased after adding supabase-js; consider lazy-loading auth if this becomes a performance issue.
+Password SSH remains enabled on the VPS; do not change this without a separate decision.
 ```
 
-## Известные Review Notes
+## Review Notes History
 
 ```text
 CocktailResults was updated to reset expanded card when result list changes.
 scripts/import-cocktails.mjs was fixed so gin no longer matches inside ginger.
 Carbonated water is normalized to soda-water.
-Design pass on 2026-05-02:
-  IngredientPicker now has featured common ingredients and collapsible categories.
-  Onboarding disabled registration button was replaced with an account-later info block.
-  Bottom nav has compact icon markers and larger tap zones.
-  Quick-mode cards have amber/teal/berry accent strips.
-Smoke test was updated to expect "Аккаунт позже" instead of "Зарегистрироваться".
-PWA/mobile pass on 2026-05-16:
-  scripts/postprocess-web-export.mjs patches dist/index.html and writes manifest/install icons after expo export.
-  package.json build:web now runs expo export plus the postprocess script.
-  App.tsx ScrollViews have screen/tab keys so onboarding -> app transitions open at top on mobile.
-  AsyncStorage persistence moved from App.tsx to src/hooks/useSavedBar.ts.
-Account sync pass on 2026-05-25:
-  Added @supabase/supabase-js and react-native-url-polyfill.
-  Aligned Expo SDK dependencies with expo install: expo ~54.0.34 and AsyncStorage 2.2.0.
-  Added AccountPanel and account tab.
-  Added optional Supabase client and auth hook.
-  Added user_bars upsert/load service and RLS SQL schema.
-  GitHub Actions now passes optional EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY secrets into build.
-Production UI/auth pass on 2026-06-07:
-  Switched from dark dashboard styling to a lighter production UI with centered desktop content.
-  Made SectionPanel unframed so cards are not nested inside cards.
-  Reworked onboarding, today, recipe cards, buy suggestions, detail screen, bottom nav, and account panel.
-  Added password reset/update support to useAuth and AccountPanel.
-  Added user_favorites cloud sync service, useFavorites remote merge/save, and RLS SQL schema.
-  Saved local bar/favorites now merge with remote data after sign-in instead of blindly replacing local state.
-UI refinement pass on 2026-06-07:
-  Added lucide-react-native and react-native-svg for proper SVG icons.
-  Bottom nav and FavoriteButton now use line icons instead of text symbols.
-  Today tab now uses a lighter plan card and compact icon quick-mode cards instead of a large dark hero plus wide pastel bars.
-  Lucide imports intentionally target individual CJS icon files to keep the Expo web bundle near 1 MB; Metro warns about private package exports, but root imports pulled the bundle to about 2.74 MB.
-Account isolation pass on 2026-06-07:
-  useSavedBar and useFavorites now wait for auth readiness before choosing guest/account storage.
-  Authenticated local storage keys are scoped by user id, preventing one account's bar/favorites from leaking into another account on the same device.
-  Guest bar/favorites are carried into Supabase only on explicit guest-to-account sign-in, not on restored sessions.
-Supabase enablement on 2026-06-07:
-  User created the Supabase project and ran supabase/schema.sql successfully in SQL Editor.
-  GitHub Actions secrets EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY were added.
-  Deployed commit b1ec616; live smoke confirmed account form is visible and local-only mode is gone.
-Account modal/profile pass on 2026-06-08:
-  Guest bar/favorites no longer merge into the account after sign-in; remote account data is authoritative.
-  Added AuthModal with sign-in/sign-up/reset/update-password and a transient session checkbox.
-  Added user_profiles SQL, profile service/hook, and account settings fields for display name and birth date.
-  Local browser QA with Supabase env verified: guest 18 ingredients -> sign-in to account -> account 7 ingredients, no guest merge.
-  Transient sign-in QA verified: with the checkbox off, reload signs out and returns to the guest bar.
-  Current Supabase project still needs the updated user_profiles table from supabase/schema.sql before profile saving works live.
-macOS/GitHub continuity check on 2026-06-15:
-  Local checkout at /Users/sergejkreis/Projects/apps/domashniy-bar matches origin/main on 59873e3.
-  git fetch --prune found only origin/main and no tags.
-  No case-only filename conflicts were found for Windows/macOS portability.
-  git diff --check passed.
-  Playwright account smoke test now accepts both local-only and Supabase-configured account modes.
+PWA/mobile pass added manifest, lang=ru, viewport-fit=cover, apple metadata, and install icons.
+Supabase account sync added auth, user_bars, user_favorites, user_profiles, and RLS schema.
+Production UI/auth pass added modal auth, password reset/update, account profile fields, and account-local storage isolation.
+Bottom nav and FavoriteButton use lucide/react-native-svg icons.
+Playwright account smoke test accepts both local-only and Supabase-configured account modes.
+macOS/GitHub continuity check found no case-only filename conflicts and no open PRs/issues on 2026-06-15.
+Full cocktail art pass completed in batches and ended with 81/81 generated assets on 2026-06-14.
 ```
 
 ## Следующие Шаги
 
 ```text
-1. Configure Supabase Auth site URL/redirect URLs for the production domain if not already saved.
-2. Test sign-up/sign-in/password recovery/bar sync/favorites sync on web and actual phones.
-3. Split App.tsx tab/detail/onboarding screens into separate components once current changes are accepted.
-4. Add unit tests around account-local merge behavior and remote sync edge cases.
-5. Add unit tests around matching/shopping logic before expanding the database further.
+1. QA full account flow on real devices: sign-up, confirm email, sign-in, password reset, profile save, bar sync, favorites sync.
+2. Improve admin/editor UI for cocktail database.
+3. Continue editorial cleanup of recipes, ingredient names, and units.
+4. Optimize drink PNG assets if performance requires it.
+5. Split App.tsx tab/detail/onboarding screens into separate components.
+6. Update GitHub Actions Node version before Node 20 actions are removed.
 ```
 
 ## Запрещено
