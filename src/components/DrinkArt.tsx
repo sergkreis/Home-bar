@@ -30,14 +30,29 @@ type DrinkArtKey =
   | "grasshopper"
   | "greyhound"
   | "harveyWallbanger"
+  | "hemingwaySpecial"
+  | "horseSNeck"
+  | "irishCoffee"
+  | "jackRoseCocktail"
+  | "johnCollins"
+  | "kamikaze"
+  | "kir"
+  | "kirRoyale"
+  | "lastWord"
+  | "lemonDrop"
   | "longIslandIcedTea"
   | "maiTai"
   | "manhattan"
   | "margarita"
+  | "martinez2"
+  | "maryPickford"
+  | "mimosa"
   | "mintJulep"
+  | "monkeyGland"
   | "moscowMule"
   | "mojito"
   | "negroni"
+  | "newYorkSour"
   | "oldFashioned"
   | "paloma"
   | "pinaColada"
@@ -91,14 +106,29 @@ const sources: Record<DrinkArtKey, ImageSourcePropType> = {
   grasshopper: require("../../assets/drinks/grasshopper-art.png"),
   greyhound: require("../../assets/drinks/greyhound-art.png"),
   harveyWallbanger: require("../../assets/drinks/harvey-wallbanger-art.png"),
+  hemingwaySpecial: require("../../assets/drinks/hemingway-special-art.png"),
+  horseSNeck: require("../../assets/drinks/horse-s-neck-art.png"),
+  irishCoffee: require("../../assets/drinks/irish-coffee-art.png"),
+  jackRoseCocktail: require("../../assets/drinks/jack-rose-cocktail-art.png"),
+  johnCollins: require("../../assets/drinks/john-collins-art.png"),
+  kamikaze: require("../../assets/drinks/kamikaze-art.png"),
+  kir: require("../../assets/drinks/kir-art.png"),
+  kirRoyale: require("../../assets/drinks/kir-royale-art.png"),
+  lastWord: require("../../assets/drinks/the-last-word-art.png"),
+  lemonDrop: require("../../assets/drinks/lemon-drop-art.png"),
   longIslandIcedTea: require("../../assets/drinks/long-island-iced-tea-art.png"),
   maiTai: require("../../assets/drinks/mai-tai-art.png"),
   manhattan: require("../../assets/drinks/manhattan-art.png"),
   margarita: require("../../assets/drinks/margarita-art.png"),
+  martinez2: require("../../assets/drinks/martinez-2-art.png"),
+  maryPickford: require("../../assets/drinks/mary-pickford-art.png"),
+  mimosa: require("../../assets/drinks/mimosa-art.png"),
   mintJulep: require("../../assets/drinks/mint-julep-art.png"),
+  monkeyGland: require("../../assets/drinks/monkey-gland-art.png"),
   moscowMule: require("../../assets/drinks/moscow-mule-art.png"),
   mojito: require("../../assets/drinks/mojito-art.png"),
   negroni: require("../../assets/drinks/negroni-art.png"),
+  newYorkSour: require("../../assets/drinks/new-york-sour-art.png"),
   oldFashioned: require("../../assets/drinks/old-fashioned-art.png"),
   paloma: require("../../assets/drinks/paloma-art.png"),
   pinaColada: require("../../assets/drinks/pina-colada-art.png"),
@@ -160,14 +190,29 @@ export function getDrinkArtKey(cocktail: DrinkArtCocktail | null): DrinkArtKey {
     grasshopper: "grasshopper",
     greyhound: "greyhound",
     "harvey-wallbanger": "harveyWallbanger",
+    "hemingway-special": "hemingwaySpecial",
+    "horse-s-neck": "horseSNeck",
+    "irish-coffee": "irishCoffee",
+    "jack-rose-cocktail": "jackRoseCocktail",
+    "john-collins": "johnCollins",
+    kamikaze: "kamikaze",
+    kir: "kir",
+    "kir-royale": "kirRoyale",
+    "the-last-word": "lastWord",
+    "lemon-drop": "lemonDrop",
     "long-island-iced-tea": "longIslandIcedTea",
     "mai-tai": "maiTai",
     manhattan: "manhattan",
     margarita: "margarita",
+    "martinez-2": "martinez2",
+    "mary-pickford": "maryPickford",
+    mimosa: "mimosa",
     "mint-julep": "mintJulep",
+    "monkey-gland": "monkeyGland",
     "moscow-mule": "moscowMule",
     mojito: "mojito",
     negroni: "negroni",
+    "new-york-sour": "newYorkSour",
     "old-fashioned": "oldFashioned",
     paloma: "paloma",
     "pina-colada": "pinaColada",
