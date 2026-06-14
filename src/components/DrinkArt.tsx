@@ -1,20 +1,35 @@
 import { Image, ImageSourcePropType, StyleSheet, View, ViewStyle } from "react-native";
 
 type DrinkArtKey =
+  | "alexander"
   | "americano"
   | "aviation"
+  | "b52"
   | "bellini"
   | "bramble"
+  | "brooklyn"
+  | "casino"
   | "caipirinha"
+  | "cloverClub"
+  | "corpseReviver"
   | "cosmopolitan"
   | "cubaLibre"
   | "daiquiri"
   | "darkAndStormy"
+  | "dirtyMartini"
   | "dryMartini"
   | "espressoMartini"
   | "french75"
+  | "frenchConnection"
+  | "frenchMartini"
   | "gimlet"
+  | "ginFizz"
+  | "ginRickey"
   | "ginTonic"
+  | "godfather"
+  | "grasshopper"
+  | "greyhound"
+  | "harveyWallbanger"
   | "longIslandIcedTea"
   | "maiTai"
   | "manhattan"
@@ -47,20 +62,35 @@ type DrinkArtProps = {
 };
 
 const sources: Record<DrinkArtKey, ImageSourcePropType> = {
+  alexander: require("../../assets/drinks/alexander-art.png"),
   americano: require("../../assets/drinks/americano-art.png"),
   aviation: require("../../assets/drinks/aviation-art.png"),
+  b52: require("../../assets/drinks/b-52-art.png"),
   bellini: require("../../assets/drinks/bellini-art.png"),
   bramble: require("../../assets/drinks/bramble-art.png"),
+  brooklyn: require("../../assets/drinks/brooklyn-art.png"),
+  casino: require("../../assets/drinks/casino-art.png"),
   caipirinha: require("../../assets/drinks/caipirinha-art.png"),
+  cloverClub: require("../../assets/drinks/clover-club-art.png"),
+  corpseReviver: require("../../assets/drinks/corpse-reviver-art.png"),
   cosmopolitan: require("../../assets/drinks/cosmopolitan-art.png"),
   cubaLibre: require("../../assets/drinks/cuba-libre-art.png"),
   daiquiri: require("../../assets/drinks/daiquiri-art.png"),
   darkAndStormy: require("../../assets/drinks/dark-and-stormy-art.png"),
+  dirtyMartini: require("../../assets/drinks/dirty-martini-art.png"),
   dryMartini: require("../../assets/drinks/dry-martini-art.png"),
   espressoMartini: require("../../assets/drinks/espresso-martini-art.png"),
   french75: require("../../assets/drinks/french-75-art.png"),
+  frenchConnection: require("../../assets/drinks/french-connection-art.png"),
+  frenchMartini: require("../../assets/drinks/french-martini-art.png"),
   gimlet: require("../../assets/drinks/gimlet-art.png"),
+  ginFizz: require("../../assets/drinks/gin-fizz-art.png"),
+  ginRickey: require("../../assets/drinks/gin-rickey-art.png"),
   ginTonic: require("../../assets/drinks/gin-tonic-art.png"),
+  godfather: require("../../assets/drinks/godfather-art.png"),
+  grasshopper: require("../../assets/drinks/grasshopper-art.png"),
+  greyhound: require("../../assets/drinks/greyhound-art.png"),
+  harveyWallbanger: require("../../assets/drinks/harvey-wallbanger-art.png"),
   longIslandIcedTea: require("../../assets/drinks/long-island-iced-tea-art.png"),
   maiTai: require("../../assets/drinks/mai-tai-art.png"),
   manhattan: require("../../assets/drinks/manhattan-art.png"),
@@ -101,20 +131,35 @@ export function getDrinkArtKey(cocktail: DrinkArtCocktail | null): DrinkArtKey {
   }
 
   const exactKeyById: Record<string, DrinkArtKey> = {
+    alexander: "alexander",
     americano: "americano",
     aviation: "aviation",
+    "b-52": "b52",
     bellini: "bellini",
     bramble: "bramble",
+    brooklyn: "brooklyn",
+    casino: "casino",
     caipirinha: "caipirinha",
+    "clover-club": "cloverClub",
+    "corpse-reviver": "corpseReviver",
     cosmopolitan: "cosmopolitan",
     "cuba-libre": "cubaLibre",
     daiquiri: "daiquiri",
     "dark-and-stormy": "darkAndStormy",
+    "dirty-martini": "dirtyMartini",
     "dry-martini": "dryMartini",
     "espresso-martini": "espressoMartini",
     "french-75": "french75",
+    "french-connection": "frenchConnection",
+    "french-martini": "frenchMartini",
     gimlet: "gimlet",
+    "gin-fizz": "ginFizz",
+    "gin-rickey": "ginRickey",
     "gin-tonic": "ginTonic",
+    godfather: "godfather",
+    grasshopper: "grasshopper",
+    greyhound: "greyhound",
+    "harvey-wallbanger": "harveyWallbanger",
     "long-island-iced-tea": "longIslandIcedTea",
     "mai-tai": "maiTai",
     manhattan: "manhattan",
