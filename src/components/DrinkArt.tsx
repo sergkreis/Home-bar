@@ -53,14 +53,35 @@ type DrinkArtKey =
   | "mojito"
   | "negroni"
   | "newYorkSour"
+  | "oldCuban"
   | "oldFashioned"
+  | "oldPal"
   | "paloma"
+  | "paradise"
+  | "peguClub"
+  | "penicillin"
+  | "pinkGin"
   | "pinaColada"
+  | "piscoSour"
+  | "plantersPunch"
+  | "pornstarMartini"
+  | "portoFlip"
+  | "ramosGinFizz"
+  | "russianSpringPunch"
+  | "rustyNail"
   | "sazerac"
+  | "seaBreeze"
+  | "sidecar"
   | "spritz"
+  | "stinger"
+  | "tequilaSunrise"
+  | "tipperary"
   | "tomCollins"
+  | "vesper"
   | "whiskeySour"
+  | "whiteLady"
   | "whiteRussian"
+  | "zombie"
   | "martini";
 
 type DrinkArtCocktail = {
@@ -129,14 +150,35 @@ const sources: Record<DrinkArtKey, ImageSourcePropType> = {
   mojito: require("../../assets/drinks/mojito-art.png"),
   negroni: require("../../assets/drinks/negroni-art.png"),
   newYorkSour: require("../../assets/drinks/new-york-sour-art.png"),
+  oldCuban: require("../../assets/drinks/old-cuban-art.png"),
   oldFashioned: require("../../assets/drinks/old-fashioned-art.png"),
+  oldPal: require("../../assets/drinks/old-pal-art.png"),
   paloma: require("../../assets/drinks/paloma-art.png"),
+  paradise: require("../../assets/drinks/paradise-art.png"),
+  peguClub: require("../../assets/drinks/pegu-club-art.png"),
+  penicillin: require("../../assets/drinks/penicillin-art.png"),
+  pinkGin: require("../../assets/drinks/pink-gin-art.png"),
   pinaColada: require("../../assets/drinks/pina-colada-art.png"),
+  piscoSour: require("../../assets/drinks/pisco-sour-art.png"),
+  plantersPunch: require("../../assets/drinks/planter-s-punch-art.png"),
+  pornstarMartini: require("../../assets/drinks/pornstar-martini-art.png"),
+  portoFlip: require("../../assets/drinks/porto-flip-art.png"),
+  ramosGinFizz: require("../../assets/drinks/ramos-gin-fizz-art.png"),
+  russianSpringPunch: require("../../assets/drinks/russian-spring-punch-art.png"),
+  rustyNail: require("../../assets/drinks/rusty-nail-art.png"),
   sazerac: require("../../assets/drinks/sazerac-art.png"),
+  seaBreeze: require("../../assets/drinks/sea-breeze-art.png"),
+  sidecar: require("../../assets/drinks/sidecar-art.png"),
   spritz: require("../../assets/drinks/spritz-art.png"),
+  stinger: require("../../assets/drinks/stinger-art.png"),
+  tequilaSunrise: require("../../assets/drinks/tequila-sunrise-art.png"),
+  tipperary: require("../../assets/drinks/tipperary-art.png"),
   tomCollins: require("../../assets/drinks/tom-collins-art.png"),
+  vesper: require("../../assets/drinks/vesper-art.png"),
   whiskeySour: require("../../assets/drinks/whiskey-sour-art.png"),
+  whiteLady: require("../../assets/drinks/white-lady-art.png"),
   whiteRussian: require("../../assets/drinks/white-russian-art.png"),
+  zombie: require("../../assets/drinks/zombie-art.png"),
   martini: require("../../assets/drinks/dry-martini-art.png"),
 };
 
@@ -213,14 +255,35 @@ export function getDrinkArtKey(cocktail: DrinkArtCocktail | null): DrinkArtKey {
     mojito: "mojito",
     negroni: "negroni",
     "new-york-sour": "newYorkSour",
+    "old-cuban": "oldCuban",
     "old-fashioned": "oldFashioned",
+    "old-pal": "oldPal",
     paloma: "paloma",
+    paradise: "paradise",
+    "pegu-club": "peguClub",
+    penicillin: "penicillin",
+    "pink-gin": "pinkGin",
     "pina-colada": "pinaColada",
+    "pisco-sour": "piscoSour",
+    "planter-s-punch": "plantersPunch",
+    "pornstar-martini": "pornstarMartini",
+    "porto-flip": "portoFlip",
+    "ramos-gin-fizz": "ramosGinFizz",
+    "russian-spring-punch": "russianSpringPunch",
+    "rusty-nail": "rustyNail",
     sazerac: "sazerac",
+    "sea-breeze": "seaBreeze",
+    sidecar: "sidecar",
     spritz: "spritz",
+    stinger: "stinger",
+    "tequila-sunrise": "tequilaSunrise",
+    tipperary: "tipperary",
     "tom-collins": "tomCollins",
+    vesper: "vesper",
     "whiskey-sour": "whiskeySour",
+    "white-lady": "whiteLady",
     "white-russian": "whiteRussian",
+    zombie: "zombie",
   };
   const exactKey = cocktail.id ? exactKeyById[cocktail.id] : null;
 
