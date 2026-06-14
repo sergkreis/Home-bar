@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
 
-import { colors, spacing } from "../theme";
+import { colors, fonts, spacing } from "../theme";
 
 type SectionPanelProps = {
   title: string;
@@ -30,15 +30,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   sectionTitle: {
-    color: colors.text,
-    fontSize: 21,
-    fontWeight: "800",
-    lineHeight: 26,
+    color: colors.textSubtle,
+    fontFamily: fonts.display,
+    fontSize: 24,
+    fontWeight: "900",
+    lineHeight: 30,
   },
   sectionHint: {
-    color: colors.textMuted,
-    fontSize: 14,
-    lineHeight: 20,
+    color: colors.textDim,
+    fontSize: 15,
+    lineHeight: 21,
     maxWidth: 720,
   },
 });

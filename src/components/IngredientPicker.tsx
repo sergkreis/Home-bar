@@ -244,8 +244,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: spacing.md,
     alignItems: "flex-start",
-    backgroundColor: colors.surfaceDark,
+    backgroundColor: colors.surface,
     borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: spacing.md,
   },
   toolbarCopy: {
@@ -258,7 +260,7 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   toolbarLabel: {
-    color: "#c8d0c8",
+    color: colors.textSubtle,
     fontSize: 11,
     fontWeight: "900",
     letterSpacing: 0,
@@ -271,15 +273,15 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   secondaryButton: {
-    backgroundColor: "#272923",
-    borderColor: "#3a3e35",
+    backgroundColor: colors.surfaceLight,
+    borderColor: colors.borderStrong,
     borderWidth: 1,
     borderRadius: radii.sm,
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
   secondaryButtonText: {
-    color: colors.textInverse,
+    color: colors.text,
     fontSize: 12,
     fontWeight: "900",
   },
@@ -301,6 +303,8 @@ const styles = StyleSheet.create({
     color: colors.tealDark,
     backgroundColor: colors.tealSoft,
     borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: "#27695b",
     paddingHorizontal: 10,
     paddingVertical: 6,
     fontSize: 12,
@@ -311,6 +315,8 @@ const styles = StyleSheet.create({
     color: colors.text,
     backgroundColor: colors.surfaceMuted,
     borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.border,
     paddingHorizontal: 10,
     paddingVertical: 6,
     fontSize: 12,
@@ -350,7 +356,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tealSoft,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#b8d8d2",
+    borderColor: "#27695b",
     padding: spacing.md,
   },
   featuredHeader: {
@@ -409,11 +415,11 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
   },
   featuredChip: {
-    borderColor: "#9bc8c0",
+    borderColor: "#27695b",
   },
   chipActive: {
-    backgroundColor: colors.surfaceDark,
-    borderColor: colors.surfaceDark,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   chipLabel: {
     color: colors.text,
@@ -421,7 +427,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
   chipLabelActive: {
-    color: colors.textInverse,
+    color: colors.textOnAccent,
   },
   emptyState: {
     backgroundColor: colors.surface,

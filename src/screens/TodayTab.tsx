@@ -1,16 +1,17 @@
 import type { ComponentType } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import ArrowRight from "lucide-react-native/dist/cjs/icons/arrow-right";
-import BadgeCheck from "lucide-react-native/dist/cjs/icons/badge-check";
 import CircleAlert from "lucide-react-native/dist/cjs/icons/circle-alert";
-import Droplets from "lucide-react-native/dist/cjs/icons/droplets";
 import Flame from "lucide-react-native/dist/cjs/icons/flame";
-import Zap from "lucide-react-native/dist/cjs/icons/zap";
+import Leaf from "lucide-react-native/dist/cjs/icons/leaf";
+import Sprout from "lucide-react-native/dist/cjs/icons/sprout";
 
 import { CocktailResults } from "../components/CocktailResults";
+import { DrinkArt } from "../components/DrinkArt";
 import { SectionPanel } from "../components/SectionPanel";
 import { Ingredient, TasteTag } from "../data/cocktails";
-import { colors, pressed, radii, spacing } from "../theme";
+import { colors, fonts, pressed, radii, spacing } from "../theme";
+import { getStrengthLabel } from "../utils/cocktailLabels";
 import { RankedCocktail } from "../utils/cocktailMatcher";
 
 export type QuickMode = {
@@ -48,7 +49,7 @@ function getModeVisuals(mode: QuickMode): {
 } {
   if (mode.accent === "teal") {
     return {
-      Icon: Droplets,
+      Icon: Sprout,
       cardStyle: styles.actionCardTeal,
       iconStyle: styles.actionIconTeal,
       iconColor: colors.teal,
@@ -65,11 +66,15 @@ function getModeVisuals(mode: QuickMode): {
   }
 
   return {
-    Icon: Zap,
+    Icon: Leaf,
     cardStyle: styles.actionCardAmber,
     iconStyle: styles.actionIconAmber,
     iconColor: colors.accent,
   };
+}
+
+function getIngredientName(ingredients: Ingredient[], ingredientId: string) {
+  return ingredients.find((ingredient) => ingredient.id === ingredientId)?.name ?? ingredientId;
 }
 
 export function TodayTab({
@@ -85,32 +90,49 @@ export function TodayTab({
 }: TodayTabProps) {
   const heroCocktail = perfectMatches[0] ?? almostReady[0] ?? null;
   const hasPerfectMatches = perfectMatches.length > 0;
-  const HeroIcon = hasPerfectMatches ? BadgeCheck : CircleAlert;
+  const heroMissingText = heroCocktail?.missingIngredients.length
+    ? `Не хватает: ${heroCocktail.missingIngredients
+        .slice(0, 2)
+        .map((ingredientId) => getIngredientName(ingredients, ingredientId))
+        .join(", ")}`
+    : "Все ингредиенты есть дома";
 
   return (
     <>
       <View style={styles.hero}>
-        <View style={styles.heroTop}>
-          <View style={[styles.heroIcon, hasPerfectMatches ? styles.heroIconReady : styles.heroIconAlmost]}>
-            <HeroIcon
-              color={hasPerfectMatches ? colors.success : colors.accent}
-              size={22}
-              strokeWidth={2.5}
-            />
-          </View>
-          <View style={styles.heroCopy}>
-            <Text style={styles.heroLabel}>План на вечер</Text>
-            <Text style={styles.heroTitle}>
-              {hasPerfectMatches
-                ? `${perfectMatches.length} готовых рецептов`
-                : almostReady.length > 0
-                  ? "Почти готово"
-                  : "Собери первый бар"}
-            </Text>
-          </View>
+        <View style={styles.heroBackdrop} />
+        <View style={styles.heroContent}>
+          <Text style={styles.heroLabel}>План на вечер ✧</Text>
+          <Text style={styles.heroText}>Рекомендуем сегодня</Text>
+
+          {heroCocktail ? (
+            <View style={styles.heroPickCopy}>
+              <Text style={styles.heroPickTitle}>{heroCocktail.name}</Text>
+              <Text style={styles.heroPickMeta}>
+                {heroCocktail.baseSpirit} · {getStrengthLabel(heroCocktail.strength)} · {heroCocktail.glassName}
+              </Text>
+              <View style={styles.heroMissingRow}>
+                {heroCocktail.missingIngredients.length > 0 ? (
+                  <View style={styles.heroWarningIcon}>
+                    <CircleAlert color={colors.berry} size={15} strokeWidth={2.5} />
+                  </View>
+                ) : (
+                  <View style={styles.heroReadyDot} />
+                )}
+                <Text style={styles.heroMissingText} numberOfLines={2}>{heroMissingText}</Text>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.heroPickCopy}>
+              <Text style={styles.heroPickTitle}>Собери первый бар</Text>
+              <Text style={styles.heroPickMeta}>{tonightHeadline}</Text>
+            </View>
+          )}
         </View>
 
-        <Text style={styles.heroText}>{tonightHeadline}</Text>
+        <View style={styles.heroVisual}>
+          <DrinkArt cocktail={heroCocktail} size="hero" />
+        </View>
 
         {heroCocktail ? (
           <Pressable
@@ -118,20 +140,11 @@ export function TodayTab({
             accessibilityLabel={`Открыть ${heroCocktail.name}`}
             onPress={() => onSelectCocktail(heroCocktail)}
             style={({ pressed: isPressed }) => [
-              styles.heroPick,
+              styles.heroArrow,
               isPressed && { opacity: pressed.opacity },
             ]}
           >
-            <View style={styles.heroPickCopy}>
-              <Text style={styles.heroPickLabel}>Лучший вариант</Text>
-              <Text style={styles.heroPickTitle}>{heroCocktail.name}</Text>
-              <Text style={styles.heroPickMeta}>
-                {heroCocktail.missingIngredients.length === 0
-                  ? "Все ингредиенты есть"
-                  : `Не хватает: ${heroCocktail.missingIngredients.length}`}
-              </Text>
-            </View>
-            <ArrowRight color={colors.textMuted} size={22} strokeWidth={2.4} />
+            <ArrowRight color={colors.paper} size={28} strokeWidth={2.4} />
           </Pressable>
         ) : null}
       </View>
@@ -154,17 +167,14 @@ export function TodayTab({
                   isPressed && { opacity: pressed.opacity },
                 ]}
               >
-                <View style={styles.actionCardTop}>
-                  <View style={[styles.actionIcon, visual.iconStyle]}>
-                    <Icon color={visual.iconColor} size={18} strokeWidth={2.5} />
-                  </View>
-                  <Text style={styles.actionMeta}>{mode.matches.length}</Text>
+                <View style={[styles.actionIcon, visual.iconStyle]}>
+                  <Icon color={visual.iconColor} size={34} strokeWidth={1.9} />
                 </View>
-                <Text style={styles.actionTitle}>{mode.title}</Text>
-                <Text style={styles.actionSubtitle}>{mode.subtitle}</Text>
-                <Text style={styles.actionPreview} numberOfLines={1}>
-                  {mode.matches.slice(0, 2).map((cocktail) => cocktail.name).join(", ")}
-                </Text>
+                <View style={styles.actionCopy}>
+                  <Text style={styles.actionTitle}>{mode.title}</Text>
+                  <Text style={styles.actionSubtitle}>{mode.subtitle}</Text>
+                </View>
+                <ArrowRight color={visual.iconColor} size={19} strokeWidth={2.4} />
               </Pressable>
             );
           })}
@@ -198,151 +208,177 @@ export function TodayTab({
 
 const styles = StyleSheet.create({
   hero: {
-    backgroundColor: colors.surface,
+    position: "relative",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    backgroundColor: "#06170f",
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: "rgba(237, 169, 52, 0.58)",
+    padding: 28,
+    paddingRight: 86,
+    gap: spacing.lg,
+    overflow: "hidden",
+    minHeight: 260,
+  },
+  heroBackdrop: {
+    position: "absolute",
+    right: -30,
+    bottom: -45,
+    width: 420,
+    height: 260,
+    borderRadius: 110,
+    backgroundColor: "rgba(237, 169, 52, 0.08)",
+  },
+  heroContent: {
+    flex: 1,
+    flexBasis: 360,
+    minWidth: 0,
+    justifyContent: "center",
+    gap: spacing.sm,
+  },
+  heroLabel: {
+    color: colors.accent,
+    fontFamily: fonts.display,
+    fontSize: 32,
+    fontWeight: "900",
+    lineHeight: 38,
+  },
+  heroText: {
+    color: colors.textMuted,
+    fontFamily: fonts.display,
+    fontSize: 18,
+    lineHeight: 24,
+    maxWidth: 760,
+  },
+  heroPickCopy: {
+    gap: 8,
+    marginTop: 2,
+  },
+  heroPickTitle: {
+    color: colors.paper,
+    fontFamily: fonts.display,
+    fontSize: 34,
+    fontWeight: "900",
+    lineHeight: 39,
+  },
+  heroPickMeta: {
+    color: colors.textSubtle,
+    fontFamily: fonts.display,
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: "700",
+  },
+  heroMissingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 9,
+    marginTop: spacing.md,
+  },
+  heroWarningIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.berry,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroReadyDot: {
+    width: 13,
+    height: 13,
+    borderRadius: radii.pill,
+    backgroundColor: colors.success,
+  },
+  heroMissingText: {
+    color: colors.paper,
+    flex: 1,
+    fontFamily: fonts.display,
+    fontSize: 17,
+    lineHeight: 23,
+  },
+  heroVisual: {
+    flex: 0.85,
+    flexBasis: 330,
+    minHeight: 248,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: -20,
+    marginRight: -20,
+  },
+  heroArrow: {
+    position: "absolute",
+    top: 26,
+    right: 28,
+    width: 58,
+    height: 58,
+    borderRadius: radii.md,
+    backgroundColor: "rgba(24, 58, 43, 0.82)",
+    borderWidth: 1,
+    borderColor: "rgba(237, 169, 52, 0.72)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.md,
+  },
+  actionCard: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 250,
+    minHeight: 104,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(7, 26, 18, 0.86)",
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.lg,
     gap: spacing.md,
   },
-  heroTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  heroIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: radii.pill,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  heroIconReady: {
-    backgroundColor: colors.successBg,
-  },
-  heroIconAlmost: {
-    backgroundColor: colors.warningBg,
-  },
-  heroCopy: {
-    flex: 1,
-    gap: 2,
-  },
-  heroLabel: {
-    color: colors.teal,
-    fontSize: 12,
-    fontWeight: "900",
-    textTransform: "uppercase",
-  },
-  heroTitle: {
-    color: colors.text,
-    fontSize: 28,
-    fontWeight: "800",
-    lineHeight: 33,
-  },
-  heroText: {
-    color: colors.textMuted,
-    fontSize: 15,
-    lineHeight: 22,
-    maxWidth: 760,
-  },
-  heroPick: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: spacing.md,
-    backgroundColor: colors.surfaceLight,
-    borderWidth: 1,
-    borderColor: colors.borderMuted,
-    borderRadius: radii.md,
-    padding: spacing.md,
-  },
-  heroPickCopy: {
-    flex: 1,
-    gap: 3,
-  },
-  heroPickLabel: {
-    color: colors.textSubtle,
-    fontSize: 11,
-    fontWeight: "900",
-    textTransform: "uppercase",
-  },
-  heroPickTitle: {
-    color: colors.text,
-    fontSize: 20,
-    fontWeight: "800",
-    lineHeight: 24,
-  },
-  heroPickMeta: {
-    color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "700",
-  },
-  actions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
-  actionCard: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 165,
-    minHeight: 132,
-    backgroundColor: colors.surface,
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    gap: 7,
-  },
   actionCardAmber: {
-    borderColor: "#dfc993",
+    borderColor: "rgba(237, 169, 52, 0.6)",
+    backgroundColor: "rgba(49, 31, 11, 0.5)",
   },
   actionCardTeal: {
-    borderColor: "#abd6d0",
+    borderColor: "rgba(85, 208, 184, 0.55)",
+    backgroundColor: "rgba(7, 35, 31, 0.72)",
   },
   actionCardBerry: {
-    borderColor: "#e3b4c5",
-  },
-  actionCardTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
+    borderColor: "rgba(255, 122, 45, 0.58)",
+    backgroundColor: "rgba(51, 27, 8, 0.64)",
   },
   actionIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: radii.pill,
+    width: 52,
+    height: 52,
+    borderRadius: radii.md,
     alignItems: "center",
     justifyContent: "center",
   },
   actionIconAmber: {
-    backgroundColor: colors.accentSoft,
+    backgroundColor: "rgba(237, 169, 52, 0.08)",
   },
   actionIconTeal: {
-    backgroundColor: colors.tealSoft,
+    backgroundColor: "rgba(85, 208, 184, 0.08)",
   },
   actionIconBerry: {
-    backgroundColor: colors.berrySoft,
+    backgroundColor: "rgba(255, 122, 45, 0.08)",
+  },
+  actionCopy: {
+    flex: 1,
+    gap: 4,
   },
   actionTitle: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  actionMeta: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: "800",
+    color: colors.paper,
+    fontFamily: fonts.display,
+    fontSize: 19,
+    fontWeight: "900",
+    lineHeight: 23,
   },
   actionSubtitle: {
     color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  actionPreview: {
-    color: colors.text,
     fontSize: 14,
     lineHeight: 20,
   },

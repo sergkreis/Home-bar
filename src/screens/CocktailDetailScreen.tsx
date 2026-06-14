@@ -1,9 +1,10 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { DrinkArt } from "../components/DrinkArt";
 import { FavoriteButton } from "../components/FavoriteButton";
 import { SectionPanel } from "../components/SectionPanel";
 import { Ingredient } from "../data/cocktails";
-import { colors, pressed, radii, spacing } from "../theme";
+import { colors, fonts, pressed, radii, spacing } from "../theme";
 import { getStrengthLabel } from "../utils/cocktailLabels";
 import { RankedCocktail } from "../utils/cocktailMatcher";
 import { formatRecipeAmount, formatRecipeStep } from "../utils/recipeFormatting";
@@ -33,6 +34,11 @@ export function CocktailDetailScreen({
 }: CocktailDetailScreenProps) {
   const ownedSet = new Set(ownedIngredientIds);
   const missingCount = cocktail.missingIngredients.length;
+  const matchTotal = Math.max(
+    cocktail.availableCount + cocktail.missingIngredients.length,
+    cocktail.availableCount,
+    1,
+  );
 
   return (
     <ScrollView key="detail" style={styles.screen} contentContainerStyle={styles.content}>
@@ -56,10 +62,17 @@ export function CocktailDetailScreen({
             size="large"
           />
         </View>
-        <Text style={styles.title}>{cocktail.name}</Text>
-        <Text style={styles.meta}>
-          {cocktail.baseSpirit} · {getStrengthLabel(cocktail.strength)} · {cocktail.glassName}
-        </Text>
+        <View style={styles.titleRow}>
+          <View style={styles.titleCopy}>
+            <Text style={styles.title}>{cocktail.name}</Text>
+            <Text style={styles.meta}>
+              {cocktail.baseSpirit} · {getStrengthLabel(cocktail.strength)} · {cocktail.glassName}
+            </Text>
+          </View>
+          <View style={styles.headerGlass}>
+            <DrinkArt cocktail={cocktail} size="detail" />
+          </View>
+        </View>
 
         <View style={styles.statusRow}>
           <View
@@ -70,7 +83,7 @@ export function CocktailDetailScreen({
             </Text>
           </View>
           <Text style={styles.matchText}>
-            {cocktail.availableCount}/{cocktail.ingredients.length} ингредиентов
+            {cocktail.availableCount}/{matchTotal} ингредиентов
           </Text>
         </View>
       </View>
@@ -166,15 +179,18 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 920,
     alignSelf: "center",
-    padding: spacing.md,
+    padding: spacing.lg,
     paddingBottom: 40,
     gap: spacing.xl,
   },
   header: {
-    backgroundColor: colors.surfaceDark,
+    backgroundColor: "#06170f",
     borderRadius: radii.md,
-    padding: spacing.lg,
-    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: "rgba(237, 169, 52, 0.58)",
+    padding: 24,
+    gap: spacing.lg,
+    overflow: "hidden",
   },
   headerTop: {
     flexDirection: "row",
@@ -183,9 +199,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   backButton: {
-    backgroundColor: "#272923",
+    backgroundColor: "rgba(7, 26, 18, 0.86)",
     borderWidth: 1,
-    borderColor: "#3a3e35",
+    borderColor: "rgba(237, 169, 52, 0.46)",
     borderRadius: radii.sm,
     paddingHorizontal: 12,
     paddingVertical: 9,
@@ -196,15 +212,36 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   title: {
-    color: colors.textInverse,
-    fontSize: 36,
+    color: colors.paper,
+    fontFamily: fonts.display,
+    fontSize: 42,
     fontWeight: "900",
-    lineHeight: 40,
+    lineHeight: 47,
+  },
+  titleRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  titleCopy: {
+    flex: 1,
+    minWidth: 0,
+    gap: 6,
+  },
+  headerGlass: {
+    width: 220,
+    minHeight: 176,
+    borderRadius: radii.md,
+    backgroundColor: "rgba(237, 169, 52, 0.06)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   meta: {
-    color: "#d7ded8",
-    fontSize: 15,
-    lineHeight: 21,
+    color: colors.textSubtle,
+    fontFamily: fonts.display,
+    fontSize: 18,
+    lineHeight: 24,
   },
   statusRow: {
     flexDirection: "row",
@@ -229,15 +266,15 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   matchText: {
-    color: "#d7ded8",
+    color: colors.textMuted,
     fontSize: 13,
     fontWeight: "900",
   },
   callout: {
-    backgroundColor: colors.surface,
+    backgroundColor: "rgba(7, 26, 18, 0.9)",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "rgba(237, 169, 52, 0.34)",
     padding: spacing.md,
     gap: spacing.sm,
   },
@@ -259,7 +296,7 @@ const styles = StyleSheet.create({
   },
   shoppingChip: {
     backgroundColor: colors.warningBg,
-    borderColor: "#dfc37d",
+    borderColor: "#6d4f23",
     borderWidth: 1,
     borderRadius: radii.pill,
     paddingHorizontal: 11,
@@ -271,10 +308,10 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   recipeList: {
-    backgroundColor: colors.surface,
+    backgroundColor: "rgba(7, 26, 18, 0.88)",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "rgba(237, 169, 52, 0.34)",
     overflow: "hidden",
   },
   recipeRow: {
@@ -286,7 +323,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderMuted,
+    borderBottomColor: "rgba(237, 169, 52, 0.18)",
   },
   recipeRowMain: {
     flexDirection: "row",
@@ -295,8 +332,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   recipeRowText: {
-    color: colors.text,
-    fontSize: 15,
+    color: colors.paper,
+    fontFamily: fonts.display,
+    fontSize: 17,
   },
   recipeRowRight: {
     flexDirection: "row",
@@ -310,7 +348,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: colors.warningBg,
-    borderColor: "#dfc37d",
+    borderColor: "#6d4f23",
     borderWidth: 1,
     borderRadius: radii.pill,
     paddingHorizontal: 9,
@@ -339,29 +377,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.md,
     alignItems: "flex-start",
-    backgroundColor: colors.surface,
+    backgroundColor: "rgba(7, 26, 18, 0.88)",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: "rgba(237, 169, 52, 0.28)",
     padding: spacing.md,
   },
   stepIndexWrap: {
     width: 30,
     height: 30,
     borderRadius: radii.pill,
-    backgroundColor: colors.teal,
+    backgroundColor: colors.success,
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
   },
   stepIndexText: {
-    color: colors.textInverse,
+    color: colors.textOnAccent,
     fontSize: 14,
     fontWeight: "900",
   },
   stepText: {
     flex: 1,
-    color: colors.text,
+    color: colors.paper,
     fontSize: 15,
     lineHeight: 22,
   },

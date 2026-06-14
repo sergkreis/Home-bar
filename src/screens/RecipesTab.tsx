@@ -129,8 +129,8 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   filterPillActive: {
-    backgroundColor: colors.surfaceDark,
-    borderColor: colors.surfaceDark,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   filterLabel: {
     color: colors.text,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   filterLabelActive: {
-    color: colors.textInverse,
+    color: colors.textOnAccent,
   },
   searchWrap: {
     backgroundColor: colors.surface,

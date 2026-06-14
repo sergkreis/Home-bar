@@ -13,6 +13,8 @@ export type TasteTag = "sweet" | "sour" | "refreshing" | "strong" | "bitter";
 
 export type CocktailStrength = "light" | "medium" | "strong";
 
+export type CocktailImageStatus = "todo" | "reference-needed" | "generated" | "approved";
+
 export type Ingredient = {
   id: string;
   name: string;
@@ -34,6 +36,10 @@ export type CocktailRecord = {
   glassName: string;
   steps: string[];
   garnish?: string;
+  imageAssetKey?: string;
+  imageStatus?: CocktailImageStatus;
+  isPublished?: boolean;
+  referenceUrls?: string[];
   imageUrl?: string;
 };
 

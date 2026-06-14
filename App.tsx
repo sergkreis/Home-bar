@@ -7,13 +7,16 @@ import { AppHeader } from "./src/components/AppHeader";
 import { AuthModal } from "./src/components/AuthModal";
 import { AppTab, BottomNav } from "./src/components/BottomNav";
 import { SectionPanel } from "./src/components/SectionPanel";
-import { cocktails, ingredients, TasteTag } from "./src/data/cocktails";
+import { ingredients, TasteTag } from "./src/data/cocktails";
 import { starterIngredients } from "./src/data/starterIngredients";
+import { useAdminAccess } from "./src/hooks/useAdminAccess";
 import { useAuth } from "./src/hooks/useAuth";
+import { useCocktailCatalog } from "./src/hooks/useCocktailCatalog";
 import { useEnteredApp } from "./src/hooks/useEnteredApp";
 import { useFavorites } from "./src/hooks/useFavorites";
 import { useSavedBar } from "./src/hooks/useSavedBar";
 import { useUserProfile } from "./src/hooks/useUserProfile";
+import { AdminCocktailsTab } from "./src/screens/AdminCocktailsTab";
 import { BarTab } from "./src/screens/BarTab";
 import { BuyTab } from "./src/screens/BuyTab";
 import { CocktailDetailScreen } from "./src/screens/CocktailDetailScreen";
@@ -21,7 +24,7 @@ import { FavoritesTab } from "./src/screens/FavoritesTab";
 import { OnboardingScreen } from "./src/screens/OnboardingScreen";
 import { RecipesTab } from "./src/screens/RecipesTab";
 import { QuickMode, TodayTab } from "./src/screens/TodayTab";
-import { colors, spacing } from "./src/theme";
+import { colors, fonts, spacing } from "./src/theme";
 import { rankCocktails, RankedCocktail } from "./src/utils/cocktailMatcher";
 import { buildShoppingSuggestions, buildTonightHeadline } from "./src/utils/shoppingAdvisor";
 
@@ -58,6 +61,7 @@ const tabSubtitles: Record<AppTab, string> = {
   favorites: "Любимые рецепты, сохраненные для быстрого возврата.",
   recipes: "Полный список с поиском и фильтрами по настроению.",
   account: "Регистрация, вход и синхронизация бара с избранным.",
+  admin: "Закрытый доступ к облачной базе коктейлей и статусам иллюстраций.",
 };
 
 const tabLabels: Record<AppTab, string> = {
@@ -67,6 +71,7 @@ const tabLabels: Record<AppTab, string> = {
   favorites: "Любимые",
   recipes: "Рецепты",
   account: "Аккаунт",
+  admin: "Админ",
 };
 
 function getSyncPillLabel({
@@ -122,6 +127,19 @@ export default function App() {
     updatePassword,
   } = useAuth();
   const {
+    catalogCocktails,
+    catalogError,
+    catalogSource,
+    hasLoadedCatalog,
+    isLoadingCatalog,
+    reloadCatalog,
+  } = useCocktailCatalog(authUser?.id, isAuthReady);
+  const {
+    adminAccessError,
+    hasLoadedAdminAccess,
+    isAdmin,
+  } = useAdminAccess(authUser?.id, isAuthReady);
+  const {
     hasLoadedSavedBar,
     hasSavedBar,
     isSyncingBar,
@@ -131,7 +149,10 @@ export default function App() {
     syncStatus,
   } = useSavedBar(ingredients, authUser?.id, isAuthReady);
   const { hasLoadedEntered, hasEnteredApp, markEntered } = useEnteredApp();
-  const knownCocktailIds = useMemo(() => cocktails.map((cocktail) => cocktail.id), []);
+  const knownCocktailIds = useMemo(
+    () => catalogCocktails.map((cocktail) => cocktail.id),
+    [catalogCocktails],
+  );
   const {
     hasLoadedFavorites,
     isFavorite,
@@ -172,22 +193,28 @@ export default function App() {
     }
   }, [authMode]);
 
+  useEffect(() => {
+    if (!isAdmin && activeTab === "admin") {
+      setActiveTab("account");
+    }
+  }, [activeTab, isAdmin]);
+
   const rankedCocktails = useMemo(
-    () => rankCocktails(cocktails, selectedIngredients, activeTaste, ingredients),
-    [activeTaste, selectedIngredients],
+    () => rankCocktails(catalogCocktails, selectedIngredients, activeTaste, ingredients),
+    [activeTaste, catalogCocktails, selectedIngredients],
   );
   const allRankedCocktails = useMemo(
-    () => rankCocktails(cocktails, selectedIngredients, null, ingredients),
-    [selectedIngredients],
+    () => rankCocktails(catalogCocktails, selectedIngredients, null, ingredients),
+    [catalogCocktails, selectedIngredients],
   );
 
   const tonightQuickList: QuickMode[] = useMemo(
     () =>
       quickModeDefs.map((mode) => ({
         ...mode,
-        matches: rankCocktails(cocktails, selectedIngredients, mode.taste, ingredients).slice(0, 4),
+        matches: rankCocktails(catalogCocktails, selectedIngredients, mode.taste, ingredients).slice(0, 4),
       })),
-    [selectedIngredients],
+    [catalogCocktails, selectedIngredients],
   );
 
   const perfectMatches = rankedCocktails.filter((c) => c.missingIngredients.length === 0);
@@ -280,10 +307,18 @@ export default function App() {
     />
   );
 
-  if (!hasLoadedSavedBar || !hasLoadedEntered || !hasLoadedFavorites || !hasLoadedProfile || !isAuthReady) {
+  if (
+    !hasLoadedSavedBar ||
+    !hasLoadedEntered ||
+    !hasLoadedFavorites ||
+    !hasLoadedProfile ||
+    !hasLoadedCatalog ||
+    !hasLoadedAdminAccess ||
+    !isAuthReady
+  ) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <View style={styles.loadingScreen}>
           <Text style={styles.eyebrow}>Домашний бар</Text>
           <Text style={styles.loadingTitle}>Загружаем твой бар</Text>
@@ -297,7 +332,7 @@ export default function App() {
   if (selectedCocktail) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <CocktailDetailScreen
           cocktail={selectedCocktail}
           ingredients={ingredients}
@@ -315,7 +350,7 @@ export default function App() {
   if (!hasEnteredApp) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <OnboardingScreen
           ingredients={ingredients}
           ingredientGroups={ingredientGroups}
@@ -333,7 +368,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <View style={styles.appShell}>
         <ScrollView
           key={`app-${activeTab}`}
@@ -424,12 +459,27 @@ export default function App() {
               {accountPanel}
             </SectionPanel>
           ) : null}
+
+          {activeTab === "admin" ? (
+            <AdminCocktailsTab
+              adminAccessError={adminAccessError}
+              catalogCocktails={catalogCocktails}
+              catalogError={catalogError}
+              catalogSource={catalogSource}
+              ingredients={ingredients}
+              isAdmin={isAdmin}
+              isLoadingCatalog={isLoadingCatalog}
+              onReloadCatalog={reloadCatalog}
+              userId={authUser?.id}
+            />
+          ) : null}
         </ScrollView>
 
         <BottomNav
           activeTab={activeTab}
           onChangeTab={setActiveTab}
           favoritesCount={favoriteCocktails.length}
+          showAdmin={isAdmin}
         />
         {authModal}
       </View>
@@ -444,16 +494,18 @@ const styles = StyleSheet.create({
   },
   appShell: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   screen: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: "transparent",
   },
   content: {
     width: "100%",
     maxWidth: 920,
     alignSelf: "center",
-    padding: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
     paddingBottom: 112,
     gap: spacing.xl,
   },
@@ -462,6 +514,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 20,
     gap: 8,
+    backgroundColor: colors.background,
   },
   eyebrow: {
     color: colors.teal,
@@ -471,6 +524,7 @@ const styles = StyleSheet.create({
   },
   loadingTitle: {
     color: colors.text,
+    fontFamily: fonts.display,
     fontSize: 28,
     fontWeight: "900",
     lineHeight: 32,

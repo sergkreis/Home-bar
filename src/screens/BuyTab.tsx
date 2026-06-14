@@ -59,13 +59,13 @@ const styles = StyleSheet.create({
   rank: {
     width: 34,
     height: 34,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surfaceDark,
+    borderRadius: radii.md,
+    backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",
   },
   rankText: {
-    color: colors.textInverse,
+    color: colors.textOnAccent,
     fontSize: 14,
     fontWeight: "900",
   },
@@ -89,6 +89,8 @@ const styles = StyleSheet.create({
   shopBadge: {
     backgroundColor: colors.successBg,
     borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: "#2f6e54",
     paddingHorizontal: 10,
     paddingVertical: 6,
   },

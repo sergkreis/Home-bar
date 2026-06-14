@@ -1,9 +1,10 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { DrinkMark } from "../components/DrinkMark";
 import { IngredientPicker } from "../components/IngredientPicker";
 import { SectionPanel } from "../components/SectionPanel";
 import { Ingredient, IngredientCategory } from "../data/cocktails";
-import { colors, pressed, radii, spacing } from "../theme";
+import { colors, fonts, pressed, radii, spacing } from "../theme";
 
 type IngredientGroup = {
   key: IngredientCategory;
@@ -37,11 +38,16 @@ export function OnboardingScreen({
     <View style={styles.shell}>
       <ScrollView key="onboarding" style={styles.screen} contentContainerStyle={styles.content}>
         <View style={styles.hero}>
-          <Text style={styles.eyebrow}>Домашний бар</Text>
-          <Text style={styles.heroTitle}>Что можно смешать из того, что есть дома?</Text>
-          <Text style={styles.subtitle}>
-            Отметь бутылки, соки, цитрус и сиропы. Подборка сразу покажет готовые рецепты и самые выгодные покупки.
-          </Text>
+          <View style={styles.heroCopy}>
+            <Text style={styles.eyebrow}>Домашний бар</Text>
+            <Text style={styles.heroTitle}>Что можно смешать из того, что есть дома?</Text>
+            <Text style={styles.subtitle}>
+              Отметь бутылки, соки, цитрус и сиропы. Подборка сразу покажет готовые рецепты и самые выгодные покупки.
+            </Text>
+          </View>
+          <View style={styles.heroMark}>
+            <DrinkMark size="large" tone="amber" variant="shaker" />
+          </View>
 
           <View style={styles.statsRow}>
             <View style={styles.stat}>
@@ -110,35 +116,54 @@ const styles = StyleSheet.create({
   },
   content: {
     width: "100%",
-    maxWidth: 920,
+    maxWidth: 980,
     alignSelf: "center",
-    padding: spacing.md,
+    padding: spacing.lg,
     paddingBottom: 118,
     gap: spacing.xl,
   },
   hero: {
-    backgroundColor: colors.surfaceDark,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    backgroundColor: "#06170f",
     borderRadius: radii.md,
-    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: "rgba(237, 169, 52, 0.58)",
+    padding: spacing.xl,
+    gap: spacing.md,
+    overflow: "hidden",
+  },
+  heroCopy: {
+    flex: 1,
+    flexBasis: 460,
+    minWidth: 0,
     gap: spacing.md,
   },
+  heroMark: {
+    width: 150,
+    minHeight: 132,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   eyebrow: {
-    color: "#b7d9d4",
-    fontSize: 12,
+    color: colors.accent,
+    fontFamily: fonts.display,
+    fontSize: 18,
     fontWeight: "900",
     textTransform: "uppercase",
   },
   heroTitle: {
-    color: colors.textInverse,
-    fontSize: 34,
+    color: colors.paper,
+    fontFamily: fonts.display,
+    fontSize: 40,
     fontWeight: "900",
-    lineHeight: 38,
+    lineHeight: 46,
     maxWidth: 760,
   },
   subtitle: {
-    color: "#d7ded8",
-    fontSize: 15,
-    lineHeight: 22,
+    color: colors.textMuted,
+    fontSize: 16,
+    lineHeight: 23,
     maxWidth: 720,
   },
   statsRow: {
@@ -147,36 +172,37 @@ const styles = StyleSheet.create({
   },
   stat: {
     flex: 1,
-    backgroundColor: "#252820",
+    backgroundColor: "rgba(7, 26, 18, 0.88)",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#3f4437",
+    borderColor: "rgba(237, 169, 52, 0.34)",
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
   statValue: {
-    color: colors.textInverse,
+    color: colors.paper,
+    fontFamily: fonts.display,
     fontSize: 24,
     fontWeight: "900",
     lineHeight: 28,
   },
   statLabel: {
-    color: "#c8d0c8",
+    color: colors.textSubtle,
     fontSize: 11,
     fontWeight: "900",
     textTransform: "uppercase",
   },
   dock: {
-    backgroundColor: "rgba(244, 245, 242, 0.96)",
+    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: colors.borderMuted,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
   },
   dockInner: {
     width: "100%",
-    maxWidth: 920,
+    maxWidth: 980,
     alignSelf: "center",
     gap: 7,
   },
@@ -185,15 +211,15 @@ const styles = StyleSheet.create({
     borderRadius: radii.md,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.surfaceDark,
+    backgroundColor: colors.success,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
   primaryButtonDisabled: {
-    backgroundColor: colors.borderStrong,
+    backgroundColor: colors.surfaceMuted,
   },
   primaryButtonText: {
-    color: colors.textInverse,
+    color: colors.textOnAccent,
     fontSize: 16,
     fontWeight: "900",
     textAlign: "center",

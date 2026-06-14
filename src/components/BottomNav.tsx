@@ -1,15 +1,16 @@
 import type { ComponentType } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import BookOpen from "lucide-react-native/dist/cjs/icons/book-open";
+import Heart from "lucide-react-native/dist/cjs/icons/heart";
 import Martini from "lucide-react-native/dist/cjs/icons/martini";
+import Scroll from "lucide-react-native/dist/cjs/icons/scroll";
+import ShieldCheck from "lucide-react-native/dist/cjs/icons/shield-check";
 import ShoppingBasket from "lucide-react-native/dist/cjs/icons/shopping-basket";
-import Sparkles from "lucide-react-native/dist/cjs/icons/sparkles";
-import Star from "lucide-react-native/dist/cjs/icons/star";
 import UserRound from "lucide-react-native/dist/cjs/icons/user-round";
+import Wine from "lucide-react-native/dist/cjs/icons/wine";
 
-import { colors, pressed, radii, spacing } from "../theme";
+import { colors, fonts, pressed, radii, spacing } from "../theme";
 
-export type AppTab = "today" | "bar" | "buy" | "favorites" | "recipes" | "account";
+export type AppTab = "today" | "bar" | "buy" | "favorites" | "recipes" | "account" | "admin";
 
 type IconProps = {
   color?: string;
@@ -26,28 +27,37 @@ type TabConfig = {
 };
 
 const tabs: TabConfig[] = [
-  { id: "today", label: "Сегодня", Icon: Sparkles },
-  { id: "bar", label: "Бар", Icon: Martini },
+  { id: "today", label: "Сегодня", Icon: Martini },
+  { id: "bar", label: "Бар", Icon: Wine },
   { id: "buy", label: "Купить", Icon: ShoppingBasket },
-  { id: "favorites", label: "Любим.", accessibilityLabel: "Любимые", Icon: Star },
-  { id: "recipes", label: "Рецепты", Icon: BookOpen },
+  { id: "favorites", label: "Любим.", accessibilityLabel: "Любимые", Icon: Heart },
+  { id: "recipes", label: "Рецепты", Icon: Scroll },
   { id: "account", label: "Аккаунт", Icon: UserRound },
+  { id: "admin", label: "Админ", accessibilityLabel: "Админка", Icon: ShieldCheck },
 ];
 
 type BottomNavProps = {
   activeTab: AppTab;
   onChangeTab: (tab: AppTab) => void;
   favoritesCount?: number;
+  showAdmin?: boolean;
 };
 
-export function BottomNav({ activeTab, onChangeTab, favoritesCount = 0 }: BottomNavProps) {
+export function BottomNav({
+  activeTab,
+  onChangeTab,
+  favoritesCount = 0,
+  showAdmin = false,
+}: BottomNavProps) {
+  const visibleTabs = showAdmin ? tabs : tabs.filter((tab) => tab.id !== "admin");
+
   return (
     <View style={styles.navWrap}>
       <View style={styles.bottomNav}>
-        {tabs.map((tab) => {
+        {visibleTabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const showBadge = tab.id === "favorites" && favoritesCount > 0;
-          const iconColor = isActive ? colors.text : colors.textSubtle;
+          const iconColor = isActive ? colors.paper : colors.paperMuted;
           const Icon = tab.Icon;
 
           return (
@@ -66,9 +76,9 @@ export function BottomNav({ activeTab, onChangeTab, favoritesCount = 0 }: Bottom
               <View style={[styles.iconPlate, isActive && styles.iconPlateActive]}>
                 <Icon
                   color={iconColor}
-                  fill={tab.id === "favorites" && isActive ? colors.accentSoft : "transparent"}
-                  size={19}
-                  strokeWidth={isActive ? 2.7 : 2.35}
+                  fill={tab.id === "favorites" && isActive ? colors.paper : "transparent"}
+                  size={24}
+                  strokeWidth={isActive ? 2.45 : 2}
                 />
                 {showBadge ? (
                   <View style={styles.badge}>
@@ -91,9 +101,9 @@ export { tabs as bottomNavTabs };
 
 const styles = StyleSheet.create({
   navWrap: {
-    backgroundColor: "rgba(244, 245, 242, 0.97)",
+    backgroundColor: "rgba(2, 13, 9, 0.96)",
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: "rgba(237, 169, 52, 0.22)",
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
@@ -103,42 +113,48 @@ const styles = StyleSheet.create({
     maxWidth: 920,
     alignSelf: "center",
     flexDirection: "row",
-    gap: 5,
-    backgroundColor: colors.surface,
-    borderRadius: 16,
+    gap: 0,
+    backgroundColor: "rgba(7, 26, 18, 0.94)",
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: 6,
+    borderColor: "rgba(237, 169, 52, 0.38)",
+    overflow: "hidden",
   },
   navItem: {
     flex: 1,
-    minHeight: 58,
-    borderRadius: 12,
+    minHeight: 74,
+    borderRightWidth: 1,
+    borderRightColor: "rgba(237, 169, 52, 0.14)",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 2,
     gap: 4,
   },
   navItemActive: {
-    backgroundColor: colors.accentSoft,
+    backgroundColor: "rgba(20, 76, 52, 0.76)",
+    borderColor: "rgba(135, 217, 167, 0.4)",
   },
   iconPlate: {
-    width: 28,
-    height: 24,
-    borderRadius: radii.pill,
+    width: 42,
+    height: 34,
+    borderRadius: radii.sm,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "transparent",
   },
   iconPlateActive: {
-    backgroundColor: "rgba(255, 255, 255, 0.56)",
+    backgroundColor: "rgba(135, 217, 167, 0.08)",
+    borderColor: "rgba(135, 217, 167, 0.18)",
   },
   navLabel: {
-    color: colors.textMuted,
-    fontSize: 9,
-    fontWeight: "800",
+    color: colors.paperMuted,
+    fontFamily: fonts.display,
+    fontSize: 11,
+    fontWeight: "900",
   },
   navLabelActive: {
-    color: colors.text,
+    color: colors.paper,
     fontWeight: "900",
   },
   badge: {

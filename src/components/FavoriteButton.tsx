@@ -35,7 +35,7 @@ export function FavoriteButton({ isFavorite, onToggle, label, size = "small" }: 
     >
       <Star
         color={isFavorite ? colors.accent : colors.textSubtle}
-        fill={isFavorite ? colors.accentSoft : "transparent"}
+        fill={isFavorite ? colors.accent : "transparent"}
         size={iconSize}
         strokeWidth={isFavorite ? 2.7 : 2.35}
       />
@@ -45,27 +45,27 @@ export function FavoriteButton({ isFavorite, onToggle, label, size = "small" }: 
 
 const styles = StyleSheet.create({
   small: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: "rgba(237, 169, 52, 0.45)",
+    backgroundColor: "rgba(7, 26, 18, 0.82)",
   },
   large: {
-    width: 50,
-    height: 50,
+    width: 58,
+    height: 58,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
+    borderColor: "rgba(237, 169, 52, 0.55)",
+    backgroundColor: "rgba(7, 26, 18, 0.82)",
   },
   active: {
-    backgroundColor: colors.accentSoft,
+    backgroundColor: "rgba(237, 169, 52, 0.16)",
     borderColor: colors.accent,
   },
 });
