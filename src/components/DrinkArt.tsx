@@ -1,16 +1,22 @@
 import { Image, ImageSourcePropType, StyleSheet, View, ViewStyle } from "react-native";
 
 type DrinkArtKey =
-  | "oldFashioned"
-  | "mojito"
-  | "martini"
-  | "whiskeySour"
+  | "daiquiri"
+  | "dryMartini"
+  | "espressoMartini"
   | "ginTonic"
-  | "negroni";
+  | "manhattan"
+  | "margarita"
+  | "mojito"
+  | "negroni"
+  | "oldFashioned"
+  | "whiskeySour"
+  | "martini";
 
 type DrinkArtCocktail = {
   baseSpirit: string;
   glassName: string;
+  id?: string;
   name: string;
 };
 
@@ -21,12 +27,17 @@ type DrinkArtProps = {
 };
 
 const sources: Record<DrinkArtKey, ImageSourcePropType> = {
-  oldFashioned: require("../../assets/drinks/old-fashioned.png"),
-  mojito: require("../../assets/drinks/mojito.png"),
-  martini: require("../../assets/drinks/martini.png"),
-  whiskeySour: require("../../assets/drinks/whiskey-sour.png"),
-  ginTonic: require("../../assets/drinks/gin-tonic.png"),
-  negroni: require("../../assets/drinks/negroni.png"),
+  daiquiri: require("../../assets/drinks/daiquiri-art.png"),
+  dryMartini: require("../../assets/drinks/dry-martini-art.png"),
+  espressoMartini: require("../../assets/drinks/espresso-martini-art.png"),
+  ginTonic: require("../../assets/drinks/gin-tonic-art.png"),
+  manhattan: require("../../assets/drinks/manhattan-art.png"),
+  margarita: require("../../assets/drinks/margarita-art.png"),
+  mojito: require("../../assets/drinks/mojito-art.png"),
+  negroni: require("../../assets/drinks/negroni-art.png"),
+  oldFashioned: require("../../assets/drinks/old-fashioned-art.png"),
+  whiskeySour: require("../../assets/drinks/whiskey-sour-art.png"),
+  martini: require("../../assets/drinks/dry-martini-art.png"),
 };
 
 const sizeStyles = {
@@ -49,9 +60,43 @@ export function getDrinkArtKey(cocktail: DrinkArtCocktail | null): DrinkArtKey {
     return "oldFashioned";
   }
 
+  const exactKeyById: Record<string, DrinkArtKey> = {
+    daiquiri: "daiquiri",
+    "dry-martini": "dryMartini",
+    "espresso-martini": "espressoMartini",
+    "gin-tonic": "ginTonic",
+    manhattan: "manhattan",
+    margarita: "margarita",
+    mojito: "mojito",
+    negroni: "negroni",
+    "old-fashioned": "oldFashioned",
+    "whiskey-sour": "whiskeySour",
+  };
+  const exactKey = cocktail.id ? exactKeyById[cocktail.id] : null;
+
+  if (exactKey) {
+    return exactKey;
+  }
+
   const name = cocktail.name.toLocaleLowerCase("ru-RU");
   const base = cocktail.baseSpirit.toLocaleLowerCase("ru-RU");
   const glass = cocktail.glassName.toLocaleLowerCase("ru-RU");
+
+  if (name.includes("маргарит")) {
+    return "margarita";
+  }
+
+  if (name.includes("дайкири")) {
+    return "daiquiri";
+  }
+
+  if (name.includes("манхэттен")) {
+    return "manhattan";
+  }
+
+  if (name.includes("эспрессо")) {
+    return "espressoMartini";
+  }
 
   if (name.includes("мохито")) {
     return "mojito";
