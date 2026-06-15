@@ -60,17 +60,17 @@ function getProfileStatusLabel(syncStatus: ProfileSyncStatus) {
   return "Готово";
 }
 
-function isValidBirthDate(value: string) {
+function getBirthDateValidationError(value: string) {
   const trimmed = value.trim();
 
   if (!trimmed) {
-    return true;
+    return null;
   }
 
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
 
   if (!match) {
-    return false;
+    return "Дата рождения должна быть в формате ГГГГ-ММ-ДД.";
   }
 
   const year = Number(match[1]);
@@ -78,11 +78,37 @@ function isValidBirthDate(value: string) {
   const day = Number(match[3]);
   const parsed = new Date(Date.UTC(year, month - 1, day));
 
-  return (
+  const isRealDate =
     parsed.getUTCFullYear() === year &&
     parsed.getUTCMonth() === month - 1 &&
-    parsed.getUTCDate() === day
-  );
+    parsed.getUTCDate() === day;
+
+  if (!isRealDate || year < 1900) {
+    return "Проверь дату рождения.";
+  }
+
+  const today = new Date();
+  const todayUtc = new Date(Date.UTC(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  ));
+
+  if (parsed > todayUtc) {
+    return "Дата рождения не может быть в будущем.";
+  }
+
+  const minBirthDate = new Date(Date.UTC(
+    todayUtc.getUTCFullYear() - 18,
+    todayUtc.getUTCMonth(),
+    todayUtc.getUTCDate(),
+  ));
+
+  if (parsed > minBirthDate) {
+    return "Приложение рассчитано на пользователей 18+.";
+  }
+
+  return null;
 }
 
 export function AccountPanel({
@@ -103,11 +129,12 @@ export function AccountPanel({
 }: AccountPanelProps) {
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [birthDate, setBirthDate] = useState(profile.birthDate);
+  const birthDateError = getBirthDateValidationError(birthDate);
   const canSaveProfile =
     Boolean(authUserEmail) &&
     profileSyncStatus !== "loading" &&
     profileSyncStatus !== "saving" &&
-    isValidBirthDate(birthDate);
+    !birthDateError;
 
   useEffect(() => {
     setDisplayName(profile.displayName);
@@ -219,15 +246,15 @@ export function AccountPanel({
             onChangeText={setBirthDate}
             placeholder="ГГГГ-ММ-ДД"
             placeholderTextColor={colors.textDim}
-            style={[styles.input, !isValidBirthDate(birthDate) && styles.inputError]}
+            style={[styles.input, birthDateError && styles.inputError]}
             value={birthDate}
           />
-          <Text style={styles.hint}>Формат: 1990-05-24.</Text>
+          <Text style={styles.hint}>Формат: 1990-05-24. Нужна для 18+.</Text>
         </View>
       </View>
 
-      {!isValidBirthDate(birthDate) ? (
-        <Text style={styles.errorText}>Дата рождения должна быть в формате ГГГГ-ММ-ДД.</Text>
+      {birthDateError ? (
+        <Text style={styles.errorText}>{birthDateError}</Text>
       ) : null}
       {barSyncError ? <Text style={styles.errorText}>{barSyncError}</Text> : null}
       {favoritesSyncError ? <Text style={styles.errorText}>{favoritesSyncError}</Text> : null}

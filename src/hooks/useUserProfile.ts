@@ -89,6 +89,21 @@ export function useUserProfile(userId?: string, isAuthReady = true): UseUserProf
     };
   }, [isAuthReady, userId]);
 
+  useEffect(() => {
+    if (profileSyncStatus !== "saved") {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setProfileMessage(null);
+      setProfileSyncStatus("idle");
+    }, 3000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [profileSyncStatus]);
+
   const saveProfile = useCallback(
     async (nextProfile: SaveUserProfileInput) => {
       if (!userId) {
@@ -102,8 +117,8 @@ export function useUserProfile(userId?: string, isAuthReady = true): UseUserProf
       setProfileSyncStatus("saving");
 
       try {
-        await saveRemoteUserProfile(userId, normalizedProfile);
-        setProfile({
+        const savedProfile = await saveRemoteUserProfile(userId, normalizedProfile);
+        setProfile(savedProfile ?? {
           ...normalizedProfile,
           updatedAt: new Date().toISOString(),
         });

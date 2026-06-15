@@ -35,13 +35,17 @@ export function IngredientPicker({
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedGroups, setExpandedGroups] = useState<Set<IngredientCategory>>(defaultExpandedGroups);
   const isSearching = normalizeText(searchQuery).length > 0;
+  const ingredientById = useMemo(
+    () => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])),
+    [ingredients],
+  );
 
   const selectedIngredientNames = useMemo(
     () =>
       selectedIngredients
-        .map((ingredientId) => ingredients.find((ingredient) => ingredient.id === ingredientId)?.name)
+        .map((ingredientId) => ingredientById.get(ingredientId)?.name)
         .filter((name): name is string => Boolean(name)),
-    [ingredients, selectedIngredients],
+    [ingredientById, selectedIngredients],
   );
 
   const filteredIngredients = useMemo(() => {
@@ -304,7 +308,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tealSoft,
     borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: "#27695b",
+    borderColor: colors.tealBorderMuted,
     paddingHorizontal: 10,
     paddingVertical: 6,
     fontSize: 12,
@@ -356,7 +360,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tealSoft,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "#27695b",
+    borderColor: colors.tealBorderMuted,
     padding: spacing.md,
   },
   featuredHeader: {
@@ -415,7 +419,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
   },
   featuredChip: {
-    borderColor: "#27695b",
+    borderColor: colors.tealBorderMuted,
   },
   chipActive: {
     backgroundColor: colors.accent,

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Ingredient } from "../data/cocktails";
@@ -19,8 +20,8 @@ type CocktailResultsProps = {
   onToggleFavorite?: (cocktailId: string) => void;
 };
 
-function getIngredientName(ingredients: Ingredient[], ingredientId: string) {
-  return ingredients.find((ingredient) => ingredient.id === ingredientId)?.name ?? ingredientId;
+function getIngredientName(ingredientById: Map<string, Ingredient>, ingredientId: string) {
+  return ingredientById.get(ingredientId)?.name ?? ingredientId;
 }
 
 export function CocktailResults({
@@ -33,6 +34,11 @@ export function CocktailResults({
   isFavorite,
   onToggleFavorite,
 }: CocktailResultsProps) {
+  const ingredientById = useMemo(
+    () => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])),
+    [ingredients],
+  );
+
   return (
     <SectionPanel title={title} hint={hint} style={styles.resultsPanel}>
       {cocktails.length === 0 ? <Text style={styles.emptyText}>{emptyText}</Text> : null}
@@ -41,7 +47,7 @@ export function CocktailResults({
         {cocktails.map((cocktail) => {
           const isPerfect = cocktail.missingIngredients.length === 0;
           const missingNames = cocktail.missingIngredients
-            .map((ingredientId) => getIngredientName(ingredients, ingredientId))
+            .map((ingredientId) => getIngredientName(ingredientById, ingredientId))
             .join(", ");
           const matchTotal = Math.max(
             cocktail.availableCount + cocktail.missingIngredients.length,
@@ -89,7 +95,11 @@ export function CocktailResults({
                   <Text style={styles.resultMatch}>
                     {cocktail.availableCount}/{matchTotal} ингредиентов
                   </Text>
-                  <View style={styles.progressTrack}>
+                  <View
+                    accessibilityRole="progressbar"
+                    accessibilityValue={{ min: 0, max: matchTotal, now: cocktail.availableCount }}
+                    style={styles.progressTrack}
+                  >
                     <View
                       style={[
                         styles.progressFill,
@@ -137,16 +147,16 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   resultCard: {
-    backgroundColor: "rgba(7, 26, 18, 0.9)",
+    backgroundColor: colors.surfaceTranslucent,
     borderRadius: radii.md,
     padding: 10,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.42)",
+    borderColor: colors.accentBorderMedium,
     overflow: "hidden",
   },
   resultCardReady: {
-    borderColor: "rgba(135, 217, 167, 0.46)",
-    backgroundColor: "rgba(9, 31, 21, 0.94)",
+    borderColor: colors.successBorder,
+    backgroundColor: colors.surfaceTranslucentStrong,
   },
   resultHeader: {
     flexDirection: "row",
@@ -177,10 +187,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   drinkPlateReady: {
-    backgroundColor: "rgba(12, 43, 30, 0.18)",
+    backgroundColor: colors.successOverlay,
   },
   drinkPlateAlmost: {
-    backgroundColor: "rgba(46, 29, 8, 0.14)",
+    backgroundColor: colors.accentOverlay,
   },
   resultHeaderInfo: {
     flex: 1,
@@ -195,7 +205,7 @@ const styles = StyleSheet.create({
     color: colors.paper,
     fontFamily: fonts.display,
     fontSize: 20,
-    fontWeight: "900",
+    fontWeight: "800",
     lineHeight: 24,
   },
   resultMeta: {
@@ -229,23 +239,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   badgeReady: {
-    backgroundColor: "rgba(12, 43, 30, 0.78)",
-    borderColor: "rgba(135, 217, 167, 0.5)",
+    backgroundColor: colors.successBg,
+    borderColor: colors.successBorder,
   },
   badgeAlmost: {
-    backgroundColor: "rgba(46, 29, 8, 0.8)",
-    borderColor: "rgba(237, 169, 52, 0.5)",
+    backgroundColor: colors.warningBg,
+    borderColor: colors.accentBorderMedium,
   },
   badgeLabel: {
     color: colors.paper,
     fontSize: 12,
-    fontWeight: "900",
+    fontWeight: "800",
   },
   resultMatch: {
     color: colors.paper,
     fontFamily: fonts.display,
     fontSize: 16,
-    fontWeight: "900",
+    fontWeight: "800",
   },
   resultMissing: {
     color: colors.warning,

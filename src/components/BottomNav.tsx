@@ -5,7 +5,6 @@ import Martini from "lucide-react-native/dist/cjs/icons/martini";
 import Scroll from "lucide-react-native/dist/cjs/icons/scroll";
 import ShieldCheck from "lucide-react-native/dist/cjs/icons/shield-check";
 import ShoppingBasket from "lucide-react-native/dist/cjs/icons/shopping-basket";
-import UserRound from "lucide-react-native/dist/cjs/icons/user-round";
 import Wine from "lucide-react-native/dist/cjs/icons/wine";
 
 import { colors, fonts, pressed, radii, spacing } from "../theme";
@@ -32,7 +31,6 @@ const tabs: TabConfig[] = [
   { id: "buy", label: "Купить", Icon: ShoppingBasket },
   { id: "favorites", label: "Любим.", accessibilityLabel: "Любимые", Icon: Heart },
   { id: "recipes", label: "Рецепты", Icon: Scroll },
-  { id: "account", label: "Аккаунт", Icon: UserRound },
   { id: "admin", label: "Админ", accessibilityLabel: "Админка", Icon: ShieldCheck },
 ];
 
@@ -49,7 +47,7 @@ export function BottomNav({
   favoritesCount = 0,
   showAdmin = false,
 }: BottomNavProps) {
-  const visibleTabs = showAdmin ? tabs : tabs.filter((tab) => tab.id !== "admin");
+  const visibleTabs = tabs.filter((tab) => showAdmin || tab.id !== "admin");
 
   return (
     <View style={styles.navWrap}>
@@ -101,9 +99,9 @@ export { tabs as bottomNavTabs };
 
 const styles = StyleSheet.create({
   navWrap: {
-    backgroundColor: "rgba(2, 13, 9, 0.96)",
+    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: "rgba(237, 169, 52, 0.22)",
+    borderTopColor: colors.accentBorderMuted,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
@@ -114,25 +112,25 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     flexDirection: "row",
     gap: 0,
-    backgroundColor: "rgba(7, 26, 18, 0.94)",
+    backgroundColor: colors.surfaceTranslucentStrong,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.38)",
+    borderColor: colors.accentBorderSoft,
     overflow: "hidden",
   },
   navItem: {
     flex: 1,
-    minHeight: 74,
+    minHeight: 70,
     borderRightWidth: 1,
-    borderRightColor: "rgba(237, 169, 52, 0.14)",
+    borderRightColor: colors.accentBorderMuted,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 2,
     gap: 4,
   },
   navItemActive: {
-    backgroundColor: "rgba(20, 76, 52, 0.76)",
-    borderColor: "rgba(135, 217, 167, 0.4)",
+    backgroundColor: colors.successBg,
+    borderColor: colors.successBorder,
   },
   iconPlate: {
     width: 42,
@@ -144,18 +142,18 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   iconPlateActive: {
-    backgroundColor: "rgba(135, 217, 167, 0.08)",
-    borderColor: "rgba(135, 217, 167, 0.18)",
+    backgroundColor: colors.successOverlay,
+    borderColor: colors.successBorderSoft,
   },
   navLabel: {
     color: colors.paperMuted,
     fontFamily: fonts.display,
     fontSize: 11,
-    fontWeight: "900",
+    fontWeight: "700",
   },
   navLabelActive: {
     color: colors.paper,
-    fontWeight: "900",
+    fontWeight: "800",
   },
   badge: {
     position: "absolute",
@@ -172,6 +170,6 @@ const styles = StyleSheet.create({
   badgeText: {
     color: colors.textInverse,
     fontSize: 10,
-    fontWeight: "900",
+    fontWeight: "800",
   },
 });

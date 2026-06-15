@@ -3,12 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { AccountPanel } from "./src/components/AccountPanel";
+import { AppErrorBoundary } from "./src/components/AppErrorBoundary";
 import { AppHeader } from "./src/components/AppHeader";
 import { AuthModal } from "./src/components/AuthModal";
 import { AppTab, BottomNav } from "./src/components/BottomNav";
 import { SectionPanel } from "./src/components/SectionPanel";
 import { ingredients, TasteTag } from "./src/data/cocktails";
 import { starterIngredients } from "./src/data/starterIngredients";
+import { useAgeGate } from "./src/hooks/useAgeGate";
 import { useAdminAccess } from "./src/hooks/useAdminAccess";
 import { useAuth } from "./src/hooks/useAuth";
 import { useCocktailCatalog } from "./src/hooks/useCocktailCatalog";
@@ -17,6 +19,7 @@ import { useFavorites } from "./src/hooks/useFavorites";
 import { useSavedBar } from "./src/hooks/useSavedBar";
 import { useUserProfile } from "./src/hooks/useUserProfile";
 import { AdminCocktailsTab } from "./src/screens/AdminCocktailsTab";
+import { AgeGateScreen } from "./src/screens/AgeGateScreen";
 import { BarTab } from "./src/screens/BarTab";
 import { BuyTab } from "./src/screens/BuyTab";
 import { CocktailDetailScreen } from "./src/screens/CocktailDetailScreen";
@@ -27,6 +30,8 @@ import { QuickMode, TodayTab } from "./src/screens/TodayTab";
 import { colors, fonts, spacing } from "./src/theme";
 import { rankCocktails, RankedCocktail } from "./src/utils/cocktailMatcher";
 import { buildShoppingSuggestions, buildTonightHeadline } from "./src/utils/shoppingAdvisor";
+
+type RecipeMode = "easy" | null;
 
 const tasteFilters: { id: TasteTag; label: string }[] = [
   { id: "refreshing", label: "Свежее" },
@@ -49,10 +54,22 @@ const ingredientGroups = [
 ] as const;
 
 const quickModeDefs = [
-  { id: "easy", title: "Без заморочек", subtitle: "Простые рецепты из того, что уже есть", accent: "amber" as const, taste: null },
-  { id: "refreshing", title: "Что-то свежее", subtitle: "Легкие и освежающие варианты", accent: "teal" as const, taste: "refreshing" as TasteTag },
-  { id: "strong", title: "Покрепче", subtitle: "Короткие и более насыщенные рецепты", accent: "berry" as const, taste: "strong" as TasteTag },
+  { id: "easy", title: "Без заморочек", subtitle: "До 3 ключевых ингредиентов и короткие шаги", accent: "amber" as const, taste: null, recipeMode: "easy" as RecipeMode },
+  { id: "refreshing", title: "Что-то свежее", subtitle: "Легкие и освежающие варианты", accent: "teal" as const, taste: "refreshing" as TasteTag, recipeMode: null },
+  { id: "strong", title: "Покрепче", subtitle: "Короткие и более насыщенные рецепты", accent: "berry" as const, taste: "strong" as TasteTag, recipeMode: null },
 ];
+
+const ingredientById = new Map(ingredients.map((ingredient) => [ingredient.id, ingredient]));
+
+function isSimpleCocktail(cocktail: Pick<RankedCocktail, "recipeIngredients" | "steps">) {
+  const requiredIngredientCount = cocktail.recipeIngredients.filter(({ ingredientId }) => {
+    const ingredient = ingredientById.get(ingredientId);
+
+    return !ingredient?.isGarnish && !ingredient?.isOptionalDefault;
+  }).length;
+
+  return requiredIngredientCount <= 3 && cocktail.steps.length <= 3;
+}
 
 const tabSubtitles: Record<AppTab, string> = {
   today: "Лучшие варианты из текущего бара и быстрые сценарии на вечер.",
@@ -110,7 +127,7 @@ function getSyncPillLabel({
   return "Войти";
 }
 
-export default function App() {
+function AppContent() {
   const {
     authError,
     authMessage,
@@ -130,7 +147,6 @@ export default function App() {
     catalogCocktails,
     catalogError,
     catalogSource,
-    hasLoadedCatalog,
     isLoadingCatalog,
     reloadCatalog,
   } = useCocktailCatalog(authUser?.id, isAuthReady);
@@ -169,8 +185,14 @@ export default function App() {
     profileSyncStatus,
     saveProfile,
   } = useUserProfile(authUser?.id, isAuthReady);
+  const {
+    confirmAge,
+    hasConfirmedAge,
+    hasLoadedAgeGate,
+  } = useAgeGate();
 
   const [activeTaste, setActiveTaste] = useState<TasteTag | null>(null);
+  const [activeRecipeMode, setActiveRecipeMode] = useState<RecipeMode>(null);
   const [activeTab, setActiveTab] = useState<AppTab>("today");
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
   const [selectedCocktail, setSelectedCocktail] = useState<RankedCocktail | null>(null);
@@ -203,6 +225,10 @@ export default function App() {
     () => rankCocktails(catalogCocktails, selectedIngredients, activeTaste, ingredients),
     [activeTaste, catalogCocktails, selectedIngredients],
   );
+  const visibleRankedCocktails = useMemo(
+    () => (activeRecipeMode === "easy" ? rankedCocktails.filter(isSimpleCocktail) : rankedCocktails),
+    [activeRecipeMode, rankedCocktails],
+  );
   const allRankedCocktails = useMemo(
     () => rankCocktails(catalogCocktails, selectedIngredients, null, ingredients),
     [catalogCocktails, selectedIngredients],
@@ -212,14 +238,16 @@ export default function App() {
     () =>
       quickModeDefs.map((mode) => ({
         ...mode,
-        matches: rankCocktails(catalogCocktails, selectedIngredients, mode.taste, ingredients).slice(0, 4),
+        matches: rankCocktails(catalogCocktails, selectedIngredients, mode.taste, ingredients)
+          .filter((cocktail) => (mode.recipeMode === "easy" ? isSimpleCocktail(cocktail) : true))
+          .slice(0, 4),
       })),
     [catalogCocktails, selectedIngredients],
   );
 
-  const perfectMatches = rankedCocktails.filter((c) => c.missingIngredients.length === 0);
+  const perfectMatches = visibleRankedCocktails.filter((c) => c.missingIngredients.length === 0);
   const allPerfectMatches = allRankedCocktails.filter((c) => c.missingIngredients.length === 0);
-  const almostReady = rankedCocktails.filter(
+  const almostReady = visibleRankedCocktails.filter(
     (c) => c.missingIngredients.length > 0 && c.missingIngredients.length <= 2,
   );
 
@@ -240,6 +268,21 @@ export default function App() {
   const openAuthModal = () => {
     setAuthMode("sign-in");
     setIsAuthModalVisible(true);
+  };
+
+  const changeTab = (tab: AppTab) => {
+    if (tab !== "recipes") {
+      setActiveTaste(null);
+      setActiveRecipeMode(null);
+    }
+
+    setActiveTab(tab);
+  };
+
+  const openAccountPanel = () => {
+    setActiveTaste(null);
+    setActiveRecipeMode(null);
+    setActiveTab("account");
   };
 
   const accountPanel = (
@@ -275,8 +318,9 @@ export default function App() {
     );
   };
 
-  const applyQuickMode = (taste: TasteTag | null) => {
+  const applyQuickMode = (taste: TasteTag | null, recipeMode: RecipeMode) => {
     setActiveTaste(taste);
+    setActiveRecipeMode(recipeMode);
     setActiveTab("recipes");
   };
 
@@ -286,6 +330,7 @@ export default function App() {
     }
 
     setActiveTaste(null);
+    setActiveRecipeMode(null);
     setActiveTab("today");
     setSelectedCocktail(null);
     markEntered();
@@ -312,8 +357,8 @@ export default function App() {
     !hasLoadedEntered ||
     !hasLoadedFavorites ||
     !hasLoadedProfile ||
-    !hasLoadedCatalog ||
     !hasLoadedAdminAccess ||
+    !hasLoadedAgeGate ||
     !isAuthReady
   ) {
     return (
@@ -324,6 +369,16 @@ export default function App() {
           <Text style={styles.loadingTitle}>Загружаем твой бар</Text>
           <Text style={styles.loadingText}>Проверяем локальные данные и сессию аккаунта.</Text>
         </View>
+        {authModal}
+      </SafeAreaView>
+    );
+  }
+
+  if (!hasConfirmedAge) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <AgeGateScreen onConfirm={confirmAge} />
         {authModal}
       </SafeAreaView>
     );
@@ -380,10 +435,10 @@ export default function App() {
             subtitle={tabSubtitles[activeTab]}
             onPressRightPill={
               authUser
-                ? () => setActiveTab("account")
+                ? openAccountPanel
                 : isSupabaseConfigured
                   ? openAuthModal
-                  : undefined
+                  : openAccountPanel
             }
             rightPill={getSyncPillLabel({
               authUserEmail: authUser?.email,
@@ -441,9 +496,14 @@ export default function App() {
           {activeTab === "recipes" ? (
             <RecipesTab
               rankedCocktails={rankedCocktails}
+              activeRecipeMode={activeRecipeMode}
               tasteFilters={tasteFilters}
               activeTaste={activeTaste}
-              onChangeTaste={setActiveTaste}
+              onChangeTaste={(taste) => {
+                setActiveTaste(taste);
+                setActiveRecipeMode(null);
+              }}
+              onClearRecipeMode={() => setActiveRecipeMode(null)}
               ingredients={ingredients}
               onSelectCocktail={setSelectedCocktail}
               isFavorite={isFavorite}
@@ -477,13 +537,21 @@ export default function App() {
 
         <BottomNav
           activeTab={activeTab}
-          onChangeTab={setActiveTab}
+          onChangeTab={changeTab}
           favoritesCount={favoriteCocktails.length}
           showAdmin={isAdmin}
         />
         {authModal}
       </View>
     </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <AppErrorBoundary>
+      <AppContent />
+    </AppErrorBoundary>
   );
 }
 

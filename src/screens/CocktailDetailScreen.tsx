@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { DrinkArt } from "../components/DrinkArt";
@@ -19,8 +20,8 @@ type CocktailDetailScreenProps = {
   ownedIngredientIds: string[];
 };
 
-function getIngredientName(ingredients: Ingredient[], ingredientId: string) {
-  return ingredients.find((ingredient) => ingredient.id === ingredientId)?.name ?? ingredientId;
+function getIngredientName(ingredientById: Map<string, Ingredient>, ingredientId: string) {
+  return ingredientById.get(ingredientId)?.name ?? ingredientId;
 }
 
 export function CocktailDetailScreen({
@@ -32,7 +33,11 @@ export function CocktailDetailScreen({
   onAddIngredientToBar,
   ownedIngredientIds,
 }: CocktailDetailScreenProps) {
-  const ownedSet = new Set(ownedIngredientIds);
+  const ownedSet = useMemo(() => new Set(ownedIngredientIds), [ownedIngredientIds]);
+  const ingredientById = useMemo(
+    () => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])),
+    [ingredients],
+  );
   const missingCount = cocktail.missingIngredients.length;
   const matchTotal = Math.max(
     cocktail.availableCount + cocktail.missingIngredients.length,
@@ -96,7 +101,7 @@ export function CocktailDetailScreen({
               <Pressable
                 key={ingredientId}
                 accessibilityRole="button"
-                accessibilityLabel={`Добавить ${getIngredientName(ingredients, ingredientId)} в мой бар`}
+                accessibilityLabel={`Добавить ${getIngredientName(ingredientById, ingredientId)} в мой бар`}
                 onPress={() => onAddIngredientToBar(ingredientId)}
                 style={({ pressed: isPressed }) => [
                   styles.shoppingChip,
@@ -104,7 +109,7 @@ export function CocktailDetailScreen({
                 ]}
               >
                 <Text style={styles.shoppingChipText}>
-                  + {getIngredientName(ingredients, ingredientId)}
+                  + {getIngredientName(ingredientById, ingredientId)}
                 </Text>
               </Pressable>
             ))}
@@ -115,23 +120,27 @@ export function CocktailDetailScreen({
       <SectionPanel title="Ингредиенты">
         <View style={styles.recipeList}>
           {cocktail.recipeIngredients.map(({ ingredientId, amount }) => {
+            const ingredient = ingredientById.get(ingredientId);
+            const isOptional = Boolean(ingredient?.isGarnish || ingredient?.isOptionalDefault);
             const isOwned = ownedSet.has(ingredientId);
             const isMissing = cocktail.missingIngredients.includes(ingredientId);
+            const dotStyle = isOptional ? styles.dotOptional : isOwned ? styles.dotOwned : styles.dotMissing;
 
             return (
               <View key={ingredientId} style={styles.recipeRow}>
                 <View style={styles.recipeRowMain}>
-                  <View style={[styles.dot, isOwned ? styles.dotOwned : styles.dotMissing]} />
+                  <View style={[styles.dot, dotStyle]} />
                   <Text style={styles.recipeRowText}>
-                    {getIngredientName(ingredients, ingredientId)}
+                    {getIngredientName(ingredientById, ingredientId)}
                   </Text>
+                  {isOptional ? <Text style={styles.optionalLabel}>по желанию</Text> : null}
                 </View>
                 <View style={styles.recipeRowRight}>
                   <Text style={styles.recipeAmount}>{formatRecipeAmount(amount)}</Text>
                   {isMissing ? (
                     <Pressable
                       accessibilityRole="button"
-                      accessibilityLabel={`Добавить ${getIngredientName(ingredients, ingredientId)} в мой бар`}
+                      accessibilityLabel={`Добавить ${getIngredientName(ingredientById, ingredientId)} в мой бар`}
                       onPress={() => onAddIngredientToBar(ingredientId)}
                       style={({ pressed: isPressed }) => [
                         styles.addButton,
@@ -187,7 +196,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#06170f",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.58)",
+    borderColor: colors.accentBorder,
     padding: 24,
     gap: spacing.lg,
     overflow: "hidden",
@@ -199,9 +208,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   backButton: {
-    backgroundColor: "rgba(7, 26, 18, 0.86)",
+    backgroundColor: colors.surfaceTranslucentSoft,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.46)",
+    borderColor: colors.accentBorderMedium,
     borderRadius: radii.sm,
     paddingHorizontal: 12,
     paddingVertical: 9,
@@ -233,7 +242,7 @@ const styles = StyleSheet.create({
     width: 220,
     minHeight: 176,
     borderRadius: radii.md,
-    backgroundColor: "rgba(237, 169, 52, 0.06)",
+    backgroundColor: colors.accentOverlay,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -271,10 +280,10 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   callout: {
-    backgroundColor: "rgba(7, 26, 18, 0.9)",
+    backgroundColor: colors.surfaceTranslucent,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.34)",
+    borderColor: colors.accentBorderSoft,
     padding: spacing.md,
     gap: spacing.sm,
   },
@@ -308,10 +317,10 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   recipeList: {
-    backgroundColor: "rgba(7, 26, 18, 0.88)",
+    backgroundColor: colors.surfaceTranslucent,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.34)",
+    borderColor: colors.accentBorderSoft,
     overflow: "hidden",
   },
   recipeRow: {
@@ -323,7 +332,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(237, 169, 52, 0.18)",
+    borderBottomColor: colors.accentBorderMuted,
   },
   recipeRowMain: {
     flexDirection: "row",
@@ -333,6 +342,7 @@ const styles = StyleSheet.create({
   },
   recipeRowText: {
     color: colors.paper,
+    flexShrink: 1,
     fontFamily: fonts.display,
     fontSize: 17,
   },
@@ -370,6 +380,14 @@ const styles = StyleSheet.create({
   dotMissing: {
     backgroundColor: colors.accent,
   },
+  dotOptional: {
+    backgroundColor: colors.textDim,
+  },
+  optionalLabel: {
+    color: colors.textDim,
+    fontSize: 12,
+    fontWeight: "700",
+  },
   steps: {
     gap: spacing.sm,
   },
@@ -377,10 +395,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.md,
     alignItems: "flex-start",
-    backgroundColor: "rgba(7, 26, 18, 0.88)",
+    backgroundColor: colors.surfaceTranslucent,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.28)",
+    borderColor: colors.accentBorderMuted,
     padding: spacing.md,
   },
   stepIndexWrap: {

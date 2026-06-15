@@ -101,7 +101,7 @@ export function AppHeader({
               <View key={stat.label} style={styles.summarySlot}>
                 {index > 0 ? <View style={styles.summaryDivider} /> : null}
                 <View style={styles.summaryItem}>
-                  <Icon color={tint} size={34} strokeWidth={2.1} />
+                  <Icon color={tint} size={30} strokeWidth={2.1} />
                   <View style={styles.summaryCopy}>
                     <Text style={styles.summaryValue}>{stat.value}</Text>
                     <Text style={styles.summaryLabel}>{stat.label}</Text>
@@ -118,7 +118,7 @@ export function AppHeader({
 
 const styles = StyleSheet.create({
   header: {
-    gap: spacing.xl,
+    gap: spacing.lg,
     paddingBottom: 2,
   },
   headerTop: {
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(139, 102, 40, 0.32)",
+    borderBottomColor: colors.borderOverlay,
     paddingBottom: spacing.md,
   },
   brandRow: {
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     color: colors.paper,
     fontFamily: fonts.display,
     fontSize: 31,
-    fontWeight: "900",
+    fontWeight: "800",
     lineHeight: 32,
     textTransform: "uppercase",
   },
@@ -168,9 +168,9 @@ const styles = StyleSheet.create({
   title: {
     color: colors.paper,
     fontFamily: fonts.display,
-    fontSize: 50,
+    fontSize: 44,
     fontWeight: "900",
-    lineHeight: 55,
+    lineHeight: 49,
   },
   subtitle: {
     color: colors.textSubtle,
@@ -183,8 +183,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    backgroundColor: "rgba(7, 26, 18, 0.9)",
-    borderColor: "rgba(237, 169, 52, 0.72)",
+    backgroundColor: colors.surfaceTranslucent,
+    borderColor: colors.accentBorderStrong,
     borderWidth: 1,
     borderRadius: radii.md,
     paddingHorizontal: 12,
@@ -208,14 +208,14 @@ const styles = StyleSheet.create({
     color: colors.paper,
     fontFamily: fonts.display,
     fontSize: 13,
-    fontWeight: "900",
+    fontWeight: "700",
   },
   savedPillText: {
     color: colors.paper,
     flexShrink: 1,
     fontFamily: fonts.display,
     fontSize: 15,
-    fontWeight: "900",
+    fontWeight: "700",
   },
   summaryStrip: {
     flexDirection: "row",
@@ -229,12 +229,12 @@ const styles = StyleSheet.create({
   },
   summaryDivider: {
     width: 1,
-    height: 44,
-    backgroundColor: "rgba(237, 169, 52, 0.45)",
+    height: 38,
+    backgroundColor: colors.accentBorderMedium,
   },
   summaryItem: {
-    minWidth: 104,
-    minHeight: 54,
+    minWidth: 92,
+    minHeight: 48,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
@@ -245,15 +245,15 @@ const styles = StyleSheet.create({
   summaryValue: {
     color: colors.paper,
     fontFamily: fonts.display,
-    fontSize: 32,
+    fontSize: 29,
     fontWeight: "900",
-    lineHeight: 34,
+    lineHeight: 31,
   },
   summaryLabel: {
     color: colors.paperMuted,
     fontFamily: fonts.display,
-    fontSize: 15,
-    fontWeight: "900",
+    fontSize: 13,
+    fontWeight: "700",
     letterSpacing: 0,
     textTransform: "uppercase",
   },

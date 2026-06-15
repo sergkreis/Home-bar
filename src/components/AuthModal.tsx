@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { AuthMode } from "../hooks/useAuth";
@@ -63,6 +63,8 @@ export function AuthModal({
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
   const [rememberSession, setRememberSession] = useState(true);
+  const passwordInputRef = useRef<TextInput>(null);
+  const passwordRepeatInputRef = useRef<TextInput>(null);
   const isSignUp = authMode === "sign-up";
   const isReset = authMode === "reset-password";
   const isUpdatePassword = authMode === "update-password";
@@ -177,8 +179,17 @@ export function AuthModal({
               autoComplete="email"
               inputMode="email"
               onChangeText={setEmail}
+              onSubmitEditing={() => {
+                if (isReset) {
+                  submit();
+                  return;
+                }
+
+                passwordInputRef.current?.focus();
+              }}
               placeholder="email"
               placeholderTextColor={colors.textDim}
+              returnKeyType={isReset ? "go" : "next"}
               style={styles.input}
               value={email}
             />
@@ -186,11 +197,21 @@ export function AuthModal({
 
           {!isReset ? (
             <TextInput
+              ref={passwordInputRef}
               autoCapitalize="none"
               autoComplete={isSignUp ? "new-password" : "password"}
               onChangeText={setPassword}
+              onSubmitEditing={() => {
+                if (isSignUp) {
+                  passwordRepeatInputRef.current?.focus();
+                  return;
+                }
+
+                submit();
+              }}
               placeholder="пароль от 6 символов"
               placeholderTextColor={colors.textDim}
+              returnKeyType={isSignUp ? "next" : "go"}
               secureTextEntry
               style={styles.input}
               value={password}
@@ -199,11 +220,14 @@ export function AuthModal({
 
           {isSignUp ? (
             <TextInput
+              ref={passwordRepeatInputRef}
               autoCapitalize="none"
               autoComplete="new-password"
               onChangeText={setPasswordRepeat}
+              onSubmitEditing={submit}
               placeholder="повтори пароль"
               placeholderTextColor={colors.textDim}
+              returnKeyType="go"
               secureTextEntry
               style={styles.input}
               value={passwordRepeat}
@@ -267,7 +291,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(23, 24, 21, 0.38)",
+    backgroundColor: colors.surfaceTranslucentSoft,
     padding: spacing.md,
   },
   dialog: {

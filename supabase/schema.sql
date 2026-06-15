@@ -99,6 +99,20 @@ with check ((select auth.uid()) = user_id);
 create index if not exists user_profiles_updated_at_idx
 on public.user_profiles (updated_at desc);
 
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'user_profiles_birth_date_range'
+      and conrelid = 'public.user_profiles'::regclass
+  ) then
+    alter table public.user_profiles
+    add constraint user_profiles_birth_date_range
+    check (birth_date is null or birth_date >= date '1900-01-01');
+  end if;
+end $$;
+
 create table if not exists public.admin_users (
   user_id uuid primary key references auth.users(id) on delete cascade,
   role text not null default 'admin',
@@ -194,6 +208,9 @@ on public.cocktail_records (is_published, name);
 create index if not exists cocktail_records_updated_at_idx
 on public.cocktail_records (updated_at desc);
 
+create index if not exists cocktail_records_updated_by_idx
+on public.cocktail_records (updated_by);
+
 create table if not exists public.cocktail_ingredient_links (
   cocktail_id text not null references public.cocktail_records(id) on delete cascade,
   ingredient_id text not null,
@@ -245,6 +262,125 @@ using (public.is_admin());
 
 create index if not exists cocktail_ingredient_links_cocktail_id_idx
 on public.cocktail_ingredient_links (cocktail_id);
+
+create or replace function public.upsert_cocktail_catalog(
+  p_records jsonb,
+  p_links jsonb
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  record_ids text[];
+begin
+  if not public.is_admin() then
+    raise exception 'Admin access required' using errcode = '42501';
+  end if;
+
+  if jsonb_typeof(p_records) is distinct from 'array' then
+    raise exception 'p_records must be a JSON array' using errcode = '22023';
+  end if;
+
+  if jsonb_typeof(p_links) is distinct from 'array' then
+    raise exception 'p_links must be a JSON array' using errcode = '22023';
+  end if;
+
+  with record_values as (
+    select item
+    from jsonb_array_elements(p_records) as records(item)
+  ),
+  upserted as (
+    insert into public.cocktail_records (
+      id,
+      name,
+      base_spirit,
+      taste,
+      strength,
+      glass_name,
+      steps,
+      garnish,
+      image_asset_key,
+      image_status,
+      is_published,
+      reference_urls,
+      updated_at,
+      updated_by
+    )
+    select
+      item->>'id',
+      item->>'name',
+      item->>'base_spirit',
+      coalesce(
+        array(select jsonb_array_elements_text(coalesce(item->'taste', '[]'::jsonb))),
+        '{}'::text[]
+      ),
+      coalesce(nullif(item->>'strength', ''), 'medium'),
+      item->>'glass_name',
+      coalesce(
+        array(select jsonb_array_elements_text(coalesce(item->'steps', '[]'::jsonb))),
+        '{}'::text[]
+      ),
+      nullif(item->>'garnish', ''),
+      nullif(item->>'image_asset_key', ''),
+      coalesce(nullif(item->>'image_status', ''), 'todo'),
+      coalesce((item->>'is_published')::boolean, true),
+      coalesce(
+        array(select jsonb_array_elements_text(coalesce(item->'reference_urls', '[]'::jsonb))),
+        '{}'::text[]
+      ),
+      now(),
+      (select auth.uid())
+    from record_values
+    where nullif(item->>'id', '') is not null
+    on conflict (id) do update set
+      name = excluded.name,
+      base_spirit = excluded.base_spirit,
+      taste = excluded.taste,
+      strength = excluded.strength,
+      glass_name = excluded.glass_name,
+      steps = excluded.steps,
+      garnish = excluded.garnish,
+      image_asset_key = excluded.image_asset_key,
+      image_status = excluded.image_status,
+      is_published = excluded.is_published,
+      reference_urls = excluded.reference_urls,
+      updated_at = excluded.updated_at,
+      updated_by = excluded.updated_by
+    returning id
+  )
+  select coalesce(array_agg(id), '{}'::text[])
+  into record_ids
+  from upserted;
+
+  if coalesce(array_length(record_ids, 1), 0) = 0 then
+    return;
+  end if;
+
+  delete from public.cocktail_ingredient_links
+  where cocktail_id = any(record_ids);
+
+  insert into public.cocktail_ingredient_links (
+    cocktail_id,
+    ingredient_id,
+    sort_order,
+    amount
+  )
+  select
+    item->>'cocktail_id',
+    item->>'ingredient_id',
+    coalesce((item->>'sort_order')::integer, 0),
+    item->>'amount'
+  from jsonb_array_elements(p_links) as links(item)
+  where item->>'cocktail_id' = any(record_ids)
+    and nullif(item->>'ingredient_id', '') is not null
+    and nullif(item->>'amount', '') is not null;
+end;
+$$;
+
+revoke all on function public.upsert_cocktail_catalog(jsonb, jsonb) from public;
+grant execute on function public.upsert_cocktail_catalog(jsonb, jsonb) to authenticated;
 
 -- After running this schema, grant yourself admin access once:
 -- insert into public.admin_users (user_id)

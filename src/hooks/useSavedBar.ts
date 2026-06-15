@@ -42,8 +42,13 @@ export function useSavedBar(
   const [hasMergedRemoteBar, setHasMergedRemoteBar] = useState(false);
   const [isSyncingBar, setIsSyncingBar] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
+  const knownIngredientIds = useMemo(
+    () => new Set(ingredients.map((ingredient) => ingredient.id)),
+    [ingredients],
+  );
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const loadedStorageKey = useRef<string | null>(null);
+  const remoteUpdatedAtRef = useRef<string | null>(null);
+  const skipNextRemoteSaveRef = useRef(false);
 
   useEffect(() => {
     if (!isAuthReady) {
@@ -56,6 +61,8 @@ export function useSavedBar(
       setHasLoadedSavedBar(false);
       setHasMergedRemoteBar(false);
       setSyncError(null);
+      remoteUpdatedAtRef.current = null;
+      skipNextRemoteSaveRef.current = false;
 
       try {
         const storedIngredients = await AsyncStorage.getItem(storageKey);
@@ -74,7 +81,6 @@ export function useSavedBar(
           return;
         }
 
-        const knownIngredientIds = new Set(ingredients.map((ingredient) => ingredient.id));
         const savedIngredients = uniqueKnownIds(parsedIngredients, knownIngredientIds);
 
         if (isMounted) {
@@ -85,7 +91,6 @@ export function useSavedBar(
         console.warn("Failed to load saved home bar.", error);
       } finally {
         if (isMounted) {
-          loadedStorageKey.current = storageKey;
           setHasLoadedSavedBar(true);
         }
       }
@@ -96,7 +101,7 @@ export function useSavedBar(
     return () => {
       isMounted = false;
     };
-  }, [ingredients, isAuthReady, storageKey]);
+  }, [isAuthReady, knownIngredientIds, storageKey]);
 
   useEffect(() => {
     if (!isAuthReady || !hasLoadedSavedBar) {
@@ -141,17 +146,14 @@ export function useSavedBar(
           return;
         }
 
-        const knownIngredientIds = new Set(ingredients.map((ingredient) => ingredient.id));
+        const remoteIngredientIds = remoteBar
+          ? uniqueKnownIds(remoteBar.ingredientIds, knownIngredientIds)
+          : [];
 
-        if (remoteBar && remoteBar.ingredientIds.length > 0) {
-          const remoteIngredientIds = uniqueKnownIds(remoteBar.ingredientIds, knownIngredientIds);
-
-          setSelectedIngredients(remoteIngredientIds);
-          setHasSavedBar(true);
-        } else {
-          setSelectedIngredients([]);
-          setHasSavedBar(false);
-        }
+        remoteUpdatedAtRef.current = remoteBar?.updatedAt ?? null;
+        skipNextRemoteSaveRef.current = true;
+        setSelectedIngredients(remoteIngredientIds);
+        setHasSavedBar(remoteIngredientIds.length > 0);
 
         setHasMergedRemoteBar(true);
       } catch (error) {
@@ -174,8 +176,8 @@ export function useSavedBar(
   }, [
     hasLoadedSavedBar,
     hasMergedRemoteBar,
-    ingredients,
     isAuthReady,
+    knownIngredientIds,
     userId,
   ]);
 
@@ -184,12 +186,37 @@ export function useSavedBar(
       return;
     }
 
+    if (skipNextRemoteSaveRef.current) {
+      skipNextRemoteSaveRef.current = false;
+      return;
+    }
+
     const currentUserId = userId;
     const timeoutId = setTimeout(() => {
       setIsSyncingBar(true);
       setSyncError(null);
 
-      saveRemoteUserBar(currentUserId, selectedIngredients)
+      saveRemoteUserBar(currentUserId, selectedIngredients, remoteUpdatedAtRef.current)
+        .then((result) => {
+          if (!result) {
+            return;
+          }
+
+          if (result.status === "saved") {
+            remoteUpdatedAtRef.current = result.bar.updatedAt;
+            return;
+          }
+
+          const remoteIngredientIds = result.bar
+            ? uniqueKnownIds(result.bar.ingredientIds, knownIngredientIds)
+            : [];
+
+          remoteUpdatedAtRef.current = result.bar?.updatedAt ?? null;
+          skipNextRemoteSaveRef.current = true;
+          setSelectedIngredients(remoteIngredientIds);
+          setHasSavedBar(remoteIngredientIds.length > 0);
+          setSyncError("Бар обновился на другом устройстве. Показали свежую версию из аккаунта.");
+        })
         .catch((error) => {
           console.warn("Failed to save remote home bar.", error);
           setSyncError("Не удалось сохранить бар в аккаунте.");
@@ -202,7 +229,14 @@ export function useSavedBar(
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [hasLoadedSavedBar, hasMergedRemoteBar, isAuthReady, selectedIngredients, userId]);
+  }, [
+    hasLoadedSavedBar,
+    hasMergedRemoteBar,
+    isAuthReady,
+    knownIngredientIds,
+    selectedIngredients,
+    userId,
+  ]);
 
   const syncStatus = syncError ? "error" : isSyncingBar ? "syncing" : userId ? "remote" : "local";
 

@@ -17,8 +17,8 @@ const manifest = {
   scope: "/",
   display: "standalone",
   orientation: "portrait",
-  background_color: "#101318",
-  theme_color: "#101318",
+  background_color: "#020d09",
+  theme_color: "#020d09",
   icons: [
     {
       src: "/icon.png",

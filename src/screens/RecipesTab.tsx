@@ -8,12 +8,15 @@ import { colors, pressed, radii, spacing } from "../theme";
 import { RankedCocktail } from "../utils/cocktailMatcher";
 
 type TasteFilter = { id: TasteTag; label: string };
+type RecipeMode = "easy" | null;
 
 type RecipesTabProps = {
   rankedCocktails: RankedCocktail[];
+  activeRecipeMode: RecipeMode;
   tasteFilters: TasteFilter[];
   activeTaste: TasteTag | null;
   onChangeTaste: (taste: TasteTag | null) => void;
+  onClearRecipeMode: () => void;
   ingredients: Ingredient[];
   onSelectCocktail: (cocktail: RankedCocktail) => void;
   isFavorite: (cocktailId: string) => boolean;
@@ -24,43 +27,104 @@ function normalizeText(value: string) {
   return value.trim().toLocaleLowerCase("ru-RU");
 }
 
+function isSimpleCocktail(cocktail: RankedCocktail, ingredientById: Map<string, Ingredient>) {
+  const requiredIngredientCount = cocktail.recipeIngredients.filter(({ ingredientId }) => {
+    const ingredient = ingredientById.get(ingredientId);
+
+    return !ingredient?.isGarnish && !ingredient?.isOptionalDefault;
+  }).length;
+
+  return requiredIngredientCount <= 3 && cocktail.steps.length <= 3;
+}
+
+function getSearchText(cocktail: RankedCocktail, ingredientById: Map<string, Ingredient>) {
+  const ingredientText = cocktail.recipeIngredients
+    .flatMap(({ ingredientId }) => {
+      const ingredient = ingredientById.get(ingredientId);
+
+      return ingredient ? [ingredient.name, ...(ingredient.aliases ?? [])] : [ingredientId];
+    })
+    .join(" ");
+
+  return normalizeText(
+    [
+      cocktail.name,
+      cocktail.baseSpirit,
+      cocktail.glassName,
+      cocktail.taste.join(" "),
+      ingredientText,
+    ].join(" "),
+  );
+}
+
 export function RecipesTab({
   rankedCocktails,
+  activeRecipeMode,
   tasteFilters,
   activeTaste,
   onChangeTaste,
+  onClearRecipeMode,
   ingredients,
   onSelectCocktail,
   isFavorite,
   onToggleFavorite,
 }: RecipesTabProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const ingredientById = useMemo(
+    () => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])),
+    [ingredients],
+  );
 
   const filteredCocktails = useMemo(() => {
     const normalized = normalizeText(searchQuery);
+    const modeFilteredCocktails =
+      activeRecipeMode === "easy"
+        ? rankedCocktails.filter((cocktail) => isSimpleCocktail(cocktail, ingredientById))
+        : rankedCocktails;
+
     if (!normalized) {
-      return rankedCocktails;
+      return modeFilteredCocktails;
     }
-    return rankedCocktails.filter((cocktail) =>
-      normalizeText(cocktail.name).includes(normalized),
+
+    return modeFilteredCocktails.filter((cocktail) =>
+      getSearchText(cocktail, ingredientById).includes(normalized),
     );
-  }, [rankedCocktails, searchQuery]);
+  }, [activeRecipeMode, ingredientById, rankedCocktails, searchQuery]);
 
   return (
     <>
       <SectionPanel title="Фильтр рецептов" hint="Поиск и настроение влияют на порядок выдачи. Готовые варианты остаются выше.">
         <View style={styles.filterRow}>
+          {activeRecipeMode === "easy" ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Отключить фильтр простых рецептов"
+              onPress={onClearRecipeMode}
+              style={({ pressed: isPressed }) => [
+                styles.filterPill,
+                styles.filterPillActive,
+                isPressed && { opacity: pressed.opacity },
+              ]}
+            >
+              <Text style={[styles.filterLabel, styles.filterLabelActive]}>
+                Простые
+              </Text>
+            </Pressable>
+          ) : null}
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Показать все коктейли"
-            onPress={() => onChangeTaste(null)}
+            onPress={() => {
+              onClearRecipeMode();
+              onChangeTaste(null);
+            }}
             style={({ pressed: isPressed }) => [
               styles.filterPill,
-              activeTaste === null && styles.filterPillActive,
+              activeTaste === null && activeRecipeMode === null && styles.filterPillActive,
               isPressed && { opacity: pressed.opacity },
             ]}
           >
-            <Text style={[styles.filterLabel, activeTaste === null && styles.filterLabelActive]}>
+            <Text style={[styles.filterLabel, activeTaste === null && activeRecipeMode === null && styles.filterLabelActive]}>
               Все
             </Text>
           </Pressable>
@@ -89,11 +153,13 @@ export function RecipesTab({
 
         <View style={styles.searchWrap}>
           <TextInput
-            accessibilityLabel="Поиск коктейля по названию"
+            accessibilityLabel="Поиск коктейля по названию, базе или ингредиентам"
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Найти коктейль по названию"
+            onSubmitEditing={() => setSearchQuery((value) => value.trim())}
+            placeholder="Найти по названию, базе или ингредиенту"
             placeholderTextColor={colors.textDim}
+            returnKeyType="search"
             style={styles.searchInput}
           />
         </View>
@@ -135,7 +201,7 @@ const styles = StyleSheet.create({
   filterLabel: {
     color: colors.text,
     fontSize: 14,
-    fontWeight: "900",
+    fontWeight: "800",
   },
   filterLabelActive: {
     color: colors.textOnAccent,

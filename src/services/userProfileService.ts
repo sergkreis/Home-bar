@@ -17,6 +17,14 @@ export type SaveUserProfileInput = {
   displayName: string;
 };
 
+function toUserProfile(row: UserProfileRow): UserProfile {
+  return {
+    birthDate: row.birth_date ?? "",
+    displayName: row.display_name ?? "",
+    updatedAt: row.updated_at,
+  };
+}
+
 export async function loadRemoteUserProfile(userId: string): Promise<UserProfile | null> {
   if (!supabase) {
     return null;
@@ -36,29 +44,34 @@ export async function loadRemoteUserProfile(userId: string): Promise<UserProfile
     return null;
   }
 
-  return {
-    birthDate: data.birth_date ?? "",
-    displayName: data.display_name ?? "",
-    updatedAt: data.updated_at,
-  };
+  return toUserProfile(data);
 }
 
-export async function saveRemoteUserProfile(userId: string, profile: SaveUserProfileInput) {
+export async function saveRemoteUserProfile(
+  userId: string,
+  profile: SaveUserProfileInput,
+): Promise<UserProfile | null> {
   if (!supabase) {
-    return;
+    return null;
   }
 
   const displayName = profile.displayName.trim();
   const birthDate = profile.birthDate.trim() || null;
 
-  const { error } = await supabase.from("user_profiles").upsert({
-    user_id: userId,
-    display_name: displayName,
-    birth_date: birthDate,
-    updated_at: new Date().toISOString(),
-  });
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .upsert({
+      user_id: userId,
+      display_name: displayName,
+      birth_date: birthDate,
+      updated_at: new Date().toISOString(),
+    })
+    .select("display_name, birth_date, updated_at")
+    .maybeSingle<UserProfileRow>();
 
   if (error) {
     throw error;
   }
+
+  return data ? toUserProfile(data) : null;
 }

@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.45)",
-    backgroundColor: "rgba(7, 26, 18, 0.82)",
+    borderColor: colors.accentBorderMedium,
+    backgroundColor: colors.surfaceTranslucentSoft,
   },
   large: {
     width: 58,
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.55)",
-    backgroundColor: "rgba(7, 26, 18, 0.82)",
+    borderColor: colors.accentBorder,
+    backgroundColor: colors.surfaceTranslucentSoft,
   },
   active: {
-    backgroundColor: "rgba(237, 169, 52, 0.16)",
+    backgroundColor: colors.accentOverlayStrong,
     borderColor: colors.accent,
   },
 });

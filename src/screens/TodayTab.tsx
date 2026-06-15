@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import { useMemo, type ComponentType } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import ArrowRight from "lucide-react-native/dist/cjs/icons/arrow-right";
 import CircleAlert from "lucide-react-native/dist/cjs/icons/circle-alert";
@@ -20,6 +20,7 @@ export type QuickMode = {
   subtitle: string;
   accent: "amber" | "teal" | "berry";
   taste: TasteTag | null;
+  recipeMode: "easy" | null;
   matches: RankedCocktail[];
 };
 
@@ -29,7 +30,7 @@ type TodayTabProps = {
   perfectMatches: RankedCocktail[];
   almostReady: RankedCocktail[];
   ingredients: Ingredient[];
-  onApplyQuickMode: (taste: TasteTag | null) => void;
+  onApplyQuickMode: (taste: TasteTag | null, recipeMode: "easy" | null) => void;
   onSelectCocktail: (cocktail: RankedCocktail) => void;
   isFavorite: (cocktailId: string) => boolean;
   onToggleFavorite: (cocktailId: string) => void;
@@ -73,8 +74,8 @@ function getModeVisuals(mode: QuickMode): {
   };
 }
 
-function getIngredientName(ingredients: Ingredient[], ingredientId: string) {
-  return ingredients.find((ingredient) => ingredient.id === ingredientId)?.name ?? ingredientId;
+function getIngredientName(ingredientById: Map<string, Ingredient>, ingredientId: string) {
+  return ingredientById.get(ingredientId)?.name ?? ingredientId;
 }
 
 export function TodayTab({
@@ -88,12 +89,15 @@ export function TodayTab({
   isFavorite,
   onToggleFavorite,
 }: TodayTabProps) {
+  const ingredientById = useMemo(
+    () => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])),
+    [ingredients],
+  );
   const heroCocktail = perfectMatches[0] ?? almostReady[0] ?? null;
-  const hasPerfectMatches = perfectMatches.length > 0;
   const heroMissingText = heroCocktail?.missingIngredients.length
     ? `Не хватает: ${heroCocktail.missingIngredients
         .slice(0, 2)
-        .map((ingredientId) => getIngredientName(ingredients, ingredientId))
+        .map((ingredientId) => getIngredientName(ingredientById, ingredientId))
         .join(", ")}`
     : "Все ингредиенты есть дома";
 
@@ -160,7 +164,7 @@ export function TodayTab({
                 accessibilityLabel={`${mode.title}: ${mode.matches.length} коктейлей`}
                 accessibilityRole="button"
                 key={mode.id}
-                onPress={() => onApplyQuickMode(mode.taste)}
+                onPress={() => onApplyQuickMode(mode.taste, mode.recipeMode)}
                 style={({ pressed: isPressed }) => [
                   styles.actionCard,
                   visual.cardStyle,
@@ -174,7 +178,10 @@ export function TodayTab({
                   <Text style={styles.actionTitle}>{mode.title}</Text>
                   <Text style={styles.actionSubtitle}>{mode.subtitle}</Text>
                 </View>
-                <ArrowRight color={visual.iconColor} size={19} strokeWidth={2.4} />
+                <View style={styles.actionMeta}>
+                  <Text style={[styles.actionCount, { color: visual.iconColor }]}>{mode.matches.length}</Text>
+                  <ArrowRight color={visual.iconColor} size={19} strokeWidth={2.4} />
+                </View>
               </Pressable>
             );
           })}
@@ -211,10 +218,10 @@ const styles = StyleSheet.create({
     position: "relative",
     flexDirection: "row",
     flexWrap: "wrap",
-    backgroundColor: "#06170f",
+    backgroundColor: colors.backgroundSoft,
     borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.58)",
+    borderColor: colors.accentBorder,
     padding: 28,
     paddingRight: 86,
     gap: spacing.lg,
@@ -228,7 +235,7 @@ const styles = StyleSheet.create({
     width: 420,
     height: 260,
     borderRadius: 110,
-    backgroundColor: "rgba(237, 169, 52, 0.08)",
+    backgroundColor: colors.accentOverlay,
   },
   heroContent: {
     flex: 1,
@@ -241,7 +248,7 @@ const styles = StyleSheet.create({
     color: colors.accent,
     fontFamily: fonts.display,
     fontSize: 32,
-    fontWeight: "900",
+    fontWeight: "800",
     lineHeight: 38,
   },
   heroText: {
@@ -259,7 +266,7 @@ const styles = StyleSheet.create({
     color: colors.paper,
     fontFamily: fonts.display,
     fontSize: 34,
-    fontWeight: "900",
+    fontWeight: "800",
     lineHeight: 39,
   },
   heroPickMeta: {
@@ -313,9 +320,9 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: radii.md,
-    backgroundColor: "rgba(24, 58, 43, 0.82)",
+    backgroundColor: colors.surfaceRaised,
     borderWidth: 1,
-    borderColor: "rgba(237, 169, 52, 0.72)",
+    borderColor: colors.accentBorderStrong,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -331,7 +338,7 @@ const styles = StyleSheet.create({
     minHeight: 104,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(7, 26, 18, 0.86)",
+    backgroundColor: colors.surfaceTranslucentSoft,
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.border,
@@ -339,16 +346,16 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   actionCardAmber: {
-    borderColor: "rgba(237, 169, 52, 0.6)",
-    backgroundColor: "rgba(49, 31, 11, 0.5)",
+    borderColor: colors.accentBorder,
+    backgroundColor: colors.accentSoft,
   },
   actionCardTeal: {
-    borderColor: "rgba(85, 208, 184, 0.55)",
-    backgroundColor: "rgba(7, 35, 31, 0.72)",
+    borderColor: colors.tealBorder,
+    backgroundColor: colors.tealSoft,
   },
   actionCardBerry: {
-    borderColor: "rgba(255, 122, 45, 0.58)",
-    backgroundColor: "rgba(51, 27, 8, 0.64)",
+    borderColor: colors.berryBorder,
+    backgroundColor: colors.berrySoft,
   },
   actionIcon: {
     width: 52,
@@ -358,23 +365,33 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   actionIconAmber: {
-    backgroundColor: "rgba(237, 169, 52, 0.08)",
+    backgroundColor: colors.accentOverlay,
   },
   actionIconTeal: {
-    backgroundColor: "rgba(85, 208, 184, 0.08)",
+    backgroundColor: colors.tealOverlay,
   },
   actionIconBerry: {
-    backgroundColor: "rgba(255, 122, 45, 0.08)",
+    backgroundColor: colors.berryOverlay,
   },
   actionCopy: {
     flex: 1,
     gap: 4,
   },
+  actionMeta: {
+    alignItems: "center",
+    gap: 6,
+  },
+  actionCount: {
+    fontFamily: fonts.display,
+    fontSize: 18,
+    fontWeight: "800",
+    lineHeight: 22,
+  },
   actionTitle: {
     color: colors.paper,
     fontFamily: fonts.display,
     fontSize: 19,
-    fontWeight: "900",
+    fontWeight: "800",
     lineHeight: 23,
   },
   actionSubtitle: {

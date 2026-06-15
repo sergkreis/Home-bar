@@ -165,6 +165,27 @@ function toLinkInserts(cocktail: CocktailCatalogSaveInput): CocktailIngredientLi
   }));
 }
 
+async function saveCatalogViaRpc(
+  cocktails: CocktailCatalogSaveInput[],
+  userId?: string,
+): Promise<void> {
+  if (!supabase || cocktails.length === 0) {
+    return;
+  }
+
+  const recordRows = cocktails.map((cocktail) => toRecordUpsert(cocktail, userId));
+  const linkRows = cocktails.flatMap(toLinkInserts);
+
+  const { error } = await supabase.rpc("upsert_cocktail_catalog", {
+    p_links: linkRows,
+    p_records: recordRows,
+  });
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function loadRemoteCocktailCatalog(): Promise<RemoteCocktailCatalog | null> {
   if (!supabase) {
     return null;
@@ -211,75 +232,12 @@ export async function saveRemoteCocktail(
   cocktail: CocktailCatalogSaveInput,
   userId?: string,
 ): Promise<void> {
-  if (!supabase) {
-    return;
-  }
-
-  const { error: recordError } = await supabase
-    .from("cocktail_records")
-    .upsert(toRecordUpsert(cocktail, userId));
-
-  if (recordError) {
-    throw recordError;
-  }
-
-  const { error: deleteError } = await supabase
-    .from("cocktail_ingredient_links")
-    .delete()
-    .eq("cocktail_id", cocktail.id.trim());
-
-  if (deleteError) {
-    throw deleteError;
-  }
-
-  const linkInserts = toLinkInserts(cocktail);
-  if (linkInserts.length === 0) {
-    return;
-  }
-
-  const { error: insertError } = await supabase
-    .from("cocktail_ingredient_links")
-    .insert(linkInserts);
-
-  if (insertError) {
-    throw insertError;
-  }
+  await saveCatalogViaRpc([cocktail], userId);
 }
 
 export async function seedRemoteCocktails(
   cocktails: CocktailCatalogSaveInput[] = staticCocktails,
   userId?: string,
 ): Promise<void> {
-  if (!supabase) {
-    return;
-  }
-
-  const recordRows = cocktails.map((cocktail) => toRecordUpsert(cocktail, userId));
-  const ids = recordRows.map((record) => record.id);
-
-  const { error: recordsError } = await supabase.from("cocktail_records").upsert(recordRows);
-
-  if (recordsError) {
-    throw recordsError;
-  }
-
-  const { error: deleteError } = await supabase
-    .from("cocktail_ingredient_links")
-    .delete()
-    .in("cocktail_id", ids);
-
-  if (deleteError) {
-    throw deleteError;
-  }
-
-  const linkRows = cocktails.flatMap(toLinkInserts);
-  if (linkRows.length === 0) {
-    return;
-  }
-
-  const { error: linksError } = await supabase.from("cocktail_ingredient_links").insert(linkRows);
-
-  if (linksError) {
-    throw linksError;
-  }
+  await saveCatalogViaRpc(cocktails, userId);
 }

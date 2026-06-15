@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     color: colors.textSubtle,
     fontFamily: fonts.display,
     fontSize: 24,
-    fontWeight: "900",
+    fontWeight: "800",
     lineHeight: 30,
   },
   sectionHint: {
