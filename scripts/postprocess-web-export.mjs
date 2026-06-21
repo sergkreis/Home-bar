@@ -35,6 +35,35 @@ const manifest = {
   ],
 };
 
+const staleServiceWorkerCleanup = `const CACHE_CLEANUP_VERSION = "domashniy-bar-stale-sw-cleanup-2026-06-21";
+
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
+
+  event.waitUntil(
+    caches
+      .keys()
+      .then((cacheNames) => Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))),
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+      await self.registration.unregister();
+
+      const clients = await self.clients.matchAll({
+        includeUncontrolled: true,
+        type: "window",
+      });
+      await Promise.all(clients.map((client) => client.navigate(client.url)));
+    })(),
+  );
+});
+`;
+
 function upsertHeadTag(html, tag, marker) {
   if (html.includes(marker)) {
     return html;
@@ -86,5 +115,7 @@ html = upsertHeadTag(html, '<link rel="apple-touch-icon" href="/icon.png" />', '
 
 await writeFile(indexPath, html, "utf8");
 await writeFile(path.join(distDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+await writeFile(path.join(distDir, "sw.js"), staleServiceWorkerCleanup, "utf8");
+await writeFile(path.join(distDir, "service-worker.js"), staleServiceWorkerCleanup, "utf8");
 await copyFile(path.resolve("assets/icon.png"), path.join(distDir, "icon.png"));
 await copyFile(path.resolve("assets/adaptive-icon.png"), path.join(distDir, "adaptive-icon.png"));

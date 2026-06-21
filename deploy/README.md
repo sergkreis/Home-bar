@@ -87,6 +87,11 @@ The static build is written to:
 dist/
 ```
 
+The web export postprocess step writes `/sw.js` and `/service-worker.js` as cleanup
+service workers. They unregister old browser/PWA workers and clear stale Cache
+Storage, so keep the matching nginx `no-store` locations in
+`deploy/nginx-home-bar.conf`.
+
 ## Manual Cutover Checklist
 
 Use this only if GitHub Actions is unavailable.

@@ -217,7 +217,7 @@ Production check on 2026-06-15:
   https://kreisphoto.de/ returned 200 OK.
   https://www.kreisphoto.de/ returned the same current bundle.
   Current deployed JS bundle contains AuthModal, supabase, old-cuban-art, and zombie-art.
-  Service worker files /sw.js and /service-worker.js returned 404, so browser/PWA cache is not app-managed.
+  Service worker files /sw.js and /service-worker.js were 404 before the stale-cache cleanup pass.
 ```
 
 ## Проверка И Команды
@@ -466,6 +466,10 @@ Persisted id helper pass on 2026-06-21:
   Added src/utils/persistedIds.ts and unit tests.
   useSavedBar and useFavorites now share account-scoped storage key and id sanitizing logic.
   Remote account state remains authoritative; stale/unknown remote ids are dropped instead of creating a phantom saved bar state.
+Stale service worker cleanup pass on 2026-06-21:
+  scripts/postprocess-web-export.mjs writes /sw.js and /service-worker.js kill-switch files.
+  deploy/nginx-home-bar.conf serves those files and /manifest.json with no-store cache headers.
+  Purpose: force old PWA/browser service workers to unregister and clear stale app-shell caches.
 ```
 
 ## Следующие Шаги
