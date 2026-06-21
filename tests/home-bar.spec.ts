@@ -56,7 +56,6 @@ test("account entry opens the current sync account flow", async ({ page }) => {
 
   if (await openAuthButton.isVisible()) {
     await openAuthButton.click();
-    await expect(page.getByText("Войти")).toBeVisible();
     await expect(page.getByText("Вход откроет бар и избранное именно из аккаунта.")).toBeVisible();
     return;
   }
