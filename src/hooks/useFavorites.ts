@@ -5,6 +5,11 @@ import {
   loadRemoteUserFavorites,
   saveRemoteUserFavorites,
 } from "../services/userFavoritesService";
+import {
+  getScopedStorageKey,
+  resolveAuthoritativeRemoteIds,
+  uniqueKnownIds,
+} from "../utils/persistedIds";
 
 const STORAGE_KEY = "domashniy-bar:favorites";
 const REMOTE_SAVE_DEBOUNCE_MS = 800;
@@ -21,24 +26,12 @@ type UseFavoritesResult = {
   toggleFavorite: (cocktailId: string) => void;
 };
 
-function uniqueKnownIds(values: unknown[], knownIds: Set<string>): string[] {
-  return Array.from(
-    new Set(
-      values.filter((value): value is string => typeof value === "string" && knownIds.has(value)),
-    ),
-  );
-}
-
-function getStorageKey(userId?: string) {
-  return userId ? `${STORAGE_KEY}:user:${userId}` : STORAGE_KEY;
-}
-
 export function useFavorites(
   knownCocktailIds: string[],
   userId?: string,
   isAuthReady = true,
 ): UseFavoritesResult {
-  const storageKey = useMemo(() => getStorageKey(userId), [userId]);
+  const storageKey = useMemo(() => getScopedStorageKey(STORAGE_KEY, userId), [userId]);
   const knownIds = useMemo(() => new Set(knownCocktailIds), [knownCocktailIds]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [hasLoadedFavorites, setHasLoadedFavorites] = useState(false);
@@ -121,9 +114,10 @@ export function useFavorites(
           return;
         }
 
-        const remoteIds = remoteFavorites
-          ? uniqueKnownIds(remoteFavorites.cocktailIds, knownIds)
-          : [];
+        const remoteIds = resolveAuthoritativeRemoteIds(
+          remoteFavorites?.cocktailIds,
+          knownIds,
+        );
 
         remoteUpdatedAtRef.current = remoteFavorites?.updatedAt ?? null;
         skipNextRemoteSaveRef.current = true;
@@ -175,9 +169,10 @@ export function useFavorites(
             return;
           }
 
-          const remoteIds = result.favorites
-            ? uniqueKnownIds(result.favorites.cocktailIds, knownIds)
-            : [];
+          const remoteIds = resolveAuthoritativeRemoteIds(
+            result.favorites?.cocktailIds,
+            knownIds,
+          );
 
           remoteUpdatedAtRef.current = result.favorites?.updatedAt ?? null;
           skipNextRemoteSaveRef.current = true;

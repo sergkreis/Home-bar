@@ -1,6 +1,6 @@
 # Domashniy Bar - Handover
 
-Последнее обновление: 2026-06-15
+Последнее обновление: 2026-06-21
 
 ## Быстрый Контекст
 
@@ -102,6 +102,7 @@ src/services/userProfileService.ts   user_profiles load/upsert helpers
 supabase/schema.sql                  user_bars/user_favorites/user_profiles tables and RLS policies
 src/data/                            generated cocktail/ingredient data
 src/utils/                           matching and shopping suggestion logic
+src/utils/persistedIds.ts            scoped local storage keys and persisted/remote id sanitizing
 tests/home-bar.spec.ts               Playwright smoke tests for core flow
 scripts/import-cocktails.mjs         import/generation from TheCocktailDB plus curated data
 scripts/postprocess-web-export.mjs   PWA metadata patch after Expo export
@@ -350,6 +351,25 @@ This is intentional for now because root lucide imports previously inflated the 
 GitHub Actions warns that Node.js 20 actions are deprecated; update workflow to Node 24 after compatibility is confirmed.
 ```
 
+Last local verification on macOS on 2026-06-21:
+
+```text
+npm test
+npx tsc --noEmit
+npm run build:web
+npm run test:ui
+```
+
+Result:
+
+```text
+Vitest passed: 35 passed.
+Type-check passed.
+Static web build passed and postprocessed PWA metadata into dist/.
+Local Playwright smoke test passed: 6 passed.
+Metro still warns about private lucide-react-native deep icon imports, as previously noted.
+```
+
 ## Supabase/Auth State
 
 ```text
@@ -369,6 +389,7 @@ Guest state is separate from account state.
 When a user signs in, the account's remote bar/favorites are authoritative.
 Guest-selected ingredients are not merged into an existing account after sign-in.
 Authenticated AsyncStorage keys are scoped by Supabase user id.
+Persisted and remote ids are sanitized through src/utils/persistedIds.ts.
 ```
 
 ## Git/GitHub Notes
@@ -441,6 +462,10 @@ Bottom nav and FavoriteButton use lucide/react-native-svg icons.
 Playwright account smoke test accepts both local-only and Supabase-configured account modes.
 macOS/GitHub continuity check found no case-only filename conflicts and no open PRs/issues on 2026-06-15.
 Full cocktail art pass completed in batches and ended with 81/81 generated assets on 2026-06-14.
+Persisted id helper pass on 2026-06-21:
+  Added src/utils/persistedIds.ts and unit tests.
+  useSavedBar and useFavorites now share account-scoped storage key and id sanitizing logic.
+  Remote account state remains authoritative; stale/unknown remote ids are dropped instead of creating a phantom saved bar state.
 ```
 
 ## Следующие Шаги
@@ -451,7 +476,8 @@ Full cocktail art pass completed in batches and ended with 81/81 generated asset
 3. Continue editorial cleanup of recipes, ingredient names, and units.
 4. Optimize drink PNG assets if performance requires it.
 5. Split App.tsx tab/detail/onboarding screens into separate components.
-6. Update GitHub Actions Node version before Node 20 actions are removed.
+6. Add deeper hook-level tests around account-local merge behavior and remote sync edge cases.
+7. Update GitHub Actions Node version before Node 20 actions are removed.
 ```
 
 ## Запрещено

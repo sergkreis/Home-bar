@@ -3,6 +3,11 @@ import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useStat
 
 import { Ingredient } from "../data/cocktails";
 import { loadRemoteUserBar, saveRemoteUserBar } from "../services/userBarService";
+import {
+  getScopedStorageKey,
+  resolveAuthoritativeRemoteIds,
+  uniqueKnownIds,
+} from "../utils/persistedIds";
 
 const SAVED_BAR_STORAGE_KEY = "domashniy-bar:selected-ingredients";
 const SAVE_DEBOUNCE_MS = 250;
@@ -18,24 +23,15 @@ type UseSavedBarResult = {
   setSelectedIngredients: Dispatch<SetStateAction<string[]>>;
 };
 
-function uniqueKnownIds(values: unknown[], knownIds: Set<string>): string[] {
-  return Array.from(
-    new Set(
-      values.filter((value): value is string => typeof value === "string" && knownIds.has(value)),
-    ),
-  );
-}
-
-function getStorageKey(userId?: string) {
-  return userId ? `${SAVED_BAR_STORAGE_KEY}:user:${userId}` : SAVED_BAR_STORAGE_KEY;
-}
-
 export function useSavedBar(
   ingredients: Ingredient[],
   userId?: string,
   isAuthReady = true,
 ): UseSavedBarResult {
-  const storageKey = useMemo(() => getStorageKey(userId), [userId]);
+  const storageKey = useMemo(
+    () => getScopedStorageKey(SAVED_BAR_STORAGE_KEY, userId),
+    [userId],
+  );
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [hasLoadedSavedBar, setHasLoadedSavedBar] = useState(false);
   const [hasSavedBar, setHasSavedBar] = useState(false);
@@ -146,9 +142,10 @@ export function useSavedBar(
           return;
         }
 
-        const remoteIngredientIds = remoteBar
-          ? uniqueKnownIds(remoteBar.ingredientIds, knownIngredientIds)
-          : [];
+        const remoteIngredientIds = resolveAuthoritativeRemoteIds(
+          remoteBar?.ingredientIds,
+          knownIngredientIds,
+        );
 
         remoteUpdatedAtRef.current = remoteBar?.updatedAt ?? null;
         skipNextRemoteSaveRef.current = true;
@@ -207,9 +204,10 @@ export function useSavedBar(
             return;
           }
 
-          const remoteIngredientIds = result.bar
-            ? uniqueKnownIds(result.bar.ingredientIds, knownIngredientIds)
-            : [];
+          const remoteIngredientIds = resolveAuthoritativeRemoteIds(
+            result.bar?.ingredientIds,
+            knownIngredientIds,
+          );
 
           remoteUpdatedAtRef.current = result.bar?.updatedAt ?? null;
           skipNextRemoteSaveRef.current = true;
