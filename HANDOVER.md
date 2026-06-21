@@ -43,6 +43,15 @@ C:\Users\Sergej\Documents\Codex\PROJECTS.md
 /Users/sergejkreis/Projects/codex-workspace-index/PROJECTS.md
 ```
 
+Текущая локальная сессия на Windows:
+
+```text
+2026-06-21: Android debug build собран и установлен на реальный Nothing Phone A001T / Android 16.
+Package id: de.kreisphoto.domashniybar.
+Исправлены Android safe-area отступы, detail hero layout и race guard в useSavedBar remote save.
+Commit/push for this Android QA pass were approved at session close; continue from latest origin/main and verify final git status before editing.
+```
+
 ## Пути И Репозиторий
 
 Windows checkout:
@@ -76,6 +85,7 @@ Expo SDK 54
 React 19
 React Native 0.81
 React Native Web
+React Native Safe Area Context
 TypeScript strict mode
 npm / package-lock.json
 Static web export served by nginx
@@ -91,6 +101,7 @@ Resend/custom SMTP configured through Supabase Dashboard for auth emails
 App.tsx                              main app shell, screen switching, layout and tab rendering
 assets/drinks/                       81 generated PNG cocktail illustrations
 src/components/DrinkArt.tsx          cocktail id -> illustration mapping
+src/components/BottomNav.tsx         bottom tab navigation
 src/components/                      reusable UI components
 src/hooks/useAuth.ts                 Supabase auth session state and email/password actions
 src/hooks/useSavedBar.ts             AsyncStorage persistence plus optional Supabase sync for selected home bar
@@ -150,6 +161,8 @@ Ranked cocktail list by ingredient match
 Recipe detail with glass, ingredients, steps, garnish
 Shopping suggestions for 1-2 missing ingredients
 Bottom navigation with lucide/react-native-svg icons
+Android safe-area handling through react-native-safe-area-context
+Native Android package id de.kreisphoto.domashniybar
 Production dark emerald/gold visual direction
 Generated cocktail database from TheCocktailDB plus curated classics
 Generated cocktail illustrations for every cocktail in the current database
@@ -251,6 +264,21 @@ Run Expo:
 npm start
 ```
 
+Run Android dev build:
+
+```bash
+npm run android
+```
+
+Real Android device notes:
+
+```text
+Windows tested device: Nothing Phone A001T / Android 16 / arm64-v8a.
+Enable Developer Options -> USB debugging, select USB file transfer, authorize RSA prompt.
+For debug builds, keep Metro on 127.0.0.1:8081 and run adb reverse tcp:8081 tcp:8081.
+The generated android/ folder is native Expo prebuild output and is ignored by git.
+```
+
 Run web:
 
 ```bash
@@ -312,6 +340,30 @@ Supabase setup:
 ```
 
 ## Last Verification
+
+Last Windows Android/phone verification on 2026-06-21:
+
+```text
+npx tsc --noEmit
+npm test
+.\gradlew.bat app:assembleDebug -x lint -x test --configure-on-demand --build-cache -PreactNativeDevServerPort=8081 -PreactNativeArchitectures=arm64-v8a --console=plain --no-daemon
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+npm run build:web
+Real phone visual QA on A001T / Android 16
+```
+
+Result:
+
+```text
+Type-check passed.
+Unit tests passed: 4 files, 30 tests.
+Android debug APK build passed and was installed on the real phone.
+Safe-area no longer overlaps the Nothing OS status bar or gesture bar.
+Cocktail detail title no longer breaks into narrow syllable columns on the phone.
+Static web build passed.
+Runtime logcat check found no app FATAL EXCEPTION.
+Known warnings remain: lucide-react-native private deep icon import warnings, Gradle deprecation warnings, npm audit reports 27 vulnerabilities after npm install.
+```
 
 Last full verification on macOS on 2026-06-21:
 
@@ -409,6 +461,7 @@ supabase/schema.sql was run in SQL Editor during previous work.
 GitHub Actions secrets for Supabase URL and anon key were added.
 Production is built with Supabase env and shows the account sign-in flow.
 Local development has no .env by default, so account tab stays in local-only mode unless .env is created from .env.example.
+Real phone debug build on 2026-06-21 was verified in local-only mode and showed "Локально"; no account was signed in on the phone.
 Custom SMTP/Resend setup was configured through dashboards by the user; verify templates and delivery when changing auth.
 User profile fields exist in app and schema: display_name, birth_date.
 ```
@@ -442,6 +495,7 @@ Current visual direction:
 Dark emerald/gold home-bar style inspired by a premium cocktail menu.
 Cocktail art uses vintage engraved illustrations with transparent PNG cutouts.
 Cards and bottom navigation are optimized for phone-first usage.
+2026-06-21 real-phone design pass fixed Android safe-area overlap and mobile detail hero wrapping.
 ```
 
 Frontend skill bundle to use for future web app work:
@@ -469,10 +523,11 @@ Use Playwright for existing tests/home-bar.spec.ts and regression checks.
 ## Текущая Незавершенная Работа
 
 ```text
+Current local changes from 2026-06-21 are pending commit/push: App.tsx, app.json, package.json, package-lock.json, BottomNav.tsx, useSavedBar.ts, CocktailDetailScreen.tsx, README.md, HANDOVER.md, and global PROJECTS.md copies.
+Account flow is implemented but still needs full real-device QA with Supabase env configured: sign-up, email confirmation, sign-in, reset password, profile save, bar sync, favorites sync.
 Recipe database still needs editorial review: ingredient names, units, serving text, and Russian wording.
 Admin/editor surface for cocktail database exists in planning but should be improved before heavy database editing.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
-Account sync should still be checked on actual phones after UX/auth changes.
 Add unit tests around account-local isolation, no guest merge after sign-in, and remote sync edge cases.
 Add more tests around matching/shopping logic before another database expansion.
 Optimize PNG asset size if mobile loading becomes heavy.
@@ -506,13 +561,15 @@ Stale service worker cleanup pass on 2026-06-21:
 ## Следующие Шаги
 
 ```text
-1. QA full account flow on real devices: sign-up, confirm email, sign-in, password reset, profile save, bar sync, favorites sync.
-2. Improve admin/editor UI for cocktail database.
-3. Continue editorial cleanup of recipes, ingredient names, and units.
-4. Optimize drink PNG assets if performance requires it.
-5. Split App.tsx tab/detail/onboarding screens into separate components.
-6. Add deeper hook-level tests around account-local merge behavior and remote sync edge cases.
-7. Update GitHub Actions Node version before Node 20 actions are removed.
+1. On the next machine/chat, pull main, run npm install, then npx tsc --noEmit, npm test, npm run build:web.
+2. Configure Supabase public env locally and QA full account flow on real devices: sign-up, confirm email, sign-in, password reset, profile save, bar sync, favorites sync.
+3. Verify bar/favorites sync between Mac, Windows, and phone on one account.
+4. Improve admin/editor UI for cocktail database.
+5. Continue editorial cleanup of recipes, ingredient names, and units.
+6. Optimize drink PNG assets if performance requires it.
+7. Split App.tsx tab/detail/onboarding screens into separate components.
+8. Add deeper hook-level tests around account-local merge behavior and remote sync edge cases.
+9. Update GitHub Actions to Node 24 before Node 20 actions are removed.
 ```
 
 ## Запрещено
@@ -531,6 +588,7 @@ Stale service worker cleanup pass on 2026-06-21:
 Open C:\Users\Sergej\Documents\Codex\PROJECTS.md and continue Domashniy Bar.
 On macOS, open /Users/sergejkreis/Projects/codex-workspace-index/PROJECTS.md.
 Then open this HANDOVER.md.
+Pull latest main and inspect git status before editing.
 Before deployment work, run type-check/build/tests and verify the live site state.
 Deployment is handled by GitHub Actions after push to main.
 ```

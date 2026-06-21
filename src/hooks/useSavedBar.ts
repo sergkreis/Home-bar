@@ -188,13 +188,22 @@ export function useSavedBar(
       return;
     }
 
+    let isMounted = true;
     const currentUserId = userId;
     const timeoutId = setTimeout(() => {
+      if (!isMounted) {
+        return;
+      }
+
       setIsSyncingBar(true);
       setSyncError(null);
 
       saveRemoteUserBar(currentUserId, selectedIngredients, remoteUpdatedAtRef.current)
         .then((result) => {
+          if (!isMounted) {
+            return;
+          }
+
           if (!result) {
             return;
           }
@@ -216,15 +225,22 @@ export function useSavedBar(
           setSyncError("Бар обновился на другом устройстве. Показали свежую версию из аккаунта.");
         })
         .catch((error) => {
+          if (!isMounted) {
+            return;
+          }
+
           console.warn("Failed to save remote home bar.", error);
           setSyncError("Не удалось сохранить бар в аккаунте.");
         })
         .finally(() => {
-          setIsSyncingBar(false);
+          if (isMounted) {
+            setIsSyncingBar(false);
+          }
         });
     }, REMOTE_SAVE_DEBOUNCE_MS);
 
     return () => {
+      isMounted = false;
       clearTimeout(timeoutId);
     };
   }, [

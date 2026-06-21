@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { AccountPanel } from "./src/components/AccountPanel";
 import { AppErrorBoundary } from "./src/components/AppErrorBoundary";
@@ -32,6 +33,8 @@ import { rankCocktails, RankedCocktail } from "./src/utils/cocktailMatcher";
 import { buildShoppingSuggestions, buildTonightHeadline } from "./src/utils/shoppingAdvisor";
 
 type RecipeMode = "easy" | null;
+
+const safeAreaEdges = ["top", "right", "bottom", "left"] as const;
 
 const tasteFilters: { id: TasteTag; label: string }[] = [
   { id: "refreshing", label: "Свежее" },
@@ -362,7 +365,7 @@ function AppContent() {
     !isAuthReady
   ) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={safeAreaEdges} style={styles.safeArea}>
         <StatusBar style="light" />
         <View style={styles.loadingScreen}>
           <Text style={styles.eyebrow}>Домашний бар</Text>
@@ -376,7 +379,7 @@ function AppContent() {
 
   if (!hasConfirmedAge) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={safeAreaEdges} style={styles.safeArea}>
         <StatusBar style="light" />
         <AgeGateScreen onConfirm={confirmAge} />
         {authModal}
@@ -386,7 +389,7 @@ function AppContent() {
 
   if (selectedCocktail) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={safeAreaEdges} style={styles.safeArea}>
         <StatusBar style="light" />
         <CocktailDetailScreen
           cocktail={selectedCocktail}
@@ -404,7 +407,7 @@ function AppContent() {
 
   if (!hasEnteredApp) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={safeAreaEdges} style={styles.safeArea}>
         <StatusBar style="light" />
         <OnboardingScreen
           ingredients={ingredients}
@@ -422,7 +425,7 @@ function AppContent() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView edges={safeAreaEdges} style={styles.safeArea}>
       <StatusBar style="light" />
       <View style={styles.appShell}>
         <ScrollView
@@ -549,9 +552,11 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AppErrorBoundary>
-      <AppContent />
-    </AppErrorBoundary>
+    <SafeAreaProvider>
+      <AppErrorBoundary>
+        <AppContent />
+      </AppErrorBoundary>
+    </SafeAreaProvider>
   );
 }
 

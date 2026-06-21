@@ -34,6 +34,7 @@
 - React 19;
 - React Native 0.81;
 - React Native Web;
+- React Native Safe Area Context для корректных отступов на телефонах с вырезами и gesture bar;
 - TypeScript strict mode;
 - `@react-native-async-storage/async-storage` для локального сохранения;
 - Supabase Auth + Postgres для аккаунтов и облачной синхронизации;
@@ -59,6 +60,14 @@ npm start
 ```bash
 npm run web
 ```
+
+Запустить Android dev-сборку:
+
+```bash
+npm run android
+```
+
+Для реального Android-телефона нужны Android SDK, Java из Android Studio, включенная USB-отладка и авторизованный `adb`. Debug APK проверялся на Nothing Phone `A001T` / Android 16 с package id `de.kreisphoto.domashniybar`. Без публичных Supabase env-переменных приложение на телефоне работает в режиме `Локально`: бар и избранное хранятся на устройстве.
 
 Собрать статическую web-версию для nginx:
 
@@ -110,6 +119,8 @@ SQL-схема с RLS находится в `supabase/schema.sql`. Ее нужн
 
 Supabase Auth должен иметь корректные production redirect URLs для `https://kreisphoto.de/`. Почтовые письма подтверждения/восстановления настраиваются в Supabase Dashboard; для красивой отправки используется внешний SMTP/Resend.
 
+Следующая обязательная проверка перед production account-релизом: регистрация, подтверждение email, вход, восстановление пароля, сохранение профиля, синхронизация бара и избранного на реальных телефонах с заданными `EXPO_PUBLIC_SUPABASE_URL` и `EXPO_PUBLIC_SUPABASE_ANON_KEY`.
+
 ## Структура
 
 ```text
@@ -134,6 +145,7 @@ supabase/schema.sql                  Supabase tables/RLS
 deploy/                              nginx/VPS deploy scripts
 tests/home-bar.spec.ts               Playwright smoke-тесты
 HANDOVER.md                          состояние проекта для будущих сессий Codex
+TODO.md                              ближайшие задачи и старт нового чата
 ```
 
 ## Деплой
@@ -175,6 +187,7 @@ npm run test:ui
 
 - провести отдельную QA-проверку аккаунтов на реальных телефонах;
 - проверить синхронизацию бара/избранного между Mac, Windows и телефоном на одном аккаунте;
+- довести Android/iOS dev-процедуру до повторяемой инструкции для нового компьютера;
 - улучшить админский редактор базы коктейлей;
 - продолжить нормализацию рецептов, ингредиентов и единиц измерения;
 - оптимизировать вес PNG-ассетов, если загрузка на мобильных станет тяжелой;

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { DrinkArt } from "../components/DrinkArt";
 import { FavoriteButton } from "../components/FavoriteButton";
@@ -33,6 +33,8 @@ export function CocktailDetailScreen({
   onAddIngredientToBar,
   ownedIngredientIds,
 }: CocktailDetailScreenProps) {
+  const { width } = useWindowDimensions();
+  const isCompact = width < 520;
   const ownedSet = useMemo(() => new Set(ownedIngredientIds), [ownedIngredientIds]);
   const ingredientById = useMemo(
     () => new Map(ingredients.map((ingredient) => [ingredient.id, ingredient])),
@@ -47,7 +49,7 @@ export function CocktailDetailScreen({
 
   return (
     <ScrollView key="detail" style={styles.screen} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
+      <View style={[styles.header, isCompact && styles.headerCompact]}>
         <View style={styles.headerTop}>
           <Pressable
             accessibilityRole="button"
@@ -67,14 +69,14 @@ export function CocktailDetailScreen({
             size="large"
           />
         </View>
-        <View style={styles.titleRow}>
-          <View style={styles.titleCopy}>
+        <View style={[styles.titleRow, isCompact && styles.titleRowCompact]}>
+          <View style={[styles.titleCopy, isCompact && styles.titleCopyCompact]}>
             <Text style={styles.title}>{cocktail.name}</Text>
             <Text style={styles.meta}>
               {cocktail.baseSpirit} · {getStrengthLabel(cocktail.strength)} · {cocktail.glassName}
             </Text>
           </View>
-          <View style={styles.headerGlass}>
+          <View style={[styles.headerGlass, isCompact && styles.headerGlassCompact]}>
             <DrinkArt cocktail={cocktail} size="detail" />
           </View>
         </View>
@@ -201,6 +203,9 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     overflow: "hidden",
   },
+  headerCompact: {
+    padding: spacing.lg,
+  },
   headerTop: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -233,10 +238,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.md,
   },
+  titleRowCompact: {
+    flexDirection: "column",
+    alignItems: "stretch",
+  },
   titleCopy: {
     flex: 1,
     minWidth: 0,
     gap: 6,
+  },
+  titleCopyCompact: {
+    width: "100%",
   },
   headerGlass: {
     width: 220,
@@ -245,6 +257,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accentOverlay,
     alignItems: "center",
     justifyContent: "center",
+  },
+  headerGlassCompact: {
+    width: "100%",
+    minHeight: 188,
   },
   meta: {
     color: colors.textSubtle,

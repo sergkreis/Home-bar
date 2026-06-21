@@ -29,7 +29,7 @@ const tabs: TabConfig[] = [
   { id: "today", label: "Сегодня", Icon: Martini },
   { id: "bar", label: "Бар", Icon: Wine },
   { id: "buy", label: "Купить", Icon: ShoppingBasket },
-  { id: "favorites", label: "Любим.", accessibilityLabel: "Любимые", Icon: Heart },
+  { id: "favorites", label: "Любимые", Icon: Heart },
   { id: "recipes", label: "Рецепты", Icon: Scroll },
   { id: "admin", label: "Админ", accessibilityLabel: "Админка", Icon: ShieldCheck },
 ];
