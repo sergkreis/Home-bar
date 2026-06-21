@@ -18,28 +18,29 @@ https://kreisphoto.de/
 59873e3 Complete cocktail art set
 ```
 
-Последний проверенный remote commit перед этим docs-merge:
+Последний проверенный production commit:
 
 ```text
-1afe0d2 Update Mac handover and smoke test
+2013e52 Add stale service worker cleanup
 ```
 
-Последний проверенный GitHub Actions deploy перед этим docs-merge:
+Последний проверенный GitHub Actions deploy:
 
 ```text
-https://github.com/sergkreis/Home-bar/actions/runs/27514689629
+https://github.com/sergkreis/Home-bar/actions/runs/27912173646
 ```
 
 Текущий production bundle на момент проверки:
 
 ```text
-/_expo/static/js/web/index-3ceb18d6d67c6bd5bd53e68c295291bd.js
+/_expo/static/js/web/index-0c5e33e03d027db7c1a7c0669165bf84.js
 ```
 
 Глобальный индекс проектов:
 
 ```text
 C:\Users\Sergej\Documents\Codex\PROJECTS.md
+/Users/sergejkreis/Projects/codex-workspace-index/PROJECTS.md
 ```
 
 ## Пути И Репозиторий
@@ -108,6 +109,20 @@ scripts/import-cocktails.mjs         import/generation from TheCocktailDB plus c
 scripts/postprocess-web-export.mjs   PWA metadata patch after Expo export
 deploy/                              VPS/nginx deployment scripts and config
 .github/workflows/deploy.yml         GitHub Actions deploy workflow
+```
+
+## Текущее Состояние На 2026-06-21
+
+```text
+main is aligned with origin/main at 2013e52.
+Git working tree was clean at session close before docs updates.
+Production https://kreisphoto.de/ returns 200 OK.
+Production HTML is no-store and references index-0c5e33e03d027db7c1a7c0669165bf84.js.
+/sw.js and /service-worker.js return cleanup service workers with no-store and Service-Worker-Allowed: /.
+Production Playwright smoke passed after the deploy.
+Chrome and Safari on the Mac were checked after cache/state cleanup.
+The apparent "old version" in Safari was the current first-run onboarding state, not a stale bundle.
+Manual resolution in Safari: confirm 18+, press "Стартовый", then "Подобрать коктейли".
 ```
 
 ## Реализованные Возможности
@@ -211,13 +226,15 @@ VPS was cleaned on 2026-05-01.
 Old KIKU files and services were backed up to /root/home-bar-cleanup-backups/20260501-131803 before removal.
 Full cocktail art set was deployed on 2026-06-14 through GitHub Actions.
 macOS continuity/smoke-test commit was deployed on 2026-06-15 through GitHub Actions.
+Production account sync/assets prep and persisted id helper commits were deployed on 2026-06-21.
+Stale service worker cleanup was deployed on 2026-06-21.
 GitHub Actions deploy succeeded:
-  https://github.com/sergkreis/Home-bar/actions/runs/27514689629
-Production check on 2026-06-15:
+  https://github.com/sergkreis/Home-bar/actions/runs/27912173646
+Production check on 2026-06-21:
   https://kreisphoto.de/ returned 200 OK.
-  https://www.kreisphoto.de/ returned the same current bundle.
-  Current deployed JS bundle contains AuthModal, supabase, old-cuban-art, and zombie-art.
-  Service worker files /sw.js and /service-worker.js were 404 before the stale-cache cleanup pass.
+  Current deployed JS bundle is /_expo/static/js/web/index-0c5e33e03d027db7c1a7c0669165bf84.js.
+  /manifest.json, /sw.js, and /service-worker.js are served with no-store cache headers.
+  Cleanup service workers unregister themselves and clear stale Cache Storage.
 ```
 
 ## Проверка И Команды
@@ -296,26 +313,40 @@ Supabase setup:
 
 ## Last Verification
 
-Last full local verification on Windows on 2026-06-14:
+Last full verification on macOS on 2026-06-21:
 
 ```text
 npx tsc --noEmit
 npm test
 npm run build:web
 npm run test:ui
-Browser plugin check against http://localhost:8081/
-Production HTTP check against https://kreisphoto.de/
+PLAYWRIGHT_BASE_URL=https://kreisphoto.de npm run test:ui
+Production HTTP/header checks against https://kreisphoto.de/
+Browser checks in Chrome and Safari on the local Mac
 ```
 
 Result:
 
 ```text
 Type-check passed.
-Unit tests passed: 4 files, 30 tests.
+Unit tests passed: 35 tests.
 Static web build passed and included 81 drink assets.
 Playwright UI tests passed: 6 passed.
-Browser check found no broken visible images and no console errors.
 Production returned 200 OK.
+Production service worker cleanup endpoints returned 200 with no-store headers.
+Chrome loaded the fresh site after local state/cache cleanup.
+Safari loaded the fresh site; any "old" view was first-run onboarding state.
+```
+
+## Handoff For Next Chat
+
+```text
+Start by checking git status --short --branch.
+Read this HANDOVER.md before making changes.
+Do not touch secrets, .env, auth.json, browser profile files, or VPS private data.
+If Safari/Chrome look stale again, first verify the production bundle and local first-run state before changing code.
+Expected production first-run path: age gate -> "Собери бар" -> "Стартовый" -> "Подобрать коктейли" -> "Сегодня".
+Deploy only after explicit approval because production is kreisphoto.de.
 ```
 
 Last macOS continuity verification on 2026-06-15:
@@ -498,6 +529,7 @@ Stale service worker cleanup pass on 2026-06-21:
 
 ```text
 Open C:\Users\Sergej\Documents\Codex\PROJECTS.md and continue Domashniy Bar.
+On macOS, open /Users/sergejkreis/Projects/codex-workspace-index/PROJECTS.md.
 Then open this HANDOVER.md.
 Before deployment work, run type-check/build/tests and verify the live site state.
 Deployment is handled by GitHub Actions after push to main.

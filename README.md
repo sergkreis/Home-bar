@@ -152,6 +152,16 @@ Workflow: `.github/workflows/deploy.yml`
 https://kreisphoto.de/
 ```
 
+Текущее проверенное состояние на 2026-06-21:
+
+```text
+Production commit: 2013e52 Add stale service worker cleanup
+Production bundle: /_expo/static/js/web/index-0c5e33e03d027db7c1a7c0669165bf84.js
+HTML, manifest and cleanup service workers are served with no-store cache headers.
+/sw.js and /service-worker.js unregister stale browser/PWA workers and clear Cache Storage.
+Chrome and Safari on the local Mac were checked after deploy; Safari's apparent stale view was first-run onboarding state.
+```
+
 Перед деплоем обычно прогоняются:
 
 ```bash
@@ -164,6 +174,7 @@ npm run test:ui
 ## Ближайшие задачи
 
 - провести отдельную QA-проверку аккаунтов на реальных телефонах;
+- проверить синхронизацию бара/избранного между Mac, Windows и телефоном на одном аккаунте;
 - улучшить админский редактор базы коктейлей;
 - продолжить нормализацию рецептов, ингредиентов и единиц измерения;
 - оптимизировать вес PNG-ассетов, если загрузка на мобильных станет тяжелой;

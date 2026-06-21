@@ -59,6 +59,23 @@ run deploy/install-static.sh over SSH
 
 GitHub currently warns that Node.js 20 actions are deprecated. Update the workflow to Node 24 when the installed toolchain is confirmed compatible.
 
+## Current Production State
+
+Last verified on 2026-06-21:
+
+```text
+Commit: 2013e52 Add stale service worker cleanup
+GitHub Actions run: https://github.com/sergkreis/Home-bar/actions/runs/27912173646
+URL: https://kreisphoto.de/
+Production bundle: /_expo/static/js/web/index-0c5e33e03d027db7c1a7c0669165bf84.js
+HTML cache-control: no-cache, no-store, must-revalidate
+/sw.js and /service-worker.js: 200 OK, application/javascript, no-store, Service-Worker-Allowed: /
+```
+
+Chrome and Safari on the local Mac were checked after deploy. The Safari report of
+an "old" site was the current first-run onboarding state; the manual path is:
+confirm age, press `Стартовый`, then press `Подобрать коктейли`.
+
 ## Server Layout
 
 ```text
