@@ -2,10 +2,13 @@ import "react-native-url-polyfill/auto";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
+import { Platform } from "react-native";
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-const supabaseProjectRef = supabaseUrl ? new URL(supabaseUrl).hostname.split(".")[0] : null;
+const supabaseProjectRef = supabaseUrl
+  ? new URL(supabaseUrl).hostname.split(".")[0]
+  : null;
 const supabaseAuthStorageKey = supabaseProjectRef
   ? `sb-${supabaseProjectRef}-auth-token`
   : null;
@@ -21,16 +24,17 @@ export const supabase = isSupabaseConfigured
         storage: AsyncStorage,
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: typeof window !== "undefined",
+        detectSessionInUrl: Platform.OS === "web",
         flowType: "pkce",
       },
     })
   : null;
 
 export async function clearPersistedSupabaseSession() {
-  const keysToRemove = [supabaseAuthStorageKey, supabaseTransientAuthStorageKey].filter(
-    (key): key is string => Boolean(key),
-  );
+  const keysToRemove = [
+    supabaseAuthStorageKey,
+    supabaseTransientAuthStorageKey,
+  ].filter((key): key is string => Boolean(key));
 
   await Promise.all(keysToRemove.map((key) => AsyncStorage.removeItem(key)));
 }
@@ -56,7 +60,9 @@ export async function clearTransientSupabaseSessionIfNeeded() {
     return;
   }
 
-  const isTransientSession = await AsyncStorage.getItem(supabaseTransientAuthStorageKey);
+  const isTransientSession = await AsyncStorage.getItem(
+    supabaseTransientAuthStorageKey,
+  );
 
   if (isTransientSession) {
     await clearPersistedSupabaseSession();

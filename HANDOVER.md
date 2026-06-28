@@ -1,6 +1,6 @@
 # Domashniy Bar - Handover
 
-Последнее обновление: 2026-06-21
+Последнее обновление: 2026-06-28
 
 ## Быстрый Контекст
 
@@ -18,22 +18,22 @@ https://kreisphoto.de/
 59873e3 Complete cocktail art set
 ```
 
-Последний проверенный production commit:
+Последний проверенный production commit перед session-close auth push:
 
 ```text
-2013e52 Add stale service worker cleanup
+37da852 Handle Android back on cocktail detail
 ```
 
-Последний проверенный GitHub Actions deploy:
+Последний проверенный GitHub Actions deploy перед session-close auth push:
 
 ```text
-https://github.com/sergkreis/Home-bar/actions/runs/27912173646
+https://github.com/sergkreis/Home-bar/actions/runs/28319755529
 ```
 
-Текущий production bundle на момент проверки:
+Текущий production bundle на момент проверки перед session-close auth push:
 
 ```text
-/_expo/static/js/web/index-0c5e33e03d027db7c1a7c0669165bf84.js
+/_expo/static/js/web/index-ea9bbfa8dda1dc5eb0b5caff36604414.js
 ```
 
 Глобальный индекс проектов:
@@ -46,10 +46,13 @@ C:\Users\Sergej\Documents\Codex\PROJECTS.md
 Текущая локальная сессия на Windows:
 
 ```text
-2026-06-21: Android debug build собран и установлен на реальный Nothing Phone A001T / Android 16.
+2026-06-28: Android debug/client QA продолжен на реальном Nothing Phone A001T / Android 16.
 Package id: de.kreisphoto.domashniybar.
-Исправлены Android safe-area отступы, detail hero layout и race guard в useSavedBar remote save.
-Commit/push for this Android QA pass were approved at session close; continue from latest origin/main and verify final git status before editing.
+Supabase env добавлены локально в .env без вывода секретов; .env игнорируется git.
+Проверены регистрация, email confirmation и авторизованное состояние после reload.
+Исправлены auth loading timeout/finally, native redirect URL guard, web-only detectSessionInUrl и KeyboardAvoidingView/ScrollView в auth modal.
+Gmail положил confirmation email в spam; это deliverability/SMTP/DNS задача, не клиентский баг.
+Commit/push for this auth QA pass were approved at session close; continue from latest origin/main and verify final git status before editing.
 ```
 
 ## Пути И Репозиторий
@@ -122,18 +125,18 @@ deploy/                              VPS/nginx deployment scripts and config
 .github/workflows/deploy.yml         GitHub Actions deploy workflow
 ```
 
-## Текущее Состояние На 2026-06-21
+## Текущее Состояние На 2026-06-28
 
 ```text
-main is aligned with origin/main at 2013e52.
-Git working tree was clean at session close before docs updates.
+Before the session-close commit, main was aligned with origin/main at 37da852.
+Tracked changes were limited to auth fixes and docs updates.
+Untracked REVIEW-2026-06-15.md remained intentionally uncommitted.
 Production https://kreisphoto.de/ returns 200 OK.
-Production HTML is no-store and references index-0c5e33e03d027db7c1a7c0669165bf84.js.
+Production HTML is no-store and referenced index-ea9bbfa8dda1dc5eb0b5caff36604414.js before the auth push.
 /sw.js and /service-worker.js return cleanup service workers with no-store and Service-Worker-Allowed: /.
-Production Playwright smoke passed after the deploy.
-Chrome and Safari on the Mac were checked after cache/state cleanup.
-The apparent "old version" in Safari was the current first-run onboarding state, not a stale bundle.
-Manual resolution in Safari: confirm 18+, press "Стартовый", then "Подобрать коктейли".
+Local 2026-06-28 checks passed: npx tsc --noEmit, npm test, npm run build:web, npm run test:ui.
+Android dev-client reload with Supabase env showed the authenticated account state and clean app-filtered logcat.
+Known build warning remains: lucide-react-native private deep icon import warnings during web export.
 ```
 
 ## Реализованные Возможности
@@ -341,7 +344,35 @@ Supabase setup:
 
 ## Last Verification
 
-Last Windows Android/phone verification on 2026-06-21:
+Last Windows Android/account verification on 2026-06-28:
+
+```text
+npx tsc --noEmit
+npm test
+npm run build:web
+npm run test:ui
+npx expo start --dev-client --localhost
+adb reverse tcp:8081 tcp:8081
+Real phone auth QA on Nothing Phone A001T / Android 16
+Android app-filtered logcat check
+```
+
+Result:
+
+```text
+Type-check passed.
+Unit tests passed: 35 tests.
+Static web build passed and produced 81 drink assets.
+Playwright UI tests passed: 6 passed.
+Supabase .env was loaded locally without exposing values.
+Sign-up no longer hangs on "Проверяем".
+Email confirmation reached the mailbox and account became authenticated in the Android dev client.
+Password fields in the auth modal remain usable above the phone keyboard.
+Android logcat check found no ReactNativeJS/AndroidRuntime app errors after reload.
+Gmail classified the confirmation email as spam; fix via Supabase SMTP/domain deliverability.
+```
+
+Previous Windows Android/phone verification on 2026-06-21:
 
 ```text
 npx tsc --noEmit
@@ -396,6 +427,9 @@ Safari loaded the fresh site; any "old" view was first-run onboarding state.
 Start by checking git status --short --branch.
 Read this HANDOVER.md before making changes.
 Do not touch secrets, .env, auth.json, browser profile files, or VPS private data.
+Do not automatically commit untracked REVIEW-2026-06-15.md.
+After continuing on another computer, pull main and run npx tsc --noEmit, npm test, npm run build:web.
+If production needs verification, check the latest GitHub Actions run created by the 2026-06-28 session-close push.
 If Safari/Chrome look stale again, first verify the production bundle and local first-run state before changing code.
 Expected production first-run path: age gate -> "Собери бар" -> "Стартовый" -> "Подобрать коктейли" -> "Сегодня".
 Deploy only after explicit approval because production is kreisphoto.de.
@@ -460,9 +494,10 @@ Supabase project was created by the user.
 supabase/schema.sql was run in SQL Editor during previous work.
 GitHub Actions secrets for Supabase URL and anon key were added.
 Production is built with Supabase env and shows the account sign-in flow.
-Local development has no .env by default, so account tab stays in local-only mode unless .env is created from .env.example.
-Real phone debug build on 2026-06-21 was verified in local-only mode and showed "Локально"; no account was signed in on the phone.
-Custom SMTP/Resend setup was configured through dashboards by the user; verify templates and delivery when changing auth.
+Local development stays in local-only mode unless .env is created from .env.example.
+On 2026-06-28 the Windows checkout had a local .env with Expo public Supabase values; values were verified by shape only and not printed.
+Real phone Android dev-client QA on 2026-06-28 verified sign-up, email confirmation, and authenticated state after reload.
+Custom SMTP/Resend setup was configured through dashboards by the user; Gmail still sent the confirmation email to spam, so verify sender domain, SPF, DKIM, DMARC, and template content.
 User profile fields exist in app and schema: display_name, birth_date.
 ```
 
@@ -496,6 +531,7 @@ Dark emerald/gold home-bar style inspired by a premium cocktail menu.
 Cocktail art uses vintage engraved illustrations with transparent PNG cutouts.
 Cards and bottom navigation are optimized for phone-first usage.
 2026-06-21 real-phone design pass fixed Android safe-area overlap and mobile detail hero wrapping.
+2026-06-28 auth modal pass fixed keyboard overlap for password fields on Android.
 ```
 
 Frontend skill bundle to use for future web app work:
@@ -523,8 +559,9 @@ Use Playwright for existing tests/home-bar.spec.ts and regression checks.
 ## Текущая Незавершенная Работа
 
 ```text
-Current local changes from 2026-06-21 are pending commit/push: App.tsx, app.json, package.json, package-lock.json, BottomNav.tsx, useSavedBar.ts, CocktailDetailScreen.tsx, README.md, HANDOVER.md, and global PROJECTS.md copies.
-Account flow is implemented but still needs full real-device QA with Supabase env configured: sign-up, email confirmation, sign-in, reset password, profile save, bar sync, favorites sync.
+Session-close changes from 2026-06-28 should be committed and pushed before starting new work: AuthModal keyboard handling, useAuth timeout/error handling, native redirect guard, web-only Supabase URL session detection, README/HANDOVER/TODO/PROJECTS updates.
+Account flow still needs continued QA for reset password, profile save, bar sync, favorites sync, and cross-device behavior.
+Supabase auth email deliverability needs SMTP/domain work because Gmail marked the confirmation email as spam.
 Recipe database still needs editorial review: ingredient names, units, serving text, and Russian wording.
 Admin/editor surface for cocktail database exists in planning but should be improved before heavy database editing.
 App.tsx still does too much: screen switching, filtering, shopping suggestions, and layout remain together.
@@ -556,20 +593,27 @@ Stale service worker cleanup pass on 2026-06-21:
   scripts/postprocess-web-export.mjs writes /sw.js and /service-worker.js kill-switch files.
   deploy/nginx-home-bar.conf serves those files and /manifest.json with no-store cache headers.
   Purpose: force old PWA/browser service workers to unregister and clear stale app-shell caches.
+Android auth QA pass on 2026-06-28:
+  AuthModal now uses KeyboardAvoidingView + ScrollView so password fields are not covered by the phone keyboard.
+  useAuth wraps Supabase auth requests with timeout and try/catch/finally so loading cannot stay forever on "Проверяем".
+  Native sign-up no longer crashes on window.location.origin; redirect URL is web-only when unavailable on React Native.
+  Supabase client now uses detectSessionInUrl only on web.
+  Real Android dev-client confirmed sign-up/email confirmation/authenticated state; Gmail spam remains external deliverability work.
 ```
 
 ## Следующие Шаги
 
 ```text
-1. On the next machine/chat, pull main, run npm install, then npx tsc --noEmit, npm test, npm run build:web.
-2. Configure Supabase public env locally and QA full account flow on real devices: sign-up, confirm email, sign-in, password reset, profile save, bar sync, favorites sync.
-3. Verify bar/favorites sync between Mac, Windows, and phone on one account.
-4. Improve admin/editor UI for cocktail database.
-5. Continue editorial cleanup of recipes, ingredient names, and units.
-6. Optimize drink PNG assets if performance requires it.
-7. Split App.tsx tab/detail/onboarding screens into separate components.
-8. Add deeper hook-level tests around account-local merge behavior and remote sync edge cases.
-9. Update GitHub Actions to Node 24 before Node 20 actions are removed.
+1. On the next machine/chat, pull main, run npm install if needed, then npx tsc --noEmit, npm test, npm run build:web.
+2. Check the latest GitHub Actions deploy from the 2026-06-28 session-close push and production https://kreisphoto.de/.
+3. Continue account QA: reset password, profile save, bar sync, favorites sync, and cross-device behavior between Windows/Mac/phone.
+4. Fix Supabase Auth email deliverability: custom sender/domain, SPF, DKIM, DMARC, and Gmail spam result.
+5. Improve admin/editor UI for cocktail database.
+6. Continue editorial cleanup of recipes, ingredient names, and units.
+7. Optimize drink PNG assets if performance requires it.
+8. Split App.tsx tab/detail/onboarding screens into separate components.
+9. Add deeper hook-level tests around account-local merge behavior and remote sync edge cases.
+10. Update GitHub Actions to Node 24 before Node 20 actions are removed.
 ```
 
 ## Запрещено

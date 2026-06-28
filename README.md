@@ -117,9 +117,9 @@ SQL-схема с RLS находится в `supabase/schema.sql`. Ее нужн
 - `user_profiles`;
 - RLS policies для доступа только к своим данным.
 
-Supabase Auth должен иметь корректные production redirect URLs для `https://kreisphoto.de/`. Почтовые письма подтверждения/восстановления настраиваются в Supabase Dashboard; для красивой отправки используется внешний SMTP/Resend.
+Supabase Auth должен иметь корректные production redirect URLs для `https://kreisphoto.de/`. Почтовые письма подтверждения/восстановления настраиваются в Supabase Dashboard; для production-доставляемости нужен внешний SMTP/Resend с проверенными SPF/DKIM/DMARC.
 
-Следующая обязательная проверка перед production account-релизом: регистрация, подтверждение email, вход, восстановление пароля, сохранение профиля, синхронизация бара и избранного на реальных телефонах с заданными `EXPO_PUBLIC_SUPABASE_URL` и `EXPO_PUBLIC_SUPABASE_ANON_KEY`.
+Проверено на реальном Android-телефоне 2026-06-28 с заданными `EXPO_PUBLIC_SUPABASE_URL` и `EXPO_PUBLIC_SUPABASE_ANON_KEY`: регистрация, email confirmation и авторизованное состояние после reload работают. Исправлены зависание кнопки на `Проверяем`, native redirect crash и перекрытие password-полей клавиатурой. Письмо подтверждения у Gmail попало в spam, поэтому следующая внешняя задача - проверить SMTP/domain deliverability. Также остается полноценная cross-device QA синхронизации бара, избранного, профиля и восстановления пароля.
 
 ## Структура
 
@@ -164,14 +164,14 @@ Workflow: `.github/workflows/deploy.yml`
 https://kreisphoto.de/
 ```
 
-Текущее проверенное состояние на 2026-06-21:
+Текущее проверенное состояние на 2026-06-28:
 
 ```text
-Production commit: 2013e52 Add stale service worker cleanup
-Production bundle: /_expo/static/js/web/index-0c5e33e03d027db7c1a7c0669165bf84.js
+Last verified production commit before the session-close auth push: 37da852 Handle Android back on cocktail detail
+Last verified production bundle before the auth push: /_expo/static/js/web/index-ea9bbfa8dda1dc5eb0b5caff36604414.js
 HTML, manifest and cleanup service workers are served with no-store cache headers.
 /sw.js and /service-worker.js unregister stale browser/PWA workers and clear Cache Storage.
-Chrome and Safari on the local Mac were checked after deploy; Safari's apparent stale view was first-run onboarding state.
+2026-06-28 local auth/mobile checks passed: TypeScript, unit tests, web export, Playwright UI tests, Android dev-client reload, Android logcat.
 ```
 
 Перед деплоем обычно прогоняются:
@@ -185,8 +185,8 @@ npm run test:ui
 
 ## Ближайшие задачи
 
-- провести отдельную QA-проверку аккаунтов на реальных телефонах;
-- проверить синхронизацию бара/избранного между Mac, Windows и телефоном на одном аккаунте;
+- проверить SMTP/domain deliverability для Supabase Auth писем, потому что Gmail отправил confirmation email в spam;
+- продолжить QA аккаунтов: восстановление пароля, профиль, синхронизация бара/избранного между Mac, Windows и телефоном на одном аккаунте;
 - довести Android/iOS dev-процедуру до повторяемой инструкции для нового компьютера;
 - улучшить админский редактор базы коктейлей;
 - продолжить нормализацию рецептов, ингредиентов и единиц измерения;
