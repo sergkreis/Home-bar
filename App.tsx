@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { BackHandler, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { AccountPanel } from "./src/components/AccountPanel";
@@ -223,6 +223,19 @@ function AppContent() {
       setActiveTab("account");
     }
   }, [activeTab, isAdmin]);
+
+  useEffect(() => {
+    if (Platform.OS !== "android" || !selectedCocktail) {
+      return undefined;
+    }
+
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      setSelectedCocktail(null);
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [selectedCocktail]);
 
   const rankedCocktails = useMemo(
     () => rankCocktails(catalogCocktails, selectedIngredients, activeTaste, ingredients),
