@@ -1,14 +1,22 @@
-import { AuthError, Session, User } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 import { useEffect, useRef, useState } from "react";
 
 import {
-  clearPersistedSupabaseSession,
-  clearSupabaseSessionTransientMarker,
-  clearTransientSupabaseSessionIfNeeded,
   isSupabaseConfigured,
   markSupabaseSessionTransient,
   supabase,
 } from "../lib/supabase";
+import {
+  AuthCommandResult,
+  getSessionUser,
+  getUnexpectedAuthErrorMessage,
+  loadInitialAuthSession,
+  sendPasswordReset,
+  signInWithEmail,
+  signOutCurrentUser,
+  signUpWithEmail,
+  updateAccountPassword,
+} from "../services/authService";
 
 export type AuthMode =
   | "sign-in"
@@ -36,69 +44,6 @@ type UseAuthResult = {
   updatePassword: (password: string) => Promise<void>;
 };
 
-const AUTH_REQUEST_TIMEOUT_MS = 15000;
-const AUTH_REQUEST_TIMEOUT_MESSAGE =
-  "Сервер не ответил за 15 секунд. Проверь интернет и настройки Supabase.";
-
-async function withAuthTimeout<T>(request: Promise<T>) {
-  let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
-  const timeout = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => {
-      reject(new Error(AUTH_REQUEST_TIMEOUT_MESSAGE));
-    }, AUTH_REQUEST_TIMEOUT_MS);
-  });
-
-  try {
-    return await Promise.race([request, timeout]);
-  } finally {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-  }
-}
-
-function getAuthErrorMessage(error: AuthError) {
-  const message = error.message.toLowerCase();
-
-  if (message.includes("invalid login credentials")) {
-    return "Неверная почта или пароль.";
-  }
-
-  if (message.includes("email not confirmed")) {
-    return "Почта еще не подтверждена.";
-  }
-
-  if (message.includes("password")) {
-    return "Проверь пароль: минимум 6 символов.";
-  }
-
-  return error.message;
-}
-
-function getUnexpectedAuthErrorMessage(error: unknown) {
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-
-  return "Не удалось связаться с Supabase. Проверь интернет и попробуй еще раз.";
-}
-
-function getSessionUser(session: Session | null) {
-  return session?.user ?? null;
-}
-
-function getAuthRedirectUrl() {
-  if (
-    typeof window === "undefined" ||
-    typeof window.location?.origin !== "string"
-  ) {
-    return undefined;
-  }
-
-  return window.location.origin;
-}
-
 export function useAuth(): UseAuthResult {
   const [authMode, setAuthModeState] = useState<AuthMode>("sign-in");
   const [authUser, setAuthUser] = useState<User | null>(null);
@@ -114,22 +59,18 @@ export function useAuth(): UseAuthResult {
     }
 
     let isMounted = true;
-    const authClient = supabase;
-
     async function loadInitialSession() {
-      await clearTransientSupabaseSessionIfNeeded();
-
-      const { data, error } = await authClient.auth.getSession();
+      const { error, user } = await loadInitialAuthSession();
 
       if (!isMounted) {
         return;
       }
 
       if (error) {
-        setAuthError(error.message);
+        setAuthError(error);
       }
 
-      setAuthUser(getSessionUser(data.session));
+      setAuthUser(user);
       setIsAuthReady(true);
     }
 
@@ -169,153 +110,75 @@ export function useAuth(): UseAuthResult {
     setAuthMessage(null);
   };
 
+  const runAuthCommand = async (
+    command: () => Promise<AuthCommandResult>,
+    onSuccess?: () => void,
+  ) => {
+    if (!supabase) {
+      return false;
+    }
+
+    setIsAuthLoading(true);
+    setAuthError(null);
+    setAuthMessage(null);
+
+    try {
+      const result = await command();
+
+      if (result.error) {
+        setAuthError(result.error);
+        return false;
+      }
+
+      if (result.message) {
+        setAuthMessage(result.message);
+      }
+
+      onSuccess?.();
+      return true;
+    } catch (error) {
+      setAuthError(getUnexpectedAuthErrorMessage(error));
+      return false;
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
   const signIn = async (
     email: string,
     password: string,
     rememberSession = true,
   ) => {
-    if (!supabase) {
-      return;
-    }
-
     shouldPersistSession.current = rememberSession;
-    setIsAuthLoading(true);
-    setAuthError(null);
-    setAuthMessage(null);
+    const succeeded = await runAuthCommand(() =>
+      signInWithEmail(email, password, rememberSession),
+    );
 
-    try {
-      const { error } = await withAuthTimeout(
-        supabase.auth.signInWithPassword({ email, password }),
-      );
-
-      if (error) {
-        setAuthError(getAuthErrorMessage(error));
-        shouldPersistSession.current = true;
-      } else if (!rememberSession) {
-        await markSupabaseSessionTransient();
-      } else {
-        await clearSupabaseSessionTransientMarker();
-      }
-    } catch (error) {
-      setAuthError(getUnexpectedAuthErrorMessage(error));
+    if (!succeeded) {
       shouldPersistSession.current = true;
-    } finally {
-      setIsAuthLoading(false);
     }
   };
 
   const signUp = async (email: string, password: string) => {
-    if (!supabase) {
-      return;
-    }
-
-    setIsAuthLoading(true);
-    setAuthError(null);
-    setAuthMessage(null);
-
-    try {
-      const { data, error } = await withAuthTimeout(
-        supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: getAuthRedirectUrl(),
-          },
-        }),
-      );
-
-      if (error) {
-        setAuthError(getAuthErrorMessage(error));
-      } else if (!data.session) {
-        setAuthMessage("Проверь почту и подтверди регистрацию.");
-      } else {
-        setAuthMessage("Аккаунт создан. Бар и избранное синхронизируются.");
-      }
-    } catch (error) {
-      setAuthError(getUnexpectedAuthErrorMessage(error));
-    } finally {
-      setIsAuthLoading(false);
-    }
+    await runAuthCommand(() => signUpWithEmail(email, password));
   };
 
   const resetPassword = async (email: string) => {
-    if (!supabase) {
-      return;
-    }
-
-    setIsAuthLoading(true);
-    setAuthError(null);
-    setAuthMessage(null);
-
-    try {
-      const { error } = await withAuthTimeout(
-        supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: getAuthRedirectUrl(),
-        }),
-      );
-
-      if (error) {
-        setAuthError(getAuthErrorMessage(error));
-      } else {
-        setAuthMessage("Отправили письмо для восстановления пароля.");
-      }
-    } catch (error) {
-      setAuthError(getUnexpectedAuthErrorMessage(error));
-    } finally {
-      setIsAuthLoading(false);
-    }
+    await runAuthCommand(() => sendPasswordReset(email));
   };
 
   const updatePassword = async (password: string) => {
-    if (!supabase) {
-      return;
-    }
-
-    setIsAuthLoading(true);
-    setAuthError(null);
-    setAuthMessage(null);
-
-    try {
-      const { error } = await withAuthTimeout(
-        supabase.auth.updateUser({ password }),
-      );
-
-      if (error) {
-        setAuthError(getAuthErrorMessage(error));
-      } else {
+    await runAuthCommand(
+      () => updateAccountPassword(password),
+      () => {
         setAuthModeState("sign-in");
-        setAuthMessage("Пароль обновлен.");
-      }
-    } catch (error) {
-      setAuthError(getUnexpectedAuthErrorMessage(error));
-    } finally {
-      setIsAuthLoading(false);
-    }
+      },
+    );
   };
 
   const signOut = async () => {
-    if (!supabase) {
-      return;
-    }
-
-    setIsAuthLoading(true);
-    setAuthError(null);
-    setAuthMessage(null);
     shouldPersistSession.current = true;
-
-    try {
-      const { error } = await withAuthTimeout(supabase.auth.signOut());
-
-      if (error) {
-        setAuthError(error.message);
-      } else {
-        await clearPersistedSupabaseSession();
-      }
-    } catch (error) {
-      setAuthError(getUnexpectedAuthErrorMessage(error));
-    } finally {
-      setIsAuthLoading(false);
-    }
+    await runAuthCommand(signOutCurrentUser);
   };
 
   return {
