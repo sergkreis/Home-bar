@@ -28,9 +28,12 @@ const styles = StyleSheet.create({
   },
   header: {
     gap: 4,
+    maxWidth: "100%",
+    minWidth: 0,
   },
   sectionTitle: {
     color: colors.textSubtle,
+    flexShrink: 1,
     fontFamily: fonts.display,
     fontSize: 24,
     fontWeight: "800",
@@ -38,6 +41,7 @@ const styles = StyleSheet.create({
   },
   sectionHint: {
     color: colors.textDim,
+    flexShrink: 1,
     fontSize: 15,
     lineHeight: 21,
     maxWidth: 720,

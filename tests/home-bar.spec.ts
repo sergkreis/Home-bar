@@ -123,3 +123,46 @@ test("compact header and navigation fit a 320px phone", async ({ page }, testInf
   await expect(page.getByText("56", { exact: true })).toBeVisible();
   await expect(page.getByText("Любим...", { exact: true })).toHaveCount(0);
 });
+
+test("section panels stay readable on a 320px phone", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "small-phone");
+
+  await page.goto("/");
+  await confirmAgeIfShown(page);
+  await page.getByRole("button", { name: "Стартовый" }).click();
+  await page.getByRole("button", { name: "Подобрать коктейли" }).click();
+
+  const quickChoiceHeading = page.getByRole("heading", {
+    name: "Быстрый выбор",
+  });
+  await expect(quickChoiceHeading).toBeVisible();
+  const quickChoiceBox = await quickChoiceHeading.boundingBox();
+
+  await page.getByRole("button", { name: /Что-то свежее/ }).click();
+
+  const filterHeading = page.getByRole("heading", {
+    name: "Фильтр рецептов",
+  });
+  const filterHint = page.getByText(
+    "Поиск и настроение влияют на порядок выдачи. Готовые варианты остаются выше.",
+  );
+  await expect(filterHeading).toBeVisible();
+  await expect(filterHint).toBeVisible();
+
+  const viewportWidth = page.viewportSize()?.width ?? 320;
+  const visibleBoxes = [
+    quickChoiceBox,
+    await filterHeading.boundingBox(),
+    await filterHint.boundingBox(),
+  ];
+  for (const box of visibleBoxes) {
+    expect(box).not.toBeNull();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(viewportWidth);
+  }
+
+  const horizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(horizontalOverflow).toBeLessThanOrEqual(0);
+});
