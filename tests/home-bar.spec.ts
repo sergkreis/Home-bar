@@ -1,11 +1,17 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function confirmAgeIfShown(page: Page) {
-  const confirmAgeButton = page.getByRole("button", { name: "Мне есть 18" });
+  const hasConfirmedAge = await page.evaluate(
+    () => window.localStorage.getItem("domashniy-bar:age-confirmed") === "true",
+  );
 
-  if (await confirmAgeButton.isVisible()) {
-    await confirmAgeButton.click();
+  if (hasConfirmedAge) {
+    return;
   }
+
+  const confirmAgeButton = page.getByRole("button", { name: "Мне есть 18" });
+  await expect(confirmAgeButton).toBeVisible();
+  await confirmAgeButton.click();
 }
 
 test("home page supports the core mobile flow", async ({ page }) => {
