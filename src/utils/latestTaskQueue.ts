@@ -54,11 +54,17 @@ export function createLatestTaskQueue<T>({
         await worker(value);
       }
     } catch (error) {
-      hasPendingValue = false;
       onError?.(error);
     } finally {
       isRunning = false;
-      if (!isDisposed) {
+
+      if (isDisposed) {
+        return;
+      }
+
+      if (hasPendingValue) {
+        void drain();
+      } else {
         onBusyChange?.(false);
       }
     }

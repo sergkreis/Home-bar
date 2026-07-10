@@ -4,11 +4,13 @@ import { createLatestTaskQueue } from "./latestTaskQueue";
 
 function deferred() {
   let resolve!: () => void;
-  const promise = new Promise<void>((nextResolve) => {
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<void>((nextResolve, nextReject) => {
     resolve = nextResolve;
+    reject = nextReject;
   });
 
-  return { promise, resolve };
+  return { promise, reject, resolve };
 }
 
 async function flushPromises() {
@@ -59,5 +61,38 @@ describe("createLatestTaskQueue", () => {
     await flushPromises();
 
     expect(savedValues).toEqual(["conflicting"]);
+  });
+
+  it("continues with a newer pending value after a failed save", async () => {
+    const firstSave = deferred();
+    const savedValues: string[] = [];
+    const onError = vi.fn();
+    const worker = vi.fn(async (value: string) => {
+      savedValues.push(value);
+      if (value === "first") {
+        await firstSave.promise;
+      }
+    });
+    const queue = createLatestTaskQueue({ onError, worker });
+
+    queue.enqueue("first");
+    queue.enqueue("latest");
+    firstSave.reject(new Error("Network unavailable"));
+    await flushPromises();
+
+    expect(onError).toHaveBeenCalledOnce();
+    expect(savedValues).toEqual(["first", "latest"]);
+  });
+
+  it("does not retry a failed value when nothing newer is pending", async () => {
+    const onError = vi.fn();
+    const worker = vi.fn().mockRejectedValue(new Error("Network unavailable"));
+    const queue = createLatestTaskQueue({ onError, worker });
+
+    queue.enqueue("only-value");
+    await flushPromises();
+
+    expect(worker).toHaveBeenCalledOnce();
+    expect(onError).toHaveBeenCalledOnce();
   });
 });
