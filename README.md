@@ -119,7 +119,7 @@ SQL-схема с RLS находится в `supabase/schema.sql`. Ее нужн
 
 Supabase Auth должен иметь корректные production redirect URLs для `https://kreisphoto.de/`. Почтовые письма подтверждения/восстановления настраиваются в Supabase Dashboard; для production-доставляемости нужен внешний SMTP/Resend с проверенными SPF/DKIM/DMARC.
 
-Проверено на реальном Android-телефоне 2026-06-28 с заданными `EXPO_PUBLIC_SUPABASE_URL` и `EXPO_PUBLIC_SUPABASE_ANON_KEY`: регистрация, email confirmation и авторизованное состояние после reload работают. Исправлены зависание кнопки на `Проверяем`, native redirect crash и перекрытие password-полей клавиатурой. Письмо подтверждения у Gmail попало в spam, поэтому следующая внешняя задача - проверить SMTP/domain deliverability. Также остается полноценная cross-device QA синхронизации бара, избранного, профиля и восстановления пароля.
+Проверено на реальном Android-телефоне 2026-06-28 с заданными `EXPO_PUBLIC_SUPABASE_URL` и `EXPO_PUBLIC_SUPABASE_ANON_KEY`: регистрация, email confirmation и авторизованное состояние после reload работают. Исправлены зависание кнопки на `Проверяем`, native redirect crash и перекрытие password-полей клавиатурой. В ревью 2026-07-10 дополнительно добавлены видимые подписи полей, переключатели видимости пароля и accessibility-состояния. Письмо подтверждения у Gmail попало в spam, поэтому следующая внешняя задача - проверить SMTP/domain deliverability. Также остается полноценная cross-device QA синхронизации бара, избранного, профиля и восстановления пароля.
 
 ## Структура
 
@@ -164,14 +164,16 @@ Workflow: `.github/workflows/deploy.yml`
 https://kreisphoto.de/
 ```
 
-Текущее проверенное состояние на 2026-06-28:
+Текущее локально проверенное состояние на 2026-07-10:
 
 ```text
-Last verified production commit before the session-close auth push: 37da852 Handle Android back on cocktail detail
-Last verified production bundle before the auth push: /_expo/static/js/web/index-ea9bbfa8dda1dc5eb0b5caff36604414.js
-HTML, manifest and cleanup service workers are served with no-store cache headers.
-/sw.js and /service-worker.js unregister stale browser/PWA workers and clear Cache Storage.
-2026-06-28 local auth/mobile checks passed: TypeScript, unit tests, web export, Playwright UI tests, Android dev-client reload, Android logcat.
+Remote sync writes are serialized and retain the latest pending local state.
+Web tabs and cocktail details have stable URLs, browser history and direct-link support.
+Header and bottom navigation are covered at 320 px; auth fields have labels and password visibility controls.
+GitHub Actions is prepared for Node 24, npm ci and pre-deploy unit tests.
+2026-07-10 checks passed: TypeScript, 40 unit tests, Expo Doctor 18/18, web export,
+Playwright UI 13 passed / 2 conditional skips, and Android Expo export.
+No production deploy was performed during this review pass.
 ```
 
 Перед деплоем обычно прогоняются:
@@ -187,9 +189,10 @@ npm run test:ui
 
 - проверить SMTP/domain deliverability для Supabase Auth писем, потому что Gmail отправил confirmation email в spam;
 - продолжить QA аккаунтов: восстановление пароля, профиль, синхронизация бара/избранного между Mac, Windows и телефоном на одном аккаунте;
+- проверить реальные cross-device конфликты после добавленной очереди remote save;
 - довести Android/iOS dev-процедуру до повторяемой инструкции для нового компьютера;
 - улучшить админский редактор базы коктейлей;
 - продолжить нормализацию рецептов, ингредиентов и единиц измерения;
 - оптимизировать вес PNG-ассетов, если загрузка на мобильных станет тяжелой;
 - вынести крупные части `App.tsx` в отдельные экраны/компоненты;
-- обновить GitHub Actions под Node 24, когда actions runner окончательно уйдет с Node 20.
+- запланировать переход с Expo SDK 54 перед принудительным исправлением оставшихся npm audit предупреждений.

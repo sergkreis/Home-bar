@@ -8,6 +8,7 @@ import {
   resolveAuthoritativeRemoteIds,
   uniqueKnownIds,
 } from "../utils/persistedIds";
+import { createLatestTaskQueue, LatestTaskQueue } from "../utils/latestTaskQueue";
 
 const SAVED_BAR_STORAGE_KEY = "domashniy-bar:selected-ingredients";
 const SAVE_DEBOUNCE_MS = 250;
@@ -43,8 +44,12 @@ export function useSavedBar(
     [ingredients],
   );
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeUserIdRef = useRef(userId);
+  const loadedStorageKeyRef = useRef<string | null>(null);
+  const remoteSaveQueueRef = useRef<LatestTaskQueue<string[]> | null>(null);
   const remoteUpdatedAtRef = useRef<string | null>(null);
   const skipNextRemoteSaveRef = useRef(false);
+  activeUserIdRef.current = userId;
 
   useEffect(() => {
     if (!isAuthReady) {
@@ -54,6 +59,9 @@ export function useSavedBar(
     let isMounted = true;
 
     async function loadSavedBar() {
+      remoteSaveQueueRef.current?.dispose();
+      remoteSaveQueueRef.current = null;
+      loadedStorageKeyRef.current = null;
       setHasLoadedSavedBar(false);
       setHasMergedRemoteBar(false);
       setSyncError(null);
@@ -87,6 +95,7 @@ export function useSavedBar(
         console.warn("Failed to load saved home bar.", error);
       } finally {
         if (isMounted) {
+          loadedStorageKeyRef.current = storageKey;
           setHasLoadedSavedBar(true);
         }
       }
@@ -124,7 +133,13 @@ export function useSavedBar(
   }, [hasLoadedSavedBar, isAuthReady, selectedIngredients, storageKey]);
 
   useEffect(() => {
-    if (!isAuthReady || !hasLoadedSavedBar || !userId || hasMergedRemoteBar) {
+    if (
+      !isAuthReady ||
+      !hasLoadedSavedBar ||
+      loadedStorageKeyRef.current !== storageKey ||
+      !userId ||
+      remoteSaveQueueRef.current
+    ) {
       return;
     }
 
@@ -152,6 +167,53 @@ export function useSavedBar(
         setSelectedIngredients(remoteIngredientIds);
         setHasSavedBar(remoteIngredientIds.length > 0);
 
+        let queue: LatestTaskQueue<string[]>;
+        queue = createLatestTaskQueue({
+          onBusyChange: (isBusy) => {
+            if (activeUserIdRef.current === currentUserId) {
+              setIsSyncingBar(isBusy);
+            }
+          },
+          onError: (error) => {
+            if (activeUserIdRef.current !== currentUserId) {
+              return;
+            }
+
+            console.warn("Failed to save remote home bar.", error);
+            setSyncError("Не удалось сохранить бар в аккаунте.");
+          },
+          worker: async (ingredientIds) => {
+            const result = await saveRemoteUserBar(
+              currentUserId,
+              ingredientIds,
+              remoteUpdatedAtRef.current,
+            );
+
+            if (!result || activeUserIdRef.current !== currentUserId) {
+              return;
+            }
+
+            if (result.status === "saved") {
+              remoteUpdatedAtRef.current = result.bar.updatedAt;
+              return;
+            }
+
+            queue.clear();
+            const nextIds = resolveAuthoritativeRemoteIds(
+              result.bar?.ingredientIds,
+              knownIngredientIds,
+            );
+            remoteUpdatedAtRef.current = result.bar?.updatedAt ?? null;
+            skipNextRemoteSaveRef.current = true;
+            setSelectedIngredients(nextIds);
+            setHasSavedBar(nextIds.length > 0);
+            setSyncError(
+              "Бар обновился на другом устройстве. Показали свежую версию из аккаунта.",
+            );
+          },
+        });
+        remoteSaveQueueRef.current = queue;
+
         setHasMergedRemoteBar(true);
       } catch (error) {
         console.warn("Failed to sync saved home bar.", error);
@@ -169,12 +231,14 @@ export function useSavedBar(
 
     return () => {
       isMounted = false;
+      remoteSaveQueueRef.current?.dispose();
+      remoteSaveQueueRef.current = null;
     };
   }, [
     hasLoadedSavedBar,
-    hasMergedRemoteBar,
     isAuthReady,
     knownIngredientIds,
+    storageKey,
     userId,
   ]);
 
@@ -188,59 +252,12 @@ export function useSavedBar(
       return;
     }
 
-    let isMounted = true;
-    const currentUserId = userId;
     const timeoutId = setTimeout(() => {
-      if (!isMounted) {
-        return;
-      }
-
-      setIsSyncingBar(true);
       setSyncError(null);
-
-      saveRemoteUserBar(currentUserId, selectedIngredients, remoteUpdatedAtRef.current)
-        .then((result) => {
-          if (!isMounted) {
-            return;
-          }
-
-          if (!result) {
-            return;
-          }
-
-          if (result.status === "saved") {
-            remoteUpdatedAtRef.current = result.bar.updatedAt;
-            return;
-          }
-
-          const remoteIngredientIds = resolveAuthoritativeRemoteIds(
-            result.bar?.ingredientIds,
-            knownIngredientIds,
-          );
-
-          remoteUpdatedAtRef.current = result.bar?.updatedAt ?? null;
-          skipNextRemoteSaveRef.current = true;
-          setSelectedIngredients(remoteIngredientIds);
-          setHasSavedBar(remoteIngredientIds.length > 0);
-          setSyncError("Бар обновился на другом устройстве. Показали свежую версию из аккаунта.");
-        })
-        .catch((error) => {
-          if (!isMounted) {
-            return;
-          }
-
-          console.warn("Failed to save remote home bar.", error);
-          setSyncError("Не удалось сохранить бар в аккаунте.");
-        })
-        .finally(() => {
-          if (isMounted) {
-            setIsSyncingBar(false);
-          }
-        });
+      remoteSaveQueueRef.current?.enqueue([...selectedIngredients]);
     }, REMOTE_SAVE_DEBOUNCE_MS);
 
     return () => {
-      isMounted = false;
       clearTimeout(timeoutId);
     };
   }, [

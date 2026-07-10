@@ -30,6 +30,13 @@ import { RecipesTab } from "./src/screens/RecipesTab";
 import { QuickMode, TodayTab } from "./src/screens/TodayTab";
 import { colors, fonts, spacing } from "./src/theme";
 import { rankCocktails, RankedCocktail } from "./src/utils/cocktailMatcher";
+import {
+  AppHistoryState,
+  buildCocktailPath,
+  buildTabPath,
+  readCurrentAppRoute,
+  writeAppRoute,
+} from "./src/utils/appNavigation";
 import { buildShoppingSuggestions, buildTonightHeadline } from "./src/utils/shoppingAdvisor";
 
 type RecipeMode = "easy" | null;
@@ -150,6 +157,7 @@ function AppContent() {
     catalogCocktails,
     catalogError,
     catalogSource,
+    hasLoadedCatalog,
     isLoadingCatalog,
     reloadCatalog,
   } = useCocktailCatalog(authUser?.id, isAuthReady);
@@ -196,9 +204,11 @@ function AppContent() {
 
   const [activeTaste, setActiveTaste] = useState<TasteTag | null>(null);
   const [activeRecipeMode, setActiveRecipeMode] = useState<RecipeMode>(null);
-  const [activeTab, setActiveTab] = useState<AppTab>("today");
+  const [activeTab, setActiveTab] = useState<AppTab>(() => readCurrentAppRoute().tab);
   const [isAuthModalVisible, setIsAuthModalVisible] = useState(false);
-  const [selectedCocktail, setSelectedCocktail] = useState<RankedCocktail | null>(null);
+  const [selectedCocktailId, setSelectedCocktailId] = useState<string | null>(
+    () => readCurrentAppRoute().cocktailId,
+  );
 
   useEffect(() => {
     if (hasLoadedSavedBar && hasLoadedEntered && hasSavedBar && !hasEnteredApp) {
@@ -219,23 +229,44 @@ function AppContent() {
   }, [authMode]);
 
   useEffect(() => {
-    if (!isAdmin && activeTab === "admin") {
+    if (hasLoadedAdminAccess && !isAdmin && activeTab === "admin") {
       setActiveTab("account");
+      writeAppRoute(buildTabPath("account"), "replace");
     }
-  }, [activeTab, isAdmin]);
+  }, [activeTab, hasLoadedAdminAccess, isAdmin]);
 
   useEffect(() => {
-    if (Platform.OS !== "android" || !selectedCocktail) {
+    if (Platform.OS !== "web") {
+      return undefined;
+    }
+
+    const applyCurrentRoute = () => {
+      const route = readCurrentAppRoute();
+      setActiveTab(route.tab);
+      setSelectedCocktailId(route.cocktailId);
+
+      if (route.tab !== "recipes") {
+        setActiveTaste(null);
+        setActiveRecipeMode(null);
+      }
+    };
+
+    window.addEventListener("popstate", applyCurrentRoute);
+    return () => window.removeEventListener("popstate", applyCurrentRoute);
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== "android" || !selectedCocktailId) {
       return undefined;
     }
 
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      setSelectedCocktail(null);
+      setSelectedCocktailId(null);
       return true;
     });
 
     return () => subscription.remove();
-  }, [selectedCocktail]);
+  }, [selectedCocktailId]);
 
   const rankedCocktails = useMemo(
     () => rankCocktails(catalogCocktails, selectedIngredients, activeTaste, ingredients),
@@ -280,25 +311,74 @@ function AppContent() {
     () => allRankedCocktails.filter((c) => isFavorite(c.id)),
     [allRankedCocktails, isFavorite],
   );
+  const selectedCocktail = useMemo(
+    () =>
+      selectedCocktailId
+        ? allRankedCocktails.find((cocktail) => cocktail.id === selectedCocktailId) ?? null
+        : null,
+    [allRankedCocktails, selectedCocktailId],
+  );
+
+  useEffect(() => {
+    if (
+      Platform.OS === "web" &&
+      hasLoadedCatalog &&
+      selectedCocktailId &&
+      !selectedCocktail
+    ) {
+      setSelectedCocktailId(null);
+      writeAppRoute(buildTabPath(activeTab), "replace");
+    }
+  }, [activeTab, hasLoadedCatalog, selectedCocktail, selectedCocktailId]);
 
   const openAuthModal = () => {
     setAuthMode("sign-in");
     setIsAuthModalVisible(true);
   };
 
-  const changeTab = (tab: AppTab) => {
+  const changeTab = (tab: AppTab, mode: "push" | "replace" = "push") => {
     if (tab !== "recipes") {
       setActiveTaste(null);
       setActiveRecipeMode(null);
     }
 
+    setSelectedCocktailId(null);
     setActiveTab(tab);
+    if (Platform.OS === "web") {
+      writeAppRoute(buildTabPath(tab), mode);
+    }
+  };
+
+  const openCocktail = (cocktail: RankedCocktail) => {
+    setSelectedCocktailId(cocktail.id);
+    if (Platform.OS === "web") {
+      writeAppRoute(buildCocktailPath(cocktail.id), "push", {
+        domashniyBar: true,
+        fromTab: activeTab,
+      });
+    }
+  };
+
+  const closeCocktail = () => {
+    if (Platform.OS === "web") {
+      const historyState = window.history.state as AppHistoryState | null;
+      if (historyState?.domashniyBar && historyState.fromTab) {
+        window.history.back();
+        return;
+      }
+
+      setSelectedCocktailId(null);
+      writeAppRoute(buildTabPath(activeTab), "replace");
+      return;
+    }
+
+    setSelectedCocktailId(null);
   };
 
   const openAccountPanel = () => {
     setActiveTaste(null);
     setActiveRecipeMode(null);
-    setActiveTab("account");
+    changeTab("account");
   };
 
   const accountPanel = (
@@ -337,7 +417,7 @@ function AppContent() {
   const applyQuickMode = (taste: TasteTag | null, recipeMode: RecipeMode) => {
     setActiveTaste(taste);
     setActiveRecipeMode(recipeMode);
-    setActiveTab("recipes");
+    changeTab("recipes");
   };
 
   const startMatching = () => {
@@ -347,8 +427,7 @@ function AppContent() {
 
     setActiveTaste(null);
     setActiveRecipeMode(null);
-    setActiveTab("today");
-    setSelectedCocktail(null);
+    changeTab("today", "replace");
     markEntered();
   };
 
@@ -382,7 +461,7 @@ function AppContent() {
         <StatusBar style="light" />
         <View style={styles.loadingScreen}>
           <Text style={styles.eyebrow}>Домашний бар</Text>
-          <Text style={styles.loadingTitle}>Загружаем твой бар</Text>
+          <Text accessibilityRole="header" style={styles.loadingTitle}>Загружаем твой бар</Text>
           <Text style={styles.loadingText}>Проверяем локальные данные и сессию аккаунта.</Text>
         </View>
         {authModal}
@@ -411,7 +490,7 @@ function AppContent() {
           isFavorite={isFavorite(selectedCocktail.id)}
           onToggleFavorite={() => toggleFavorite(selectedCocktail.id)}
           onAddIngredientToBar={addIngredientToBar}
-          onBack={() => setSelectedCocktail(null)}
+          onBack={closeCocktail}
         />
         {authModal}
       </SafeAreaView>
@@ -480,7 +559,7 @@ function AppContent() {
               almostReady={almostReady}
               ingredients={ingredients}
               onApplyQuickMode={applyQuickMode}
-              onSelectCocktail={setSelectedCocktail}
+              onSelectCocktail={openCocktail}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
             />
@@ -503,7 +582,7 @@ function AppContent() {
             <FavoritesTab
               favoriteCocktails={favoriteCocktails}
               ingredients={ingredients}
-              onSelectCocktail={setSelectedCocktail}
+              onSelectCocktail={openCocktail}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
             />
@@ -521,7 +600,7 @@ function AppContent() {
               }}
               onClearRecipeMode={() => setActiveRecipeMode(null)}
               ingredients={ingredients}
-              onSelectCocktail={setSelectedCocktail}
+              onSelectCocktail={openCocktail}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
             />

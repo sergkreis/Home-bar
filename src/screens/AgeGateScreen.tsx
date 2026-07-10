@@ -15,7 +15,7 @@ export function AgeGateScreen({ onConfirm }: AgeGateScreenProps) {
           <ShieldCheck color={colors.accent} size={34} strokeWidth={1.8} />
         </View>
         <Text style={styles.eyebrow}>Домашний бар</Text>
-        <Text style={styles.title}>Только для 18+</Text>
+        <Text accessibilityRole="header" style={styles.title}>Только для 18+</Text>
         <Text style={styles.text}>
           Здесь собраны рецепты алкогольных коктейлей. Подтверди возраст, чтобы продолжить.
         </Text>

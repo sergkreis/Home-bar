@@ -40,7 +40,7 @@ export function OnboardingScreen({
         <View style={styles.hero}>
           <View style={styles.heroCopy}>
             <Text style={styles.eyebrow}>Домашний бар</Text>
-            <Text style={styles.heroTitle}>Что можно смешать из того, что есть дома?</Text>
+            <Text accessibilityRole="header" style={styles.heroTitle}>Что можно смешать из того, что есть дома?</Text>
             <Text style={styles.subtitle}>
               Отметь бутылки, соки, цитрус и сиропы. Подборка сразу покажет готовые рецепты и самые выгодные покупки.
             </Text>

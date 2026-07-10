@@ -1,10 +1,28 @@
 # Domashniy Bar - Handover
 
-Последнее обновление: 2026-06-28
+Последнее обновление: 2026-07-10
 
 ## Быстрый Контекст
 
 Domashniy Bar - phone-oriented Expo / React Native Web / TypeScript приложение для подбора коктейлей из ингредиентов, которые уже есть дома.
+
+## Ревью И Исправления 2026-07-10
+
+```text
+Проведены code, design и UX review без production deploy.
+useSavedBar/useFavorites теперь сериализуют remote save и сохраняют последнее ожидающее локальное состояние.
+Web-навигация поддерживает URL вкладок, /cocktails/:id, direct links, browser Back и popstate.
+Шапка и нижняя навигация адаптированы для 320 px; добавлен Playwright-проект small-phone.
+Auth modal получил видимые labels, show/hide password и accessibility/live-region атрибуты.
+Lucide остаётся на индивидуальных imports; Metro настроен без package exports warning и игнорирует Playwright artifacts.
+Обновлены совместимые прямые зависимости: Supabase 2.110.2, Lucide 1.24.0, Playwright 1.61.1.
+Deploy workflow подготовлен к Node 24, actions checkout/setup-node v6, npm ci и unit tests.
+Проверки: TypeScript passed; Vitest 7 files / 40 tests passed; Expo Doctor 18/18;
+web export passed (~1.1 MB JS); Playwright 13 passed / 2 conditional skips; Android Expo export passed.
+npm audit production tree всё ещё сообщает 17 проблем Expo 54 toolchain; npm audit fix не предлагает
+совместимого исправления, а --force потребовал бы major Expo upgrade.
+Untracked REVIEW-2026-06-15.md не изменялся и не должен включаться автоматически.
+```
 
 Живой сайт:
 
@@ -125,7 +143,7 @@ deploy/                              VPS/nginx deployment scripts and config
 .github/workflows/deploy.yml         GitHub Actions deploy workflow
 ```
 
-## Текущее Состояние На 2026-06-28
+## Предыдущее Состояние На 2026-06-28
 
 ```text
 Before the session-close commit, main was aligned with origin/main at 37da852.
@@ -604,16 +622,16 @@ Android auth QA pass on 2026-06-28:
 ## Следующие Шаги
 
 ```text
-1. On the next machine/chat, pull main, run npm install if needed, then npx tsc --noEmit, npm test, npm run build:web.
-2. Check the latest GitHub Actions deploy from the 2026-06-28 session-close push and production https://kreisphoto.de/.
-3. Continue account QA: reset password, profile save, bar sync, favorites sync, and cross-device behavior between Windows/Mac/phone.
+1. After an approved commit/deploy, pull main on the next machine and run npm ci, npx tsc --noEmit, npm test, npm run build:web.
+2. Continue account QA: reset password, profile save, bar sync, favorites sync, and cross-device behavior between Windows/Mac/phone.
+3. Specifically verify rapid edits and competing updates on two devices after the remote-save queue change.
 4. Fix Supabase Auth email deliverability: custom sender/domain, SPF, DKIM, DMARC, and Gmail spam result.
 5. Improve admin/editor UI for cocktail database.
 6. Continue editorial cleanup of recipes, ingredient names, and units.
 7. Optimize drink PNG assets if performance requires it.
 8. Split App.tsx tab/detail/onboarding screens into separate components.
 9. Add deeper hook-level tests around account-local merge behavior and remote sync edge cases.
-10. Update GitHub Actions to Node 24 before Node 20 actions are removed.
+10. Plan an Expo SDK upgrade before attempting forced npm audit remediation.
 ```
 
 ## Запрещено

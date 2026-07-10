@@ -71,7 +71,7 @@ export function CocktailDetailScreen({
         </View>
         <View style={[styles.titleRow, isCompact && styles.titleRowCompact]}>
           <View style={[styles.titleCopy, isCompact && styles.titleCopyCompact]}>
-            <Text style={styles.title}>{cocktail.name}</Text>
+            <Text accessibilityRole="header" style={styles.title}>{cocktail.name}</Text>
             <Text style={styles.meta}>
               {cocktail.baseSpirit} · {getStrengthLabel(cocktail.strength)} · {cocktail.glassName}
             </Text>

@@ -14,7 +14,7 @@ export function SectionPanel({ title, hint, children, style }: SectionPanelProps
   return (
     <View style={[styles.section, style]}>
       <View style={styles.header}>
-        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text accessibilityRole="header" style={styles.sectionTitle}>{title}</Text>
         {hint ? <Text style={styles.sectionHint}>{hint}</Text> : null}
       </View>
       {children}

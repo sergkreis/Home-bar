@@ -230,6 +230,7 @@ export function AccountPanel({
         <View style={styles.field}>
           <Text style={styles.label}>Имя</Text>
           <TextInput
+            accessibilityLabel="Имя"
             autoCapitalize="words"
             onChangeText={setDisplayName}
             placeholder="Как тебя показывать в приложении"
@@ -242,6 +243,7 @@ export function AccountPanel({
         <View style={styles.field}>
           <Text style={styles.label}>Дата рождения</Text>
           <TextInput
+            accessibilityLabel="Дата рождения"
             inputMode="numeric"
             onChangeText={setBirthDate}
             placeholder="ГГГГ-ММ-ДД"
@@ -254,12 +256,12 @@ export function AccountPanel({
       </View>
 
       {birthDateError ? (
-        <Text style={styles.errorText}>{birthDateError}</Text>
+        <Text accessibilityLiveRegion="polite" style={styles.errorText}>{birthDateError}</Text>
       ) : null}
-      {barSyncError ? <Text style={styles.errorText}>{barSyncError}</Text> : null}
-      {favoritesSyncError ? <Text style={styles.errorText}>{favoritesSyncError}</Text> : null}
-      {profileError ? <Text style={styles.errorText}>{profileError}</Text> : null}
-      {profileMessage ? <Text style={styles.messageText}>{profileMessage}</Text> : null}
+      {barSyncError ? <Text accessibilityLiveRegion="polite" style={styles.errorText}>{barSyncError}</Text> : null}
+      {favoritesSyncError ? <Text accessibilityLiveRegion="polite" style={styles.errorText}>{favoritesSyncError}</Text> : null}
+      {profileError ? <Text accessibilityLiveRegion="polite" style={styles.errorText}>{profileError}</Text> : null}
+      {profileMessage ? <Text accessibilityLiveRegion="polite" style={styles.messageText}>{profileMessage}</Text> : null}
 
       <View style={styles.actions}>
         <Pressable

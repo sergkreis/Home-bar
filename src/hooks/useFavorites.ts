@@ -10,6 +10,7 @@ import {
   resolveAuthoritativeRemoteIds,
   uniqueKnownIds,
 } from "../utils/persistedIds";
+import { createLatestTaskQueue, LatestTaskQueue } from "../utils/latestTaskQueue";
 
 const STORAGE_KEY = "domashniy-bar:favorites";
 const REMOTE_SAVE_DEBOUNCE_MS = 800;
@@ -38,8 +39,12 @@ export function useFavorites(
   const [hasMergedRemoteFavorites, setHasMergedRemoteFavorites] = useState(false);
   const [isSyncingFavorites, setIsSyncingFavorites] = useState(false);
   const [favoritesSyncError, setFavoritesSyncError] = useState<string | null>(null);
+  const activeUserIdRef = useRef(userId);
+  const loadedStorageKeyRef = useRef<string | null>(null);
+  const remoteSaveQueueRef = useRef<LatestTaskQueue<string[]> | null>(null);
   const remoteUpdatedAtRef = useRef<string | null>(null);
   const skipNextRemoteSaveRef = useRef(false);
+  activeUserIdRef.current = userId;
 
   useEffect(() => {
     if (!isAuthReady) {
@@ -49,6 +54,9 @@ export function useFavorites(
     let isMounted = true;
 
     async function load() {
+      remoteSaveQueueRef.current?.dispose();
+      remoteSaveQueueRef.current = null;
+      loadedStorageKeyRef.current = null;
       setHasLoadedFavorites(false);
       setHasMergedRemoteFavorites(false);
       setFavoritesSyncError(null);
@@ -76,6 +84,7 @@ export function useFavorites(
         console.warn("Failed to load favorites.", error);
       } finally {
         if (isMounted) {
+          loadedStorageKeyRef.current = storageKey;
           setHasLoadedFavorites(true);
         }
       }
@@ -96,7 +105,13 @@ export function useFavorites(
   }, [favorites, hasLoadedFavorites, isAuthReady, storageKey]);
 
   useEffect(() => {
-    if (!isAuthReady || !hasLoadedFavorites || !userId || hasMergedRemoteFavorites) {
+    if (
+      !isAuthReady ||
+      !hasLoadedFavorites ||
+      loadedStorageKeyRef.current !== storageKey ||
+      !userId ||
+      remoteSaveQueueRef.current
+    ) {
       return;
     }
 
@@ -123,6 +138,52 @@ export function useFavorites(
         skipNextRemoteSaveRef.current = true;
         setFavorites(remoteIds);
 
+        let queue: LatestTaskQueue<string[]>;
+        queue = createLatestTaskQueue({
+          onBusyChange: (isBusy) => {
+            if (activeUserIdRef.current === currentUserId) {
+              setIsSyncingFavorites(isBusy);
+            }
+          },
+          onError: (error) => {
+            if (activeUserIdRef.current !== currentUserId) {
+              return;
+            }
+
+            console.warn("Failed to save remote favorites.", error);
+            setFavoritesSyncError("Не удалось сохранить избранное в аккаунте.");
+          },
+          worker: async (cocktailIds) => {
+            const result = await saveRemoteUserFavorites(
+              currentUserId,
+              cocktailIds,
+              remoteUpdatedAtRef.current,
+            );
+
+            if (!result || activeUserIdRef.current !== currentUserId) {
+              return;
+            }
+
+            if (result.status === "saved") {
+              remoteUpdatedAtRef.current = result.favorites.updatedAt;
+              return;
+            }
+
+            queue.clear();
+            const nextIds = resolveAuthoritativeRemoteIds(
+              result.favorites?.cocktailIds,
+              knownIds,
+            );
+            remoteUpdatedAtRef.current = result.favorites?.updatedAt ?? null;
+            skipNextRemoteSaveRef.current = true;
+            setFavorites(nextIds);
+            setFavoritesSyncError(
+              "Избранное обновилось на другом устройстве. Показали свежую версию из аккаунта.",
+            );
+          },
+        });
+        remoteSaveQueueRef.current = queue;
+
         setHasMergedRemoteFavorites(true);
       } catch (error) {
         console.warn("Failed to sync favorites.", error);
@@ -140,8 +201,10 @@ export function useFavorites(
 
     return () => {
       isMounted = false;
+      remoteSaveQueueRef.current?.dispose();
+      remoteSaveQueueRef.current = null;
     };
-  }, [hasLoadedFavorites, hasMergedRemoteFavorites, isAuthReady, knownIds, userId]);
+  }, [hasLoadedFavorites, isAuthReady, knownIds, storageKey, userId]);
 
   useEffect(() => {
     if (!isAuthReady || !hasLoadedFavorites || !userId || !hasMergedRemoteFavorites) {
@@ -153,41 +216,9 @@ export function useFavorites(
       return;
     }
 
-    const currentUserId = userId;
     const timeoutId = setTimeout(() => {
-      setIsSyncingFavorites(true);
       setFavoritesSyncError(null);
-
-      saveRemoteUserFavorites(currentUserId, favorites, remoteUpdatedAtRef.current)
-        .then((result) => {
-          if (!result) {
-            return;
-          }
-
-          if (result.status === "saved") {
-            remoteUpdatedAtRef.current = result.favorites.updatedAt;
-            return;
-          }
-
-          const remoteIds = resolveAuthoritativeRemoteIds(
-            result.favorites?.cocktailIds,
-            knownIds,
-          );
-
-          remoteUpdatedAtRef.current = result.favorites?.updatedAt ?? null;
-          skipNextRemoteSaveRef.current = true;
-          setFavorites(remoteIds);
-          setFavoritesSyncError(
-            "Избранное обновилось на другом устройстве. Показали свежую версию из аккаунта.",
-          );
-        })
-        .catch((error) => {
-          console.warn("Failed to save remote favorites.", error);
-          setFavoritesSyncError("Не удалось сохранить избранное в аккаунте.");
-        })
-        .finally(() => {
-          setIsSyncingFavorites(false);
-        });
+      remoteSaveQueueRef.current?.enqueue([...favorites]);
     }, REMOTE_SAVE_DEBOUNCE_MS);
 
     return () => {

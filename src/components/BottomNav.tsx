@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Heart from "lucide-react-native/dist/cjs/icons/heart";
 import Martini from "lucide-react-native/dist/cjs/icons/martini";
 import Scroll from "lucide-react-native/dist/cjs/icons/scroll";
@@ -47,10 +47,12 @@ export function BottomNav({
   favoritesCount = 0,
   showAdmin = false,
 }: BottomNavProps) {
+  const { width } = useWindowDimensions();
+  const isCompact = width < 360;
   const visibleTabs = tabs.filter((tab) => showAdmin || tab.id !== "admin");
 
   return (
-    <View style={styles.navWrap}>
+    <View style={[styles.navWrap, isCompact && styles.navWrapCompact]}>
       <View style={styles.bottomNav}>
         {visibleTabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -84,7 +86,16 @@ export function BottomNav({
                   </View>
                 ) : null}
               </View>
-              <Text style={[styles.navLabel, isActive && styles.navLabelActive]} numberOfLines={1}>
+              <Text
+                adjustsFontSizeToFit
+                minimumFontScale={0.82}
+                numberOfLines={1}
+                style={[
+                  styles.navLabel,
+                  isCompact && styles.navLabelCompact,
+                  isActive && styles.navLabelActive,
+                ]}
+              >
                 {tab.label}
               </Text>
             </Pressable>
@@ -105,6 +116,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
+  },
+  navWrapCompact: {
+    paddingHorizontal: spacing.sm,
   },
   bottomNav: {
     width: "100%",
@@ -150,6 +164,9 @@ const styles = StyleSheet.create({
     fontFamily: fonts.display,
     fontSize: 11,
     fontWeight: "700",
+  },
+  navLabelCompact: {
+    fontSize: 10,
   },
   navLabelActive: {
     color: colors.paper,

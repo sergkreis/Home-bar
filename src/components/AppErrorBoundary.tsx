@@ -40,7 +40,7 @@ export class AppErrorBoundary extends Component<PropsWithChildren, AppErrorBound
       <View style={styles.screen}>
         <View style={styles.panel}>
           <Text style={styles.eyebrow}>Домашний бар</Text>
-          <Text style={styles.title}>Что-то пошло не так</Text>
+          <Text accessibilityRole="header" style={styles.title}>Что-то пошло не так</Text>
           <Text style={styles.text}>
             Приложение поймало ошибку и не потеряло управление. Перезагрузи экран, чтобы продолжить.
           </Text>

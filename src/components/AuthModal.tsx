@@ -10,6 +10,8 @@ import {
   TextInput,
   View,
 } from "react-native";
+import Eye from "lucide-react-native/dist/cjs/icons/eye";
+import EyeOff from "lucide-react-native/dist/cjs/icons/eye-off";
 
 import { AuthMode } from "../hooks/useAuth";
 import { colors, pressed, radii, spacing } from "../theme";
@@ -76,6 +78,7 @@ export function AuthModal({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [rememberSession, setRememberSession] = useState(true);
   const passwordInputRef = useRef<TextInput>(null);
   const passwordRepeatInputRef = useRef<TextInput>(null);
@@ -96,6 +99,7 @@ export function AuthModal({
     if (!visible) {
       setPassword("");
       setPasswordRepeat("");
+      setIsPasswordVisible(false);
     }
   }, [visible]);
 
@@ -142,7 +146,7 @@ export function AuthModal({
           <View style={styles.dialog}>
             <View style={styles.headerRow}>
               <View style={styles.headerCopy}>
-                <Text style={styles.title}>{getModeTitle(authMode)}</Text>
+                <Text accessibilityRole="header" style={styles.title}>{getModeTitle(authMode)}</Text>
                 <Text style={styles.text}>{getModeText(authMode)}</Text>
               </View>
               <Pressable
@@ -162,6 +166,7 @@ export function AuthModal({
               <View style={styles.modeRow}>
                 <Pressable
                   accessibilityRole="button"
+                  accessibilityState={{ selected: authMode === "sign-in" }}
                   onPress={() => onSetAuthMode("sign-in")}
                   style={({ pressed: isPressed }) => [
                     styles.modeButton,
@@ -180,6 +185,7 @@ export function AuthModal({
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
+                  accessibilityState={{ selected: authMode === "sign-up" }}
                   onPress={() => onSetAuthMode("sign-up")}
                   style={({ pressed: isPressed }) => [
                     styles.modeButton,
@@ -198,6 +204,7 @@ export function AuthModal({
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
+                  accessibilityState={{ selected: authMode === "reset-password" }}
                   onPress={() => onSetAuthMode("reset-password")}
                   style={({ pressed: isPressed }) => [
                     styles.modeButton,
@@ -219,64 +226,96 @@ export function AuthModal({
             ) : null}
 
             {!isUpdatePassword ? (
-              <TextInput
-                autoCapitalize="none"
-                autoComplete="email"
-                inputMode="email"
-                onChangeText={setEmail}
-                onSubmitEditing={() => {
-                  if (isReset) {
-                    submit();
-                    return;
-                  }
+              <View style={styles.field}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  accessibilityLabel="Email"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  inputMode="email"
+                  onChangeText={setEmail}
+                  onSubmitEditing={() => {
+                    if (isReset) {
+                      submit();
+                      return;
+                    }
 
-                  passwordInputRef.current?.focus();
-                }}
-                placeholder="email"
-                placeholderTextColor={colors.textDim}
-                returnKeyType={isReset ? "go" : "next"}
-                style={styles.input}
-                value={email}
-              />
+                    passwordInputRef.current?.focus();
+                  }}
+                  placeholder="name@example.com"
+                  placeholderTextColor={colors.textDim}
+                  returnKeyType={isReset ? "go" : "next"}
+                  style={styles.input}
+                  textContentType="emailAddress"
+                  value={email}
+                />
+              </View>
             ) : null}
 
             {!isReset ? (
-              <TextInput
-                ref={passwordInputRef}
-                autoCapitalize="none"
-                autoComplete={isSignUp ? "new-password" : "password"}
-                onChangeText={setPassword}
-                onSubmitEditing={() => {
-                  if (isSignUp) {
-                    passwordRepeatInputRef.current?.focus();
-                    return;
-                  }
+              <View style={styles.field}>
+                <Text style={styles.label}>{isUpdatePassword ? "Новый пароль" : "Пароль"}</Text>
+                <View style={styles.passwordRow}>
+                  <TextInput
+                    ref={passwordInputRef}
+                    accessibilityLabel={isUpdatePassword ? "Новый пароль" : "Пароль"}
+                    autoCapitalize="none"
+                    autoComplete={isSignUp || isUpdatePassword ? "new-password" : "password"}
+                    onChangeText={setPassword}
+                    onSubmitEditing={() => {
+                      if (isSignUp) {
+                        passwordRepeatInputRef.current?.focus();
+                        return;
+                      }
 
-                  submit();
-                }}
-                placeholder="пароль от 6 символов"
-                placeholderTextColor={colors.textDim}
-                returnKeyType={isSignUp ? "next" : "go"}
-                secureTextEntry
-                style={styles.input}
-                value={password}
-              />
+                      submit();
+                    }}
+                    placeholder="Минимум 6 символов"
+                    placeholderTextColor={colors.textDim}
+                    returnKeyType={isSignUp ? "next" : "go"}
+                    secureTextEntry={!isPasswordVisible}
+                    style={[styles.input, styles.passwordInput]}
+                    textContentType={isSignUp || isUpdatePassword ? "newPassword" : "password"}
+                    value={password}
+                  />
+                  <Pressable
+                    accessibilityLabel={isPasswordVisible ? "Скрыть пароль" : "Показать пароль"}
+                    accessibilityRole="button"
+                    onPress={() => setIsPasswordVisible((current) => !current)}
+                    style={({ pressed: isPressed }) => [
+                      styles.passwordToggle,
+                      isPressed && { opacity: pressed.opacity },
+                    ]}
+                  >
+                    {isPasswordVisible ? (
+                      <EyeOff color={colors.textMuted} size={21} strokeWidth={2.2} />
+                    ) : (
+                      <Eye color={colors.textMuted} size={21} strokeWidth={2.2} />
+                    )}
+                  </Pressable>
+                </View>
+              </View>
             ) : null}
 
             {isSignUp ? (
-              <TextInput
-                ref={passwordRepeatInputRef}
-                autoCapitalize="none"
-                autoComplete="new-password"
-                onChangeText={setPasswordRepeat}
-                onSubmitEditing={submit}
-                placeholder="повтори пароль"
-                placeholderTextColor={colors.textDim}
-                returnKeyType="go"
-                secureTextEntry
-                style={styles.input}
-                value={passwordRepeat}
-              />
+              <View style={styles.field}>
+                <Text style={styles.label}>Повтори пароль</Text>
+                <TextInput
+                  ref={passwordRepeatInputRef}
+                  accessibilityLabel="Повтори пароль"
+                  autoCapitalize="none"
+                  autoComplete="new-password"
+                  onChangeText={setPasswordRepeat}
+                  onSubmitEditing={submit}
+                  placeholder="Тот же пароль ещё раз"
+                  placeholderTextColor={colors.textDim}
+                  returnKeyType="go"
+                  secureTextEntry={!isPasswordVisible}
+                  style={styles.input}
+                  textContentType="newPassword"
+                  value={passwordRepeat}
+                />
+              </View>
             ) : null}
 
             {!isSignUp && !isReset && !isUpdatePassword ? (
@@ -306,13 +345,13 @@ export function AuthModal({
             {isSignUp &&
             passwordRepeat.length > 0 &&
             password !== passwordRepeat ? (
-              <Text style={styles.errorText}>Пароли не совпадают.</Text>
+              <Text accessibilityLiveRegion="polite" style={styles.errorText}>Пароли не совпадают.</Text>
             ) : null}
             {authError ? (
-              <Text style={styles.errorText}>{authError}</Text>
+              <Text accessibilityLiveRegion="polite" style={styles.errorText}>{authError}</Text>
             ) : null}
             {authMessage ? (
-              <Text style={styles.messageText}>{authMessage}</Text>
+              <Text accessibilityLiveRegion="polite" style={styles.messageText}>{authMessage}</Text>
             ) : null}
 
             <Pressable
@@ -446,6 +485,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 15,
+  },
+  field: {
+    gap: 6,
+  },
+  label: {
+    color: colors.textMuted,
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  passwordRow: {
+    position: "relative",
+    justifyContent: "center",
+  },
+  passwordInput: {
+    paddingRight: 56,
+  },
+  passwordToggle: {
+    position: "absolute",
+    right: 1,
+    width: 48,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
   },
   rememberRow: {
     flexDirection: "row",

@@ -35,5 +35,12 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
       },
     },
+    {
+      name: "small-phone",
+      use: {
+        ...devices["Pixel 7"],
+        viewport: { width: 320, height: 568 },
+      },
+    },
   ],
 });
