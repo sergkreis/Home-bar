@@ -173,7 +173,7 @@ Header and bottom navigation are covered at 320 px; auth fields have labels and 
 GitHub Actions is prepared for Node 24, npm ci and pre-deploy unit tests.
 2026-07-10 checks passed: TypeScript, 40 unit tests, Expo Doctor 18/18, web export,
 Playwright UI 13 passed / 2 conditional skips, and Android Expo export.
-No production deploy was performed during this review pass.
+Review fixes were deployed through GitHub Actions on 2026-07-10.
 ```
 
 Перед деплоем обычно прогоняются:

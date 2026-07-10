@@ -9,7 +9,7 @@ Domashniy Bar - phone-oriented Expo / React Native Web / TypeScript прилож
 ## Ревью И Исправления 2026-07-10
 
 ```text
-Проведены code, design и UX review без production deploy.
+Проведены code, design и UX review; исправления задеплоены через GitHub Actions 2026-07-10.
 useSavedBar/useFavorites теперь сериализуют remote save и сохраняют последнее ожидающее локальное состояние.
 Web-навигация поддерживает URL вкладок, /cocktails/:id, direct links, browser Back и popstate.
 Шапка и нижняя навигация адаптированы для 320 px; добавлен Playwright-проект small-phone.
@@ -22,6 +22,7 @@ web export passed (~1.1 MB JS); Playwright 13 passed / 2 conditional skips; Andr
 npm audit production tree всё ещё сообщает 17 проблем Expo 54 toolchain; npm audit fix не предлагает
 совместимого исправления, а --force потребовал бы major Expo upgrade.
 Untracked REVIEW-2026-06-15.md не изменялся и не должен включаться автоматически.
+Deploy runs 29115416260 и 29115813284 завершились успешно; финальный documentation push создаёт следующий run.
 ```
 
 Живой сайт:
