@@ -1,0 +1,5 @@
+[mcp_servers.codebase-memory-mcp]
+command = 'C:\Users\Sergej\AppData\Local\Programs\codebase-memory-mcp\codebase-memory-mcp.exe'
+args = []
+enabled = true
+startup_timeout_sec = 30

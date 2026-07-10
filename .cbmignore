@@ -1,0 +1,25 @@
+# Dependencies and generated build output
+node_modules/
+.expo/
+dist/
+web-build/
+android/
+ios/
+
+# Test and review artifacts
+test-results/
+playwright-report/
+tmp-review/
+tmp-review-new/
+coverage/
+
+# Local runtime files and logs
+.env
+.env*.local
+*.log
+*.tsbuildinfo
+.metro-health-check*
+
+# Binary assets do not add useful symbols to the code graph
+assets/drinks/
+.codebase-memory/
