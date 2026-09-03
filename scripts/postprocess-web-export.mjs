@@ -113,6 +113,41 @@ html = upsertHeadTag(
 html = upsertHeadTag(html, '<link rel="manifest" href="/manifest.json" />', 'rel="manifest"');
 html = upsertHeadTag(html, '<link rel="apple-touch-icon" href="/icon.png" />', 'rel="apple-touch-icon"');
 
+// Optional cookieless Matomo analytics. Only injected when the build environment provides both
+// MATOMO_URL (e.g. https://stats.example.de/) and MATOMO_SITE_ID; local builds stay untracked.
+// Cookieless + anonymized IP (server-side) + Do-Not-Track respected = no consent banner needed.
+const matomoUrl = (process.env.MATOMO_URL ?? "").trim().replace(/\/+$/, "");
+const matomoSiteId = (process.env.MATOMO_SITE_ID ?? "").trim();
+
+if (matomoUrl && /^\d+$/.test(matomoSiteId)) {
+  const matomoSnippet = `<script>
+    var _paq = window._paq = window._paq || [];
+    _paq.push(["disableCookies"]);
+    _paq.push(["setDoNotTrack", true]);
+    _paq.push(["trackPageView"]);
+    _paq.push(["enableLinkTracking"]);
+    (function () {
+      var u = "${matomoUrl}/";
+      _paq.push(["setTrackerUrl", u + "matomo.php"]);
+      _paq.push(["setSiteId", "${matomoSiteId}"]);
+      var d = document, g = d.createElement("script"), s = d.getElementsByTagName("script")[0];
+      g.async = true; g.src = u + "matomo.js"; s.parentNode.insertBefore(g, s);
+      // The app is a single page: report in-app navigation (tabs, /cocktails/:id) as page views.
+      var track = function () {
+        _paq.push(["setCustomUrl", location.pathname + location.search]);
+        _paq.push(["setDocumentTitle", d.title]);
+        _paq.push(["trackPageView"]);
+      };
+      ["pushState", "replaceState"].forEach(function (m) {
+        var orig = history[m];
+        history[m] = function () { var r = orig.apply(this, arguments); setTimeout(track, 0); return r; };
+      });
+      window.addEventListener("popstate", track);
+    })();
+  </script>`;
+  html = upsertHeadTag(html, matomoSnippet, "matomo.js");
+}
+
 await writeFile(indexPath, html, "utf8");
 await writeFile(path.join(distDir, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 await writeFile(path.join(distDir, "sw.js"), staleServiceWorkerCleanup, "utf8");
