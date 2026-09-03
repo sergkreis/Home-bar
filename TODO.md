@@ -26,4 +26,7 @@ npm run test:ui
 6. Добавить hook-level тесты для account-local isolation, no guest merge after sign-in и реальных remote conflict cases. Очередь latest pending save и маршруты уже покрыты unit-тестами.
 7. Оптимизировать drink assets, если реальная мобильная загрузка станет тяжелой.
 8. Разнести `App.tsx` на более мелкие shell/screen/state модули.
-9. Запланировать обновление Expo SDK; оставшиеся 17 npm audit проблем не исправляются совместимо внутри Expo 54.
+9. Expo SDK 54 → 57 сделан в ветке `chore/expo-sdk-upgrade` (2026-09-03): RN 0.86, React 19.2, vitest 4,
+   TypeScript 6, `splash` переехал в плагин `expo-splash-screen`, expo-doctor 21/21, tsc/vitest 55/Playwright 14
+   зелёные. npm audit: 31 → 10 moderate, все оставшиеся — внутри Expo CLI/prebuild (dev-only, upstream).
+   В main мержить только после проверки превью на телефоне.
