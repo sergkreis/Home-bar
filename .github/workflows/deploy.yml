@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VPS_HOST: 212.227.28.224
-      VPS_USER: root
+      VPS_USER: deploy
       VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
       EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
       EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
@@ -53,15 +53,9 @@ jobs:
         run: |
           tar -czf home-bar-dist.tar.gz -C dist .
           scp home-bar-dist.tar.gz "$VPS_USER@$VPS_HOST:/tmp/home-bar-dist.tar.gz"
-          scp deploy/install-static.sh "$VPS_USER@$VPS_HOST:/tmp/install-static.sh"
           scp deploy/nginx-home-bar.conf "$VPS_USER@$VPS_HOST:/tmp/nginx-home-bar.conf"
 
       - name: Install static build
         run: |
-          ssh "$VPS_USER@$VPS_HOST" '
-            set -euo pipefail
-            rm -rf /tmp/home-bar-dist
-            mkdir -p /tmp/home-bar-dist
-            tar -xzf /tmp/home-bar-dist.tar.gz -C /tmp/home-bar-dist
-            bash /tmp/install-static.sh /tmp/home-bar-dist /tmp/nginx-home-bar.conf
-          '
+          # The unprivileged deploy user may run exactly this root-owned script via sudo (see deploy/README.md).
+          ssh "$VPS_USER@$VPS_HOST" 'sudo -n /usr/local/sbin/home-bar-install-static /tmp/home-bar-dist.tar.gz /tmp/nginx-home-bar.conf'

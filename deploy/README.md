@@ -48,16 +48,20 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY
 Current workflow details:
 
 ```text
-Node.js 20 via actions/setup-node@v4
-npm install --no-audit --no-fund
+Node.js 24 via actions/setup-node@v6
+npm ci --no-audit --no-fund
 npx tsc --noEmit
+npm test
 npm run build:web
 tar dist/
-scp archive and deploy scripts to VPS
-run deploy/install-static.sh over SSH
+scp archive + nginx conf to /tmp on the VPS as the unprivileged `deploy` user
+ssh deploy@VPS 'sudo -n /usr/local/sbin/home-bar-install-static /tmp/home-bar-dist.tar.gz /tmp/nginx-home-bar.conf'
 ```
 
-GitHub currently warns that Node.js 20 actions are deprecated. Update the workflow to Node 24 when the installed toolchain is confirmed compatible.
+Since 2026-09-03 the workflow no longer logs in as root. The server-side installer is a root-owned copy of
+`deploy/install-static.sh` at `/usr/local/sbin/home-bar-install-static`; `/etc/sudoers.d/home-bar-deploy`
+lets the `deploy` user run only that script. If you change `deploy/install-static.sh`, a root must reinstall
+the server copy by hand — the workflow does not ship it anymore.
 
 ## Current Production State
 
@@ -179,6 +183,8 @@ The server was left with nginx, certbot, SSH, the kreisphoto.de certificate, `/s
 
 ## Security Notes
 
-The GitHub Actions workflow still connects as `root` over SSH. This works for the small VPS, but the preferred future improvement is a restricted deploy user with narrow sudo permissions for static file install and nginx reload.
+The GitHub Actions workflow connects as the `deploy` user (key comment `github-actions-home-bar-deploy`),
+which can only run `/usr/local/sbin/home-bar-install-static` through sudo. The old root deploy key was removed
+from `/root/.ssh/authorized_keys` on 2026-09-03.
 
 Password SSH was previously left enabled on the VPS. Do not disable it without an explicit separate decision from the user.
