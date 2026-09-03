@@ -8,6 +8,7 @@ import {
 } from "../lib/supabase";
 import {
   AuthCommandResult,
+  deleteCurrentAccount,
   getSessionUser,
   getUnexpectedAuthErrorMessage,
   loadInitialAuthSession,
@@ -29,6 +30,7 @@ type UseAuthResult = {
   authMessage: string | null;
   authMode: AuthMode;
   authUser: User | null;
+  deleteAccount: () => Promise<void>;
   isAuthReady: boolean;
   isAuthLoading: boolean;
   isSupabaseConfigured: boolean;
@@ -181,11 +183,17 @@ export function useAuth(): UseAuthResult {
     await runAuthCommand(signOutCurrentUser);
   };
 
+  const deleteAccount = async () => {
+    shouldPersistSession.current = true;
+    await runAuthCommand(deleteCurrentAccount);
+  };
+
   return {
     authError,
     authMessage,
     authMode,
     authUser,
+    deleteAccount,
     isAuthReady,
     isAuthLoading,
     isSupabaseConfigured,

@@ -64,6 +64,14 @@ function getAuthRedirectUrl() {
   return window.location.origin;
 }
 
+function getAccountDeletionErrorMessage(message: string) {
+  if (message.toLowerCase().includes("no authenticated user")) {
+    return "Сессия истекла. Войди заново и повтори удаление.";
+  }
+
+  return `Не удалось удалить аккаунт: ${message}`;
+}
+
 export function getUnexpectedAuthErrorMessage(error: unknown) {
   if (error instanceof Error && error.message) {
     return error.message;
@@ -180,6 +188,27 @@ export async function updateAccountPassword(
   return error
     ? { error: getAuthErrorMessage(error) }
     : { message: "Пароль обновлен." };
+}
+
+export async function deleteCurrentAccount(): Promise<AuthCommandResult> {
+  if (!supabase) {
+    return {};
+  }
+
+  // supabase.rpc() returns a thenable builder, not a real Promise: wrap it before racing the timeout.
+  const { error } = await withAuthTimeout(
+    Promise.resolve(supabase.rpc("delete_current_user")),
+  );
+
+  if (error) {
+    return { error: getAccountDeletionErrorMessage(error.message) };
+  }
+
+  // The account is gone server-side; drop the now-orphaned session and local copies.
+  await supabase.auth.signOut().catch(() => undefined);
+  await clearPersistedSupabaseSession();
+
+  return { message: "Аккаунт и все его данные удалены." };
 }
 
 export async function signOutCurrentUser(): Promise<AuthCommandResult> {

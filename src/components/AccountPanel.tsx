@@ -15,6 +15,7 @@ type AccountPanelProps = {
   favoritesSyncStatus: SyncStatus;
   isAuthLoading: boolean;
   isSupabaseConfigured: boolean;
+  onDeleteAccount: () => Promise<void>;
   onOpenAuth: () => void;
   onSaveProfile: (profile: SaveUserProfileInput) => Promise<void>;
   onSignOut: () => Promise<void>;
@@ -119,6 +120,7 @@ export function AccountPanel({
   favoritesSyncStatus,
   isAuthLoading,
   isSupabaseConfigured,
+  onDeleteAccount,
   onOpenAuth,
   onSaveProfile,
   onSignOut,
@@ -129,6 +131,7 @@ export function AccountPanel({
 }: AccountPanelProps) {
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [birthDate, setBirthDate] = useState(profile.birthDate);
+  const [isDeleteRequested, setIsDeleteRequested] = useState(false);
   const birthDateError = getBirthDateValidationError(birthDate);
   const canSaveProfile =
     Boolean(authUserEmail) &&
@@ -291,6 +294,60 @@ export function AccountPanel({
           <Text style={styles.secondaryButtonText}>{isAuthLoading ? "Выходим" : "Выйти"}</Text>
         </Pressable>
       </View>
+
+      <View style={styles.dangerZone}>
+        <Text style={styles.dangerTitle}>Удаление аккаунта</Text>
+        <Text style={styles.dangerText}>
+          {isDeleteRequested
+            ? "Аккаунт, сохраненный бар, избранное и профиль будут удалены навсегда. Отменить это нельзя."
+            : "Удаляет аккаунт и все связанные с ним данные без возможности восстановления."}
+        </Text>
+
+        {isDeleteRequested ? (
+          <View style={styles.dangerActions}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isAuthLoading }}
+              disabled={isAuthLoading}
+              onPress={() => {
+                setIsDeleteRequested(false);
+                onDeleteAccount();
+              }}
+              style={({ pressed: isPressed }) => [
+                styles.dangerButton,
+                isAuthLoading && styles.dangerButtonDisabled,
+                isPressed && !isAuthLoading && { opacity: pressed.opacity },
+              ]}
+            >
+              <Text style={styles.dangerButtonText}>
+                {isAuthLoading ? "Удаляем" : "Да, удалить навсегда"}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setIsDeleteRequested(false)}
+              style={({ pressed: isPressed }) => [
+                styles.secondaryButton,
+                isPressed && { opacity: pressed.opacity },
+              ]}
+            >
+              <Text style={styles.secondaryButtonText}>Отмена</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setIsDeleteRequested(true)}
+            style={({ pressed: isPressed }) => [
+              styles.dangerOutlineButton,
+              isPressed && { opacity: pressed.opacity },
+            ]}
+          >
+            <Text style={styles.dangerOutlineButtonText}>Удалить аккаунт</Text>
+          </Pressable>
+        )}
+      </View>
     </View>
   );
 }
@@ -445,6 +502,61 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 13,
     fontWeight: "900",
+  },
+  dangerZone: {
+    borderTopColor: colors.border,
+    borderTopWidth: 1,
+    gap: spacing.xs,
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+  },
+  dangerTitle: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  dangerText: {
+    color: colors.textDim,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  dangerActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  dangerOutlineButton: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    borderColor: colors.danger,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  dangerOutlineButtonText: {
+    color: colors.danger,
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  dangerButton: {
+    alignItems: "center",
+    backgroundColor: colors.dangerBg,
+    borderColor: colors.danger,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  dangerButtonDisabled: {
+    opacity: 0.6,
+  },
+  dangerButtonText: {
+    color: colors.danger,
+    fontSize: 14,
+    fontWeight: "700",
   },
   errorText: {
     color: colors.danger,

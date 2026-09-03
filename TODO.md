@@ -15,6 +15,16 @@ npm run build:web
 npm run test:ui
 ```
 
+## Публикация В Google Play (2026-09-03)
+
+1. Сергею: аккаунт Google Play Developer ($25) и аккаунт Expo для EAS Build.
+2. Сергею: выполнить в Supabase SQL Editor конец `supabase/schema.sql` — функцию `delete_current_user()`;
+   без неё кнопка удаления аккаунта вернёт ошибку.
+3. Сергею: посмотреть регион проекта в Supabase (Settings → General) и сказать — уточним `web/privacy.html`.
+4. Закрытое тестирование Google: ~12 тестировщиков, 14 дней подряд, до продакшена.
+5. Скриншоты, баннер 1024x500, описания для Play Store.
+6. Письма Supabase Auth в спам Gmail — критично для мобильных: без подтверждения почты регистрация не завершается.
+
 ## Ближайшие Задачи
 
 1. QA аккаунтов на реальных телефонах с Supabase env:

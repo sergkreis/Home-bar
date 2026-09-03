@@ -386,3 +386,26 @@ grant execute on function public.upsert_cocktail_catalog(jsonb, jsonb) to authen
 -- insert into public.admin_users (user_id)
 -- select id from auth.users where email = 'sergkreis@gmail.com'
 -- on conflict (user_id) do nothing;
+
+-- Account deletion, required by Google Play and the App Store for apps that offer sign-up.
+-- Runs as the function owner so an authenticated user can remove their own auth.users row;
+-- user_bars/user_favorites/user_profiles disappear through their on delete cascade foreign keys.
+create or replace function public.delete_current_user()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  current_user_id uuid := auth.uid();
+begin
+  if current_user_id is null then
+    raise exception 'No authenticated user';
+  end if;
+
+  delete from auth.users where id = current_user_id;
+end;
+$$;
+
+revoke all on function public.delete_current_user() from public, anon;
+grant execute on function public.delete_current_user() to authenticated;

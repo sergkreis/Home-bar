@@ -153,4 +153,6 @@ await writeFile(path.join(distDir, "manifest.json"), `${JSON.stringify(manifest,
 await writeFile(path.join(distDir, "sw.js"), staleServiceWorkerCleanup, "utf8");
 await writeFile(path.join(distDir, "service-worker.js"), staleServiceWorkerCleanup, "utf8");
 await copyFile(path.resolve("assets/icon.png"), path.join(distDir, "icon.png"));
+// Privacy policy page: required as a public URL by Google Play and the App Store.
+await copyFile(path.resolve("web/privacy.html"), path.join(distDir, "privacy.html"));
 await copyFile(path.resolve("assets/adaptive-icon.png"), path.join(distDir, "adaptive-icon.png"));

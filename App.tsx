@@ -143,6 +143,7 @@ function AppContent() {
     authMessage,
     authMode,
     authUser,
+    deleteAccount,
     isAuthReady,
     isAuthLoading,
     isSupabaseConfigured,
@@ -390,6 +391,7 @@ function AppContent() {
       favoritesSyncStatus={favoritesSyncStatus}
       isAuthLoading={isAuthLoading}
       isSupabaseConfigured={isSupabaseConfigured}
+      onDeleteAccount={deleteAccount}
       onOpenAuth={openAuthModal}
       onSaveProfile={saveProfile}
       onSignOut={signOut}

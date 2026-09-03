@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   resetPasswordForEmail: vi.fn(),
   signInWithPassword: vi.fn(),
   signOut: vi.fn(),
+  rpc: vi.fn(),
   signUp: vi.fn(),
   updateUser: vi.fn(),
 }));
@@ -19,6 +20,7 @@ vi.mock("../lib/supabase", () => ({
   clearTransientSupabaseSessionIfNeeded: mocks.clearTransientSessionIfNeeded,
   markSupabaseSessionTransient: mocks.markTransientSession,
   supabase: {
+    rpc: mocks.rpc,
     auth: {
       getSession: mocks.getSession,
       resetPasswordForEmail: mocks.resetPasswordForEmail,
@@ -31,6 +33,7 @@ vi.mock("../lib/supabase", () => ({
 }));
 
 import {
+  deleteCurrentAccount,
   loadInitialAuthSession,
   sendPasswordReset,
   signInWithEmail,
@@ -114,6 +117,28 @@ describe("authService", () => {
     await expect(updateAccountPassword("new-secret")).resolves.toEqual({
       message: "Пароль обновлен.",
     });
+  });
+
+  it("signs out and clears local data after deleting the account", async () => {
+    mocks.rpc.mockResolvedValue({ error: null });
+    mocks.signOut.mockResolvedValue({ error: null });
+
+    await expect(deleteCurrentAccount()).resolves.toEqual({
+      message: "Аккаунт и все его данные удалены.",
+    });
+    expect(mocks.rpc).toHaveBeenCalledWith("delete_current_user");
+    expect(mocks.signOut).toHaveBeenCalledOnce();
+    expect(mocks.clearPersistedSession).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the session when account deletion fails", async () => {
+    mocks.rpc.mockResolvedValue({ error: { message: "No authenticated user" } });
+
+    await expect(deleteCurrentAccount()).resolves.toEqual({
+      error: "Сессия истекла. Войди заново и повтори удаление.",
+    });
+    expect(mocks.signOut).not.toHaveBeenCalled();
+    expect(mocks.clearPersistedSession).not.toHaveBeenCalled();
   });
 
   it("clears persisted data only after a successful sign-out", async () => {
