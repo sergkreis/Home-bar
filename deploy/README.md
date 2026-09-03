@@ -188,3 +188,28 @@ which can only run `/usr/local/sbin/home-bar-install-static` through sudo. The o
 from `/root/.ssh/authorized_keys` on 2026-09-03.
 
 Password SSH was previously left enabled on the VPS. Do not disable it without an explicit separate decision from the user.
+
+## Мобильные Сборки (EAS)
+
+Профили сборки описаны в `eas.json`:
+
+```text
+development  APK с dev-client для отладки
+preview      internal APK, чтобы разослать тестировщикам ссылкой
+production   AAB для Google Play (versionCode ведёт EAS, appVersionSource=remote)
+```
+
+Перед первой сборкой нужен аккаунт Expo и переменные окружения в EAS
+(`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) — без них
+приложение соберётся в локальном режиме без аккаунтов.
+
+```bash
+npx eas login
+npx eas init            # привязывает проект, дописывает extra.eas.projectId в app.json
+npx eas build --platform android --profile preview      # APK для теста
+npx eas build --platform android --profile production   # AAB для Play
+npx eas submit --platform android --latest              # загрузка в Play Console
+```
+
+Ключ подписи Android генерирует и хранит EAS. Его нельзя терять: без него
+обновить уже опубликованное приложение невозможно.
