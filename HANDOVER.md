@@ -1,10 +1,60 @@
 # Domashniy Bar - Handover
 
-Последнее обновление: 2026-07-10
+Последнее обновление: 2026-09-05
 
 ## Быстрый Контекст
 
 Domashniy Bar - phone-oriented Expo / React Native Web / TypeScript приложение для подбора коктейлей из ингредиентов, которые уже есть дома.
+
+## Состояние 2026-09-05
+
+```text
+Домен: приложение переехало на https://inmybar.app/ (Cloudflare Registrar).
+kreisphoto.de теперь отдаёт только 301 на inmybar.app и зарезервирован под фотографию Юли.
+Причина переезда: домен должен быть языково-нейтральным, впереди перевод на разные языки.
+
+Идентификатор приложения: app.inmybar (Android package и iOS bundle id).
+Переименован из de.kreisphoto.domashniybar.
+
+Expo SDK 54 -> 57, React Native 0.81 -> 0.86, React 19.2.3.
+
+ИСПРАВЛЕНО: падение при запуске на телефоне (коммит a7aa20d).
+React Native определяет глобальный window как ссылку на global, но без location и history.
+Поэтому проверка typeof window === "undefined" в src/utils/appNavigation.ts проходила на Android,
+и window.location.pathname падал на первом же рендере - пользователь видел только экран
+AppErrorBoundary "Что-то пошло не так". Обе функции маршрутизации теперь проверяют наличие самих
+браузерных API, а не только window. Добавлен тест, воспроизводящий окружение React Native.
+ПРАВИЛО НА БУДУЩЕЕ: в общем коде нельзя опираться на window/document/localStorage без проверки
+возможностей во время выполнения - те же исходники уезжают в Android-сборку.
+
+GDPR и магазин:
+- публичная политика конфиденциальности web/privacy.html -> https://inmybar.app/privacy.html
+- удаление аккаунта в приложении через security-definer RPC public.delete_current_user;
+  на сервере проверено сквозным тестом, в интерфейсе (AccountPanel) вживую ещё не нажимали
+- Matomo подключается только если заданы MATOMO_URL и MATOMO_SITE_ID (repo variables),
+  cookies отключены, DoNotTrack соблюдается - см. scripts/postprocess-web-export.mjs
+
+Деплой: GitHub Actions больше не ходит на VPS под root. Подключение под непривилегированным
+пользователем deploy, загружается только tarball и конфиг nginx, привилегированный шаг - одна
+фиксированная команда sudo -n /usr/local/sbin/home-bar-install-static (deploy/install-static.sh).
+
+Android-сборка:
+- EAS проект sergkreiss-team/domashniy-bar, projectId 176f9f21-0e28-4848-9751-e786666f6fe5
+- профили в eas.json: development / preview (APK) / production (app-bundle, autoIncrement)
+- keystore хранится на стороне EAS (Build Credentials tMBjzPfc0I)
+- переменные Supabase лежат в окружениях EAS preview/production, не в репозитории
+- бесплатный план: 15 Android-сборок за цикл, после пересборки 05.09 осталось 13
+- последняя проверенная preview-сборка: 6e7ba9fe-c4b0-49ca-af5c-53836315da64, пакет app.inmybar,
+  подпись v2/v3, 78 МБ
+- expo-updates НЕ установлен, поэтому настройка channel в eas.json пока ни на что не влияет
+
+БЛОКЕР перед Google Play: доставка писем. Resend и DKIM были подтверждены для kreisphoto.de,
+но отправка теперь идёт от inmybar.app - нужно заново подтвердить домен отправителя и добавить
+DMARC. Русского шаблона письма в Supabase тоже ещё нет. Владелец отложил задачу 05.09.
+Далее: аккаунт разработчика за 25 USD, сборка AAB, витрина магазина (скриншоты, баннер 1024x500,
+описания), форма Data Safety, примерно 12 тестировщиков x 14 дней закрытого теста.
+Apple отложен сознательно (99 USD в год).
+```
 
 ## Ревью И Исправления 2026-07-10
 
@@ -76,6 +126,12 @@ Commit/push for this auth QA pass were approved at session close; continue from 
 
 ## Пути И Репозиторий
 
+Рабочий чекаут агентов (основной с 2026-09-05):
+
+```text
+~/Projects/Home-bar на CT110 claude-agent 192.168.1.100
+```
+
 Windows checkout:
 
 ```text
@@ -103,9 +159,9 @@ main
 ## Технологии
 
 ```text
-Expo SDK 54
-React 19
-React Native 0.81
+Expo SDK 57
+React 19.2.3
+React Native 0.86
 React Native Web
 React Native Safe Area Context
 TypeScript strict mode
