@@ -66,7 +66,7 @@ C:\Users\Sergej\Documents\Codex\PROJECTS.md
 
 ```text
 2026-06-28: Android debug/client QA продолжен на реальном Nothing Phone A001T / Android 16.
-Package id: de.kreisphoto.domashniybar.
+Package id: app.inmybar.
 Supabase env добавлены локально в .env без вывода секретов; .env игнорируется git.
 Проверены регистрация, email confirmation и авторизованное состояние после reload.
 Исправлены auth loading timeout/finally, native redirect URL guard, web-only detectSessionInUrl и KeyboardAvoidingView/ScrollView в auth modal.
@@ -184,7 +184,7 @@ Recipe detail with glass, ingredients, steps, garnish
 Shopping suggestions for 1-2 missing ingredients
 Bottom navigation with lucide/react-native-svg icons
 Android safe-area handling through react-native-safe-area-context
-Native Android package id de.kreisphoto.domashniybar
+Native Android package id app.inmybar
 Production dark emerald/gold visual direction
 Generated cocktail database from TheCocktailDB plus curated classics
 Generated cocktail illustrations for every cocktail in the current database

@@ -8,10 +8,10 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "de.kreisphoto.domashniybar"
+      "bundleIdentifier": "app.inmybar"
     },
     "android": {
-      "package": "de.kreisphoto.domashniybar",
+      "package": "app.inmybar",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#020d09"

@@ -67,7 +67,7 @@ npm run web
 npm run android
 ```
 
-Для реального Android-телефона нужны Android SDK, Java из Android Studio, включенная USB-отладка и авторизованный `adb`. Debug APK проверялся на Nothing Phone `A001T` / Android 16 с package id `de.kreisphoto.domashniybar`. Без публичных Supabase env-переменных приложение на телефоне работает в режиме `Локально`: бар и избранное хранятся на устройстве.
+Для реального Android-телефона нужны Android SDK, Java из Android Studio, включенная USB-отладка и авторизованный `adb`. Debug APK проверялся на Nothing Phone `A001T` / Android 16 с package id `app.inmybar`. Без публичных Supabase env-переменных приложение на телефоне работает в режиме `Локально`: бар и избранное хранятся на устройстве.
 
 Собрать статическую web-версию для nginx:
 
