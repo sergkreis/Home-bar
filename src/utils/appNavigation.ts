@@ -55,13 +55,31 @@ export function parseAppPath(pathname: string): AppRoute {
   return { cocktailId: null, tab: "today" };
 }
 
-export function readCurrentAppRoute(): AppRoute {
+// React Native defines a global `window` that has no `location`/`history`,
+// so presence of `window` alone is not enough to treat this as the web build.
+function getBrowserHistoryApis() {
   if (typeof window === "undefined") {
+    return null;
+  }
+
+  const { history, location } = window;
+
+  if (typeof location?.pathname !== "string" || typeof history?.pushState !== "function") {
+    return null;
+  }
+
+  return { history, location };
+}
+
+export function readCurrentAppRoute(): AppRoute {
+  const browser = getBrowserHistoryApis();
+
+  if (!browser) {
     return { cocktailId: null, tab: "today" };
   }
 
-  const route = parseAppPath(window.location.pathname);
-  const historyState = window.history.state as AppHistoryState | null;
+  const route = parseAppPath(browser.location.pathname);
+  const historyState = browser.history.state as AppHistoryState | null;
 
   if (route.cocktailId && historyState?.domashniyBar && historyState.fromTab) {
     return { ...route, tab: historyState.fromTab };
@@ -75,14 +93,16 @@ export function writeAppRoute(
   mode: "push" | "replace",
   state: AppHistoryState = { domashniyBar: true },
 ) {
-  if (typeof window === "undefined") {
+  const browser = getBrowserHistoryApis();
+
+  if (!browser) {
     return;
   }
 
   if (mode === "replace") {
-    window.history.replaceState(state, "", path);
+    browser.history.replaceState(state, "", path);
     return;
   }
 
-  window.history.pushState(state, "", path);
+  browser.history.pushState(state, "", path);
 }

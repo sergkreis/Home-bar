@@ -1,6 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
-import { buildCocktailPath, buildTabPath, parseAppPath } from "./appNavigation";
+import {
+  buildCocktailPath,
+  buildTabPath,
+  parseAppPath,
+  readCurrentAppRoute,
+  writeAppRoute,
+} from "./appNavigation";
 
 describe("app navigation", () => {
   it("maps top-level tabs to stable paths", () => {
@@ -19,5 +25,19 @@ describe("app navigation", () => {
   it("falls back to today for unknown or malformed paths", () => {
     expect(parseAppPath("/unknown")).toEqual({ cocktailId: null, tab: "today" });
     expect(parseAppPath("/cocktails/%E0%A4%A")).toEqual({ cocktailId: null, tab: "today" });
+  });
+});
+
+describe("app navigation on native", () => {
+  afterEach(() => {
+    delete (globalThis as { window?: unknown }).window;
+  });
+
+  it("stays inert when window exists without the browser history apis", () => {
+    // React Native defines a global `window` that aliases global scope.
+    (globalThis as { window?: unknown }).window = globalThis;
+
+    expect(readCurrentAppRoute()).toEqual({ cocktailId: null, tab: "today" });
+    expect(() => writeAppRoute("/bar", "replace")).not.toThrow();
   });
 });
