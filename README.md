@@ -2,7 +2,7 @@
 
 Телефонно-ориентированное веб-приложение на Expo и React Native Web для подбора коктейлей из того, что уже есть дома. Пользователь отмечает ингредиенты домашнего бара, а приложение показывает, что можно смешать сейчас, что почти готово и что выгоднее докупить.
 
-Продакшен: https://kreisphoto.de/
+Продакшен: https://inmybar.app/
 
 ## Возможности
 
@@ -117,7 +117,7 @@ SQL-схема с RLS находится в `supabase/schema.sql`. Ее нужн
 - `user_profiles`;
 - RLS policies для доступа только к своим данным.
 
-Supabase Auth должен иметь корректные production redirect URLs для `https://kreisphoto.de/`. Почтовые письма подтверждения/восстановления настраиваются в Supabase Dashboard; для production-доставляемости нужен внешний SMTP/Resend с проверенными SPF/DKIM/DMARC.
+Supabase Auth должен иметь корректные production redirect URLs для `https://inmybar.app/`. Почтовые письма подтверждения/восстановления настраиваются в Supabase Dashboard; для production-доставляемости нужен внешний SMTP/Resend с проверенными SPF/DKIM/DMARC.
 
 Проверено на реальном Android-телефоне 2026-06-28 с заданными `EXPO_PUBLIC_SUPABASE_URL` и `EXPO_PUBLIC_SUPABASE_ANON_KEY`: регистрация, email confirmation и авторизованное состояние после reload работают. Исправлены зависание кнопки на `Проверяем`, native redirect crash и перекрытие password-полей клавиатурой. В ревью 2026-07-10 дополнительно добавлены видимые подписи полей, переключатели видимости пароля и accessibility-состояния. Письмо подтверждения у Gmail попало в spam, поэтому следующая внешняя задача - проверить SMTP/domain deliverability. Также остается полноценная cross-device QA синхронизации бара, избранного, профиля и восстановления пароля.
 
@@ -161,7 +161,7 @@ Workflow: `.github/workflows/deploy.yml`
 Продакшен:
 
 ```text
-https://kreisphoto.de/
+https://inmybar.app/
 ```
 
 Текущее локально проверенное состояние на 2026-07-10:

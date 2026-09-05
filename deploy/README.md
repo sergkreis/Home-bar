@@ -3,14 +3,14 @@
 Production domain:
 
 ```text
-kreisphoto.de
-www.kreisphoto.de
+inmybar.app
+www.inmybar.app
 ```
 
 Production URL:
 
 ```text
-https://kreisphoto.de/
+https://inmybar.app/
 ```
 
 Target VPS:
@@ -70,7 +70,7 @@ Last verified on 2026-06-21:
 ```text
 Commit: 2013e52 Add stale service worker cleanup
 GitHub Actions run: https://github.com/sergkreis/Home-bar/actions/runs/27912173646
-URL: https://kreisphoto.de/
+URL: https://inmybar.app/
 Production bundle: /_expo/static/js/web/index-0c5e33e03d027db7c1a7c0669165bf84.js
 HTML cache-control: no-cache, no-store, must-revalidate
 /sw.js and /service-worker.js: 200 OK, application/javascript, no-store, Service-Worker-Allowed: /
@@ -122,7 +122,7 @@ Use this only if GitHub Actions is unavailable.
 3. Copy the new static files to `/var/www/home-bar`.
 4. Run `nginx -t`.
 5. Reload nginx.
-6. Check `https://kreisphoto.de/` and `https://www.kreisphoto.de/`.
+6. Check `https://inmybar.app/` and `https://www.inmybar.app/`.
 
 Do not do manual deploys unless GitHub Actions is unavailable or the user explicitly asks for a manual server deploy.
 
@@ -141,8 +141,8 @@ Current web stack from that audit:
 
 ```text
 nginx listens on 80/443
-kreisphoto.de and www.kreisphoto.de point to 212.227.28.224
-Let's Encrypt certificate for kreisphoto.de and www.kreisphoto.de was valid until 2026-07-17 at the audit time
+inmybar.app and www.inmybar.app point to 212.227.28.224
+Let's Encrypt certificate for inmybar.app and www.inmybar.app was valid until 2026-07-17 at the audit time
 ```
 
 Before certificate-sensitive work, re-check the certificate because this date is not a current guarantee.
@@ -179,7 +179,7 @@ igipu.ru certificate files
 v2iplimit leftovers
 ```
 
-The server was left with nginx, certbot, SSH, the kreisphoto.de certificate, `/srv/home-bar`, and `/var/www/home-bar`.
+The server was left with nginx, certbot, SSH, the inmybar.app certificate, `/srv/home-bar`, and `/var/www/home-bar`.
 
 ## Security Notes
 

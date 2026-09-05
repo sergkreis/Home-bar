@@ -28,7 +28,7 @@ Deploy runs 29115416260 и 29115813284 завершились успешно; ф
 Живой сайт:
 
 ```text
-https://kreisphoto.de/
+https://inmybar.app/
 ```
 
 Последний app-content commit с полным набором иллюстраций:
@@ -150,7 +150,7 @@ deploy/                              VPS/nginx deployment scripts and config
 Before the session-close commit, main was aligned with origin/main at 37da852.
 Tracked changes were limited to auth fixes and docs updates.
 Untracked REVIEW-2026-06-15.md remained intentionally uncommitted.
-Production https://kreisphoto.de/ returns 200 OK.
+Production https://inmybar.app/ returns 200 OK.
 Production HTML is no-store and referenced index-ea9bbfa8dda1dc5eb0b5caff36604414.js before the auth push.
 /sw.js and /service-worker.js return cleanup service workers with no-store and Service-Worker-Allowed: /.
 Local 2026-06-28 checks passed: npx tsc --noEmit, npm test, npm run build:web, npm run test:ui.
@@ -236,7 +236,7 @@ VPS:
 Production:
 
 ```text
-Domain/live URL: https://kreisphoto.de/
+Domain/live URL: https://inmybar.app/
 Static web export served by nginx
 Web root: /var/www/home-bar
 Existing Let's Encrypt certificate on server; re-check expiry before certificate-sensitive work
@@ -266,7 +266,7 @@ Stale service worker cleanup was deployed on 2026-06-21.
 GitHub Actions deploy succeeded:
   https://github.com/sergkreis/Home-bar/actions/runs/27912173646
 Production check on 2026-06-21:
-  https://kreisphoto.de/ returned 200 OK.
+  https://inmybar.app/ returned 200 OK.
   Current deployed JS bundle is /_expo/static/js/web/index-0c5e33e03d027db7c1a7c0669165bf84.js.
   /manifest.json, /sw.js, and /service-worker.js are served with no-store cache headers.
   Cleanup service workers unregister themselves and clear stale Cache Storage.
@@ -335,13 +335,13 @@ npm run test:ui:headed
 Run UI tests against production:
 
 ```bash
-$env:PLAYWRIGHT_BASE_URL='https://kreisphoto.de'; npm run test:ui
+$env:PLAYWRIGHT_BASE_URL='https://inmybar.app'; npm run test:ui
 ```
 
 On macOS/Linux:
 
 ```bash
-PLAYWRIGHT_BASE_URL=https://kreisphoto.de npm run test:ui
+PLAYWRIGHT_BASE_URL=https://inmybar.app npm run test:ui
 ```
 
 Regenerate cocktail data:
@@ -356,7 +356,7 @@ Supabase setup:
 1. Create/open Supabase project.
 2. Run supabase/schema.sql in Supabase SQL Editor.
 3. Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY locally and as GitHub Actions secrets.
-4. Configure Auth site URL and redirect URLs for https://kreisphoto.de/.
+4. Configure Auth site URL and redirect URLs for https://inmybar.app/.
 5. Configure custom SMTP/Resend in Supabase Dashboard for production auth emails.
 6. Without env vars the app stays in local-only mode.
 ```
@@ -422,8 +422,8 @@ npx tsc --noEmit
 npm test
 npm run build:web
 npm run test:ui
-PLAYWRIGHT_BASE_URL=https://kreisphoto.de npm run test:ui
-Production HTTP/header checks against https://kreisphoto.de/
+PLAYWRIGHT_BASE_URL=https://inmybar.app npm run test:ui
+Production HTTP/header checks against https://inmybar.app/
 Browser checks in Chrome and Safari on the local Mac
 ```
 
@@ -451,7 +451,7 @@ After continuing on another computer, pull main and run npx tsc --noEmit, npm te
 If production needs verification, check the latest GitHub Actions run created by the 2026-06-28 session-close push.
 If Safari/Chrome look stale again, first verify the production bundle and local first-run state before changing code.
 Expected production first-run path: age gate -> "Собери бар" -> "Стартовый" -> "Подобрать коктейли" -> "Сегодня".
-Deploy only after explicit approval because production is kreisphoto.de.
+Deploy only after explicit approval because production is inmybar.app.
 ```
 
 Last macOS continuity verification on 2026-06-15:
@@ -462,7 +462,7 @@ npm test
 npx tsc --noEmit
 npm run build:web
 npm run test:ui
-PLAYWRIGHT_BASE_URL=https://kreisphoto.de npm run test:ui
+PLAYWRIGHT_BASE_URL=https://inmybar.app npm run test:ui
 npx expo-doctor
 ```
 
@@ -638,7 +638,7 @@ Android auth QA pass on 2026-06-28:
 ## Запрещено
 
 ```text
-Не деплоить to kreisphoto.de без явного разрешения.
+Не деплоить to inmybar.app без явного разрешения.
 Не удалять backup /root/home-bar-cleanup-backups/20260501-131803 без отдельного решения.
 Не обновлять generated data без внимательной проверки diff.
 Не коммитить SSH private keys, .env, API keys, passwords, local logs.
