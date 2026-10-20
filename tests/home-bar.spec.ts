@@ -14,6 +14,23 @@ async function confirmAgeIfShown(page: Page) {
   await confirmAgeButton.click();
 }
 
+test("privacy policy is visible before age confirmation, on guest account, and before login", async ({ page }) => {
+  await page.goto("/");
+  const privacy = page.getByRole("link", { name: /Политика конфиденциальности/ });
+  await expect(page.getByRole("button", { name: "Мне есть 18" })).toBeVisible();
+  await expect(privacy).toBeVisible();
+  await page.getByRole("button", { name: "Мне есть 18" }).click();
+  await page.getByRole("button", { name: "Стартовый" }).click();
+  await page.getByRole("button", { name: "Подобрать коктейли" }).click();
+  await page.getByRole("button", { name: "Открыть настройки аккаунта" }).click();
+  await expect(privacy).toBeVisible();
+  const signIn = page.getByRole("button", { name: "Войти или создать аккаунт" });
+  if (await signIn.isVisible()) {
+    await signIn.click();
+    await expect(page.getByRole("dialog").getByRole("link", { name: /Политика конфиденциальности/ })).toBeVisible();
+  }
+});
+
 test("home page supports the core mobile flow", async ({ page }) => {
   await page.goto("/");
   await confirmAgeIfShown(page);

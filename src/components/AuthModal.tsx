@@ -14,6 +14,7 @@ import Eye from "lucide-react-native/dist/cjs/icons/eye";
 import EyeOff from "lucide-react-native/dist/cjs/icons/eye-off";
 
 import { AuthMode } from "../hooks/useAuth";
+import { PrivacyLink } from "./PrivacyLink";
 import { colors, pressed, radii, spacing } from "../theme";
 
 type AuthModalProps = {
@@ -382,6 +383,7 @@ export function AuthModal({
                         : "Войти"}
               </Text>
             </Pressable>
+            <PrivacyLink />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

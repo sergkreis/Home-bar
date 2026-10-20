@@ -1,4 +1,6 @@
 import { AuthError, Session, User } from "@supabase/supabase-js";
+import { Linking, Platform } from "react-native";
+import { clearAccountCaches } from "./accountCache";
 
 import {
   clearPersistedSupabaseSession,
@@ -54,6 +56,7 @@ function getAuthErrorMessage(error: AuthError) {
 }
 
 function getAuthRedirectUrl() {
+  if (Platform.OS !== "web") return "inmybar://auth/callback";
   if (
     typeof window === "undefined" ||
     typeof window.location?.origin !== "string"
@@ -195,6 +198,8 @@ export async function deleteCurrentAccount(): Promise<AuthCommandResult> {
     return {};
   }
 
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) return { error: "Сессия истекла. Войди заново и повтори удаление." };
   // supabase.rpc() returns a thenable builder, not a real Promise: wrap it before racing the timeout.
   const { error } = await withAuthTimeout(
     Promise.resolve(supabase.rpc("delete_current_user")),
@@ -206,9 +211,17 @@ export async function deleteCurrentAccount(): Promise<AuthCommandResult> {
 
   // The account is gone server-side; drop the now-orphaned session and local copies.
   await supabase.auth.signOut().catch(() => undefined);
-  await clearPersistedSupabaseSession();
+  try {
+    try {
+      await clearPersistedSupabaseSession();
+    } finally {
+      await clearAccountCaches(session.user.id);
+    }
+  } catch {
+    return { error: "Аккаунт удалён на сервере, но данные на устройстве очистить не удалось. Очисти данные приложения в настройках Android." };
+  }
 
-  return { message: "Аккаунт и все его данные удалены." };
+  return { message: "Аккаунт и локальные данные аккаунта удалены." };
 }
 
 export async function signOutCurrentUser(): Promise<AuthCommandResult> {
@@ -216,12 +229,49 @@ export async function signOutCurrentUser(): Promise<AuthCommandResult> {
     return {};
   }
 
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) return { error: "Сессия истекла. Перезапусти приложение." };
   const { error } = await withAuthTimeout(supabase.auth.signOut());
 
   if (error) {
     return { error: error.message };
   }
 
-  await clearPersistedSupabaseSession();
+  try {
+    await clearPersistedSupabaseSession();
+  } finally {
+    await clearAccountCaches(session.user.id);
+  }
   return {};
+}
+
+export async function handleNativeAuthUrl(url: string): Promise<AuthCommandResult> {
+  if (Platform.OS === "web" || !supabase) return {};
+  // Reject unrelated links before inspecting credentials or touching the current session.
+  if (!url.startsWith("inmybar://auth/callback?")) return {};
+  const params = new URL(url).searchParams;
+  const error = params.get("error_description") || params.get("error_code");
+  if (error) return { error: `Ссылка недействительна: ${error}` };
+  const code = params.get("code");
+  if (!code) return { error: "В ссылке нет кода подтверждения. Запроси новое письмо." };
+  const result = await supabase.auth.exchangeCodeForSession(code);
+  return result.error ? { error: `Не удалось подтвердить ссылку: ${result.error.message}` } : {};
+}
+
+export function subscribeNativeAuthUrls(onResult: (result: AuthCommandResult) => void) {
+  if (Platform.OS === "web" || !supabase) return () => undefined;
+  let active = true;
+  let lastUrl: string | null = null;
+  const processUrl = (url: string) => {
+    if (url === lastUrl) return;
+    lastUrl = url;
+    handleNativeAuthUrl(url).then((result) => {
+      if (active) onResult(result);
+    }).catch(() => {
+      if (active) onResult({ error: "Не удалось обработать ссылку. Запроси новое письмо." });
+    });
+  };
+  const subscription = Linking.addEventListener("url", ({ url }) => processUrl(url));
+  Linking.getInitialURL().then((url) => { if (url && active) processUrl(url); }).catch(() => undefined);
+  return () => { active = false; subscription.remove(); };
 }

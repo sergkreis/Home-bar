@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { SaveUserProfileInput, UserProfile } from "../services/userProfileService";
 import { colors, pressed, radii, spacing } from "../theme";
+import { PrivacyLink } from "./PrivacyLink";
 
 type SyncStatus = "local" | "remote" | "syncing" | "error";
 type ProfileSyncStatus = "idle" | "loading" | "saving" | "saved" | "error";
@@ -167,6 +168,7 @@ export function AccountPanel({
           </View>
           <Text style={styles.localBadge}>Локально</Text>
         </View>
+        <PrivacyLink />
       </View>
     );
   }
@@ -194,6 +196,7 @@ export function AccountPanel({
         >
           <Text style={styles.primaryButtonText}>Войти или создать аккаунт</Text>
         </Pressable>
+        <PrivacyLink />
       </View>
     );
   }
@@ -348,6 +351,7 @@ export function AccountPanel({
           </Pressable>
         )}
       </View>
+      <PrivacyLink />
     </View>
   );
 }

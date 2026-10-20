@@ -3,6 +3,7 @@ import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useStat
 
 import { Ingredient } from "../data/cocktails";
 import { loadRemoteUserBar, saveRemoteUserBar } from "../services/userBarService";
+import { writeAccountCache } from "../services/accountCache";
 import {
   getScopedStorageKey,
   resolveAuthoritativeRemoteIds,
@@ -118,7 +119,7 @@ export function useSavedBar(
     }
 
     saveTimer.current = setTimeout(() => {
-      AsyncStorage.setItem(storageKey, JSON.stringify(selectedIngredients)).catch(
+      writeAccountCache(SAVED_BAR_STORAGE_KEY, userId, JSON.stringify(selectedIngredients)).catch(
         (error) => {
           console.warn("Failed to save home bar.", error);
         },
@@ -130,7 +131,7 @@ export function useSavedBar(
         clearTimeout(saveTimer.current);
       }
     };
-  }, [hasLoadedSavedBar, isAuthReady, selectedIngredients, storageKey]);
+  }, [hasLoadedSavedBar, isAuthReady, selectedIngredients, storageKey, userId]);
 
   useEffect(() => {
     if (

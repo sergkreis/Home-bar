@@ -1,5 +1,6 @@
 import { User } from "@supabase/supabase-js";
 import { useEffect, useRef, useState } from "react";
+import { activateAccountCache } from "../services/accountCache";
 
 import {
   isSupabaseConfigured,
@@ -12,6 +13,7 @@ import {
   getSessionUser,
   getUnexpectedAuthErrorMessage,
   loadInitialAuthSession,
+  subscribeNativeAuthUrls,
   sendPasswordReset,
   signInWithEmail,
   signOutCurrentUser,
@@ -72,6 +74,7 @@ export function useAuth(): UseAuthResult {
         setAuthError(error);
       }
 
+      activateAccountCache(user?.id);
       setAuthUser(user);
       setIsAuthReady(true);
     }
@@ -85,6 +88,9 @@ export function useAuth(): UseAuthResult {
     });
 
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+        activateAccountCache(session?.user.id);
+      }
       setAuthUser(getSessionUser(session));
       setIsAuthReady(true);
 
@@ -105,6 +111,11 @@ export function useAuth(): UseAuthResult {
       data.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => subscribeNativeAuthUrls((result) => {
+    if (result.error) setAuthError(result.error);
+    if (result.message) setAuthMessage(result.message);
+  }), []);
 
   const setAuthMode = (mode: AuthMode) => {
     setAuthModeState(mode);

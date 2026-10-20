@@ -5,6 +5,7 @@ import {
   loadRemoteUserFavorites,
   saveRemoteUserFavorites,
 } from "../services/userFavoritesService";
+import { writeAccountCache } from "../services/accountCache";
 import {
   getScopedStorageKey,
   resolveAuthoritativeRemoteIds,
@@ -99,10 +100,10 @@ export function useFavorites(
   useEffect(() => {
     if (!isAuthReady || !hasLoadedFavorites) return;
 
-    AsyncStorage.setItem(storageKey, JSON.stringify(favorites)).catch((error) => {
+    writeAccountCache(STORAGE_KEY, userId, JSON.stringify(favorites)).catch((error) => {
       console.warn("Failed to save favorites.", error);
     });
-  }, [favorites, hasLoadedFavorites, isAuthReady, storageKey]);
+  }, [favorites, hasLoadedFavorites, isAuthReady, storageKey, userId]);
 
   useEffect(() => {
     if (
