@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
   loadRemoteUserProfile,
@@ -37,6 +37,17 @@ export function useUserProfile(userId?: string, isAuthReady = true): UseUserProf
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profileMessage, setProfileMessage] = useState<string | null>(null);
   const [profileSyncStatus, setProfileSyncStatus] = useState<ProfileSyncStatus>("idle");
+
+  const lifetimeGenerationRef = useRef(0);
+
+  useLayoutEffect(() => {
+    // Invalidate at commit, before async continuations or passive effects can run.
+    // A later session can have the same user id.
+    lifetimeGenerationRef.current += 1;
+    return () => {
+      lifetimeGenerationRef.current += 1;
+    };
+  }, [isAuthReady, userId]);
 
   useEffect(() => {
     if (!isAuthReady) {
@@ -110,6 +121,7 @@ export function useUserProfile(userId?: string, isAuthReady = true): UseUserProf
         return;
       }
 
+      const generation = lifetimeGenerationRef.current;
       const normalizedProfile = normalizeProfile(nextProfile);
 
       setProfileError(null);
@@ -118,6 +130,7 @@ export function useUserProfile(userId?: string, isAuthReady = true): UseUserProf
 
       try {
         const savedProfile = await saveRemoteUserProfile(userId, normalizedProfile);
+        if (lifetimeGenerationRef.current !== generation) return;
         setProfile(savedProfile ?? {
           ...normalizedProfile,
           updatedAt: new Date().toISOString(),
@@ -125,6 +138,7 @@ export function useUserProfile(userId?: string, isAuthReady = true): UseUserProf
         setProfileMessage("Профиль сохранен.");
         setProfileSyncStatus("saved");
       } catch (error) {
+        if (lifetimeGenerationRef.current !== generation) return;
         console.warn("Failed to save user profile.", error);
         setProfileError("Не удалось сохранить профиль. Проверь SQL-схему Supabase.");
         setProfileSyncStatus("error");

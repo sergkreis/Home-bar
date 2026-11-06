@@ -261,13 +261,16 @@ export async function handleNativeAuthUrl(url: string): Promise<AuthCommandResul
 export function subscribeNativeAuthUrls(onResult: (result: AuthCommandResult) => void) {
   if (Platform.OS === "web" || !supabase) return () => undefined;
   let active = true;
-  let lastUrl: string | null = null;
+  // Retain pending and successful URLs; failed attempts may be retried.
+  const handledUrls = new Set<string>();
   const processUrl = (url: string) => {
-    if (url === lastUrl) return;
-    lastUrl = url;
+    if (!active || handledUrls.has(url)) return;
+    handledUrls.add(url);
     handleNativeAuthUrl(url).then((result) => {
+      if (result.error) handledUrls.delete(url);
       if (active) onResult(result);
     }).catch(() => {
+      handledUrls.delete(url);
       if (active) onResult({ error: "Не удалось обработать ссылку. Запроси новое письмо." });
     });
   };

@@ -88,7 +88,11 @@ export function useAuth(): UseAuthResult {
     });
 
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+      if (
+        event === "SIGNED_IN" ||
+        event === "INITIAL_SESSION" ||
+        event === "PASSWORD_RECOVERY"
+      ) {
         activateAccountCache(session?.user.id);
       }
       setAuthUser(getSessionUser(session));

@@ -58,6 +58,7 @@ export function useFavorites(
       remoteSaveQueueRef.current?.dispose();
       remoteSaveQueueRef.current = null;
       loadedStorageKeyRef.current = null;
+      setFavorites([]);
       setHasLoadedFavorites(false);
       setHasMergedRemoteFavorites(false);
       setFavoritesSyncError(null);
@@ -98,7 +99,7 @@ export function useFavorites(
   }, [isAuthReady, knownIds, storageKey]);
 
   useEffect(() => {
-    if (!isAuthReady || !hasLoadedFavorites) return;
+    if (!isAuthReady || !hasLoadedFavorites || loadedStorageKeyRef.current !== storageKey) return;
 
     writeAccountCache(STORAGE_KEY, userId, JSON.stringify(favorites)).catch((error) => {
       console.warn("Failed to save favorites.", error);

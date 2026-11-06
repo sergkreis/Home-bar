@@ -63,6 +63,8 @@ export function useSavedBar(
       remoteSaveQueueRef.current?.dispose();
       remoteSaveQueueRef.current = null;
       loadedStorageKeyRef.current = null;
+      setSelectedIngredients([]);
+      setHasSavedBar(false);
       setHasLoadedSavedBar(false);
       setHasMergedRemoteBar(false);
       setSyncError(null);

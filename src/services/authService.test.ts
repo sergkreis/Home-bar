@@ -2,6 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   clearAccountCaches: vi.fn(),
+  addEventListener: vi.fn(),
+  getInitialURL: vi.fn(),
+  removeUrlListener: vi.fn(),
   exchangeCodeForSession: vi.fn(),
   clearPersistedSession: vi.fn(),
   clearTransientMarker: vi.fn(),
@@ -16,7 +19,7 @@ const mocks = vi.hoisted(() => ({
   updateUser: vi.fn(),
 }));
 
-vi.mock("react-native", () => ({ Platform: { OS: "android" }, Linking: { addEventListener: vi.fn(), getInitialURL: vi.fn() } }));
+vi.mock("react-native", () => ({ Platform: { OS: "android" }, Linking: { addEventListener: mocks.addEventListener, getInitialURL: mocks.getInitialURL } }));
 vi.mock("./accountCache", () => ({ clearAccountCaches: mocks.clearAccountCaches }));
 vi.mock("../lib/supabase", () => ({
   clearPersistedSupabaseSession: mocks.clearPersistedSession,
@@ -40,6 +43,7 @@ vi.mock("../lib/supabase", () => ({
 import {
   deleteCurrentAccount,
   handleNativeAuthUrl,
+  subscribeNativeAuthUrls,
   loadInitialAuthSession,
   sendPasswordReset,
   signInWithEmail,
@@ -180,4 +184,155 @@ describe("authService", () => {
     expect(mocks.exchangeCodeForSession).toHaveBeenCalledExactlyOnceWith("once");
     await expect(handleNativeAuthUrl("inmybar://auth/callback?error_code=access_denied")).resolves.toEqual({ error: "Ссылка недействительна: access_denied" });
   });
+});
+
+
+describe("native auth URL subscription", () => {
+  const callbackUrl = "inmybar://auth/callback?code=retry";
+
+  function emitUrl(url = callbackUrl) {
+    const listener = mocks.addEventListener.mock.calls[0][1] as (event: { url: string }) => void;
+    listener({ url });
+  }
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mocks.getInitialURL.mockResolvedValue(null);
+    mocks.addEventListener.mockReturnValue({ remove: mocks.removeUrlListener });
+    mocks.exchangeCodeForSession.mockResolvedValue({ error: null });
+  });
+
+  it.each(["rejection", "error result"])("allows the same callback to retry after an exchange %s", async (failure) => {
+    mocks.getInitialURL.mockResolvedValue(callbackUrl);
+    if (failure === "rejection") {
+      mocks.exchangeCodeForSession.mockRejectedValueOnce(new Error("offline"));
+    } else {
+      mocks.exchangeCodeForSession.mockResolvedValueOnce({ error: { message: "offline" } });
+    }
+    const onResult = vi.fn();
+    const unsubscribe = subscribeNativeAuthUrls(onResult);
+    try {
+      await vi.waitFor(() => expect(onResult).toHaveBeenCalledWith({
+        error: failure === "rejection"
+          ? "Не удалось обработать ссылку. Запроси новое письмо."
+          : "Не удалось подтвердить ссылку: offline",
+      }));
+      emitUrl();
+      await vi.waitFor(() => expect(onResult).toHaveBeenLastCalledWith({}));
+      expect(mocks.exchangeCodeForSession).toHaveBeenCalledTimes(2);
+      expect(mocks.exchangeCodeForSession).toHaveBeenLastCalledWith("retry");
+    } finally {
+      unsubscribe();
+    }
+  });
+
+  it("deduplicates an in-flight URL even when another callback arrives", async () => {
+    let finish!: (result: { error: null }) => void;
+    mocks.exchangeCodeForSession.mockReturnValueOnce(new Promise((resolve) => { finish = resolve; }));
+    const onResult = vi.fn();
+    const unsubscribe = subscribeNativeAuthUrls(onResult);
+    try {
+      expect(mocks.addEventListener).toHaveBeenCalledWith("url", expect.any(Function));
+      emitUrl();
+      emitUrl("inmybar://auth/callback?code=other");
+      emitUrl();
+      expect(mocks.exchangeCodeForSession).toHaveBeenCalledTimes(2);
+      finish({ error: null });
+      await vi.waitFor(() => expect(onResult).toHaveBeenCalledTimes(2));
+    } finally {
+      finish({ error: null });
+      unsubscribe();
+    }
+  });
+
+
+  it("keeps completed successes deduplicated across cold and warm callbacks", async () => {
+    mocks.getInitialURL.mockResolvedValue(callbackUrl);
+    const onResult = vi.fn();
+    const unsubscribe = subscribeNativeAuthUrls(onResult);
+    try {
+      await vi.waitFor(() => expect(onResult).toHaveBeenCalledOnce());
+      emitUrl();
+      emitUrl("inmybar://auth/callback?code=other");
+      await vi.waitFor(() => expect(onResult).toHaveBeenCalledTimes(2));
+      emitUrl();
+      expect(mocks.exchangeCodeForSession).toHaveBeenCalledTimes(2);
+    } finally {
+      unsubscribe();
+    }
+  });
+
+  it.each(["rejection", "error result"])("an older %s does not release a newer pending callback", async (failure) => {
+    let rejectOlder!: (reason: Error) => void;
+    let finishOlder!: (result: { error: { message: string } }) => void;
+    let finishNewer!: (result: { error: null }) => void;
+    mocks.exchangeCodeForSession
+      .mockReturnValueOnce(new Promise((resolve, reject) => {
+        finishOlder = resolve; rejectOlder = reject;
+      }))
+      .mockReturnValueOnce(new Promise((resolve) => { finishNewer = resolve; }));
+    const onResult = vi.fn();
+    const unsubscribe = subscribeNativeAuthUrls(onResult);
+    try {
+      emitUrl();
+      emitUrl("inmybar://auth/callback?code=newer");
+      if (failure === "rejection") rejectOlder(new Error("offline"));
+      else finishOlder({ error: { message: "offline" } });
+      await vi.waitFor(() => expect(onResult).toHaveBeenCalledOnce());
+      emitUrl("inmybar://auth/callback?code=newer");
+      expect(mocks.exchangeCodeForSession).toHaveBeenCalledTimes(2);
+      emitUrl();
+      expect(mocks.exchangeCodeForSession).toHaveBeenCalledTimes(3);
+      finishNewer({ error: null });
+      await vi.waitFor(() => expect(onResult).toHaveBeenCalledTimes(3));
+      emitUrl("inmybar://auth/callback?code=newer");
+      emitUrl();
+      expect(mocks.exchangeCodeForSession).toHaveBeenCalledTimes(3);
+    } finally {
+      finishNewer({ error: null });
+      unsubscribe();
+    }
+  });
+
+  it("ignores a queued native URL event after unsubscribe", () => {
+    const onResult = vi.fn();
+    const unsubscribe = subscribeNativeAuthUrls(onResult);
+    unsubscribe();
+    expect(mocks.removeUrlListener).toHaveBeenCalledOnce();
+    emitUrl();
+    expect(mocks.exchangeCodeForSession).not.toHaveBeenCalled();
+    expect(onResult).not.toHaveBeenCalled();
+  });
+
+
+  it("ignores a late initial URL after unsubscribe", async () => {
+    let finishInitialUrl!: (url: string) => void;
+    mocks.getInitialURL.mockReturnValueOnce(new Promise((resolve) => { finishInitialUrl = resolve; }));
+    const onResult = vi.fn();
+    const unsubscribe = subscribeNativeAuthUrls(onResult);
+    expect(mocks.getInitialURL).toHaveBeenCalledOnce();
+    unsubscribe();
+    finishInitialUrl(callbackUrl);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(mocks.exchangeCodeForSession).not.toHaveBeenCalled();
+    expect(onResult).not.toHaveBeenCalled();
+  });
+
+  it.each(["success", "error result", "rejection"])("does not deliver a late exchange %s after unsubscribe", async (outcome) => {
+    let finish!: (result: { error: null | { message: string } }) => void;
+    let reject!: (reason: Error) => void;
+    mocks.exchangeCodeForSession.mockReturnValueOnce(new Promise((resolve, rejectPromise) => {
+      finish = resolve; reject = rejectPromise;
+    }));
+    const onResult = vi.fn();
+    const unsubscribe = subscribeNativeAuthUrls(onResult);
+    emitUrl();
+    expect(mocks.exchangeCodeForSession).toHaveBeenCalledOnce();
+    unsubscribe();
+    if (outcome === "rejection") reject(new Error("offline"));
+    else finish({ error: outcome === "success" ? null : { message: "offline" } });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(onResult).not.toHaveBeenCalled();
+  });
+
 });
