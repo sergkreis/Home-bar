@@ -36,7 +36,14 @@ export function useFavorites(
   const storageKey = useMemo(() => getScopedStorageKey(STORAGE_KEY, userId), [userId]);
   const knownIds = useMemo(() => new Set(knownCocktailIds), [knownCocktailIds]);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [hasLoadedFavorites, setHasLoadedFavorites] = useState(false);
+  // A completed cache load is a new generation, even when React batches the
+  // reset and completion. A boolean can stay true and skip remote hydration.
+  const [loadedScope, setLoadedScope] = useState<{
+    storageKey: string;
+    knownIds: Set<string>;
+  } | null>(null);
+  const hasLoadedFavorites = loadedScope?.storageKey === storageKey
+    && loadedScope.knownIds === knownIds;
   const [hasMergedRemoteFavorites, setHasMergedRemoteFavorites] = useState(false);
   const [isSyncingFavorites, setIsSyncingFavorites] = useState(false);
   const [favoritesSyncError, setFavoritesSyncError] = useState<string | null>(null);
@@ -59,7 +66,7 @@ export function useFavorites(
       remoteSaveQueueRef.current = null;
       loadedStorageKeyRef.current = null;
       setFavorites([]);
-      setHasLoadedFavorites(false);
+      setLoadedScope(null);
       setHasMergedRemoteFavorites(false);
       setFavoritesSyncError(null);
       remoteUpdatedAtRef.current = null;
@@ -87,7 +94,7 @@ export function useFavorites(
       } finally {
         if (isMounted) {
           loadedStorageKeyRef.current = storageKey;
-          setHasLoadedFavorites(true);
+          setLoadedScope({ storageKey, knownIds });
         }
       }
     }
@@ -206,7 +213,7 @@ export function useFavorites(
       remoteSaveQueueRef.current?.dispose();
       remoteSaveQueueRef.current = null;
     };
-  }, [hasLoadedFavorites, isAuthReady, knownIds, storageKey, userId]);
+  }, [hasLoadedFavorites, loadedScope, isAuthReady, knownIds, storageKey, userId]);
 
   useEffect(() => {
     if (!isAuthReady || !hasLoadedFavorites || !userId || !hasMergedRemoteFavorites) {
@@ -248,13 +255,13 @@ export function useFavorites(
     );
   }, []);
 
-  const favoritesSyncStatus: SyncStatus = favoritesSyncError
-    ? "error"
-    : isSyncingFavorites
-      ? "syncing"
-      : userId
-        ? "remote"
-        : "local";
+  const favoritesSyncStatus: SyncStatus = !userId
+    ? "local"
+    : favoritesSyncError
+      ? "error"
+      : !isAuthReady || !hasLoadedFavorites || !hasMergedRemoteFavorites || isSyncingFavorites
+        ? "syncing"
+        : "remote";
 
   return {
     hasLoadedFavorites,

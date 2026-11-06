@@ -35,7 +35,12 @@ export function useSavedBar(
     [userId],
   );
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const [hasLoadedSavedBar, setHasLoadedSavedBar] = useState(false);
+  // A completed cache load is a new generation, even when React batches the
+  // reset and completion. A boolean can stay true and skip remote hydration.
+  const [loadedScope, setLoadedScope] = useState<{
+    storageKey: string;
+    knownIds: Set<string>;
+  } | null>(null);
   const [hasSavedBar, setHasSavedBar] = useState(false);
   const [hasMergedRemoteBar, setHasMergedRemoteBar] = useState(false);
   const [isSyncingBar, setIsSyncingBar] = useState(false);
@@ -44,6 +49,8 @@ export function useSavedBar(
     () => new Set(ingredients.map((ingredient) => ingredient.id)),
     [ingredients],
   );
+  const hasLoadedSavedBar = loadedScope?.storageKey === storageKey
+    && loadedScope.knownIds === knownIngredientIds;
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeUserIdRef = useRef(userId);
   const loadedStorageKeyRef = useRef<string | null>(null);
@@ -65,7 +72,7 @@ export function useSavedBar(
       loadedStorageKeyRef.current = null;
       setSelectedIngredients([]);
       setHasSavedBar(false);
-      setHasLoadedSavedBar(false);
+      setLoadedScope(null);
       setHasMergedRemoteBar(false);
       setSyncError(null);
       remoteUpdatedAtRef.current = null;
@@ -99,7 +106,7 @@ export function useSavedBar(
       } finally {
         if (isMounted) {
           loadedStorageKeyRef.current = storageKey;
-          setHasLoadedSavedBar(true);
+          setLoadedScope({ storageKey, knownIds: knownIngredientIds });
         }
       }
     }
@@ -239,6 +246,7 @@ export function useSavedBar(
     };
   }, [
     hasLoadedSavedBar,
+    loadedScope,
     isAuthReady,
     knownIngredientIds,
     storageKey,
@@ -272,7 +280,13 @@ export function useSavedBar(
     userId,
   ]);
 
-  const syncStatus = syncError ? "error" : isSyncingBar ? "syncing" : userId ? "remote" : "local";
+  const syncStatus = !userId
+    ? "local"
+    : syncError
+      ? "error"
+      : !isAuthReady || !hasLoadedSavedBar || !hasMergedRemoteBar || isSyncingBar
+        ? "syncing"
+        : "remote";
 
   return {
     hasLoadedSavedBar,
