@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import ShieldCheck from "lucide-react-native/dist/cjs/icons/shield-check";
+import { PrivacyLink } from "../components/PrivacyLink";
 
 import { colors, fonts, pressed, radii, spacing } from "../theme";
 
@@ -29,6 +30,7 @@ export function AgeGateScreen({ onConfirm }: AgeGateScreenProps) {
         >
           <Text style={styles.buttonText}>Мне есть 18</Text>
         </Pressable>
+        <PrivacyLink />
       </View>
     </View>
   );

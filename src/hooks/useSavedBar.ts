@@ -3,6 +3,7 @@ import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useStat
 
 import { Ingredient } from "../data/cocktails";
 import { loadRemoteUserBar, saveRemoteUserBar } from "../services/userBarService";
+import { writeAccountCache } from "../services/accountCache";
 import {
   getScopedStorageKey,
   resolveAuthoritativeRemoteIds,
@@ -34,7 +35,12 @@ export function useSavedBar(
     [userId],
   );
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const [hasLoadedSavedBar, setHasLoadedSavedBar] = useState(false);
+  // A completed cache load is a new generation, even when React batches the
+  // reset and completion. A boolean can stay true and skip remote hydration.
+  const [loadedScope, setLoadedScope] = useState<{
+    storageKey: string;
+    knownIds: Set<string>;
+  } | null>(null);
   const [hasSavedBar, setHasSavedBar] = useState(false);
   const [hasMergedRemoteBar, setHasMergedRemoteBar] = useState(false);
   const [isSyncingBar, setIsSyncingBar] = useState(false);
@@ -43,6 +49,8 @@ export function useSavedBar(
     () => new Set(ingredients.map((ingredient) => ingredient.id)),
     [ingredients],
   );
+  const hasLoadedSavedBar = loadedScope?.storageKey === storageKey
+    && loadedScope.knownIds === knownIngredientIds;
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeUserIdRef = useRef(userId);
   const loadedStorageKeyRef = useRef<string | null>(null);
@@ -62,7 +70,9 @@ export function useSavedBar(
       remoteSaveQueueRef.current?.dispose();
       remoteSaveQueueRef.current = null;
       loadedStorageKeyRef.current = null;
-      setHasLoadedSavedBar(false);
+      setSelectedIngredients([]);
+      setHasSavedBar(false);
+      setLoadedScope(null);
       setHasMergedRemoteBar(false);
       setSyncError(null);
       remoteUpdatedAtRef.current = null;
@@ -96,7 +106,7 @@ export function useSavedBar(
       } finally {
         if (isMounted) {
           loadedStorageKeyRef.current = storageKey;
-          setHasLoadedSavedBar(true);
+          setLoadedScope({ storageKey, knownIds: knownIngredientIds });
         }
       }
     }
@@ -118,7 +128,7 @@ export function useSavedBar(
     }
 
     saveTimer.current = setTimeout(() => {
-      AsyncStorage.setItem(storageKey, JSON.stringify(selectedIngredients)).catch(
+      writeAccountCache(SAVED_BAR_STORAGE_KEY, userId, JSON.stringify(selectedIngredients)).catch(
         (error) => {
           console.warn("Failed to save home bar.", error);
         },
@@ -130,7 +140,7 @@ export function useSavedBar(
         clearTimeout(saveTimer.current);
       }
     };
-  }, [hasLoadedSavedBar, isAuthReady, selectedIngredients, storageKey]);
+  }, [hasLoadedSavedBar, isAuthReady, selectedIngredients, storageKey, userId]);
 
   useEffect(() => {
     if (
@@ -236,6 +246,7 @@ export function useSavedBar(
     };
   }, [
     hasLoadedSavedBar,
+    loadedScope,
     isAuthReady,
     knownIngredientIds,
     storageKey,
@@ -269,7 +280,13 @@ export function useSavedBar(
     userId,
   ]);
 
-  const syncStatus = syncError ? "error" : isSyncingBar ? "syncing" : userId ? "remote" : "local";
+  const syncStatus = !userId
+    ? "local"
+    : syncError
+      ? "error"
+      : !isAuthReady || !hasLoadedSavedBar || !hasMergedRemoteBar || isSyncingBar
+        ? "syncing"
+        : "remote";
 
   return {
     hasLoadedSavedBar,
